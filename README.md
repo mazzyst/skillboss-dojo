@@ -145,6 +145,30 @@ Every kata follows the same discipline:
 Want to write one? Read [CONTRIBUTING.md](CONTRIBUTING.md) — every
 submission gets the same human review as our generated content.
 
+## The Ship Check 10
+
+[`skills/skillboss-devops-check/SKILL.md`](skills/skillboss-devops-check/SKILL.md)
+is a pre-ship hygiene review you install into **your own agent** — Claude
+Code, Cursor, Copilot, or anything that reads markdown instructions. Your
+agent does the looking; the skill supplies the judgment: ten checks
+(secrets, env hygiene, auth coverage, database exposure, backups, health,
+error monitoring, rate limiting, dependencies, cost guardrails), each
+anchored to a documented breach class, each ending in an honest verdict —
+including "can't verify" when the evidence isn't in your repo.
+
+**Install:**
+
+- **Claude Code** — copy the folder into your repo:
+  `cp -r skills/skillboss-devops-check <your-repo>/.claude/skills/`, then
+  ask Claude to "run the ship check".
+- **Cursor / Copilot / other** — paste `SKILL.md` into your rules or
+  instructions file (e.g. `.cursor/rules/`), then ask your agent to run
+  the Ship Check 10 against the repo.
+
+**Its limits, honestly:** it is a heuristic review by your own agent — not
+an audit, not a pentest, not a guarantee, and it certifies nothing about
+your app.
+
 ## Try it without an account
 
 The product has a free demo at
