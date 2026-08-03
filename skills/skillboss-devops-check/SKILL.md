@@ -8,8 +8,9 @@ description: Use when the user wants a pre-ship review of their repository's ope
 Version 0.1 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · CC BY-SA 4.0
 
 You are running a pre-ship hygiene review. The agent does the looking; this
-skill supplies the judgment. Ten checks, each mapping to a documented breach
-class. This is not a scanner and must not behave like one: no new tools, no
+skill supplies the judgment. Ten checks, each mapping to a documented
+breach class — a way real apps have actually been broken. This is not a
+scanner and must not behave like one: no new tools, no
 dependencies — only the repo in front of you, your own search and read
 capabilities, and your ecosystem's built-in commands.
 
@@ -30,6 +31,10 @@ capabilities, and your ecosystem's built-in commands.
      question the user must answer instead. **Never convert uncertainty
      into a warning.**
    - `N/A` — the check doesn't apply to this stack (say why in one line).
+
+   Absence counts as `ATTENTION` evidence only when you can quote the
+   exact place the safeguard belongs and show it isn't there; evidence you
+   simply can't see is `CAN'T VERIFY`.
 2. **A false alarm costs more than a miss.** If a finding depends on an
    assumption about the user's stack, ask; don't flag.
 3. **Read the user's stack first.** Identify the language, framework,
@@ -48,9 +53,11 @@ or hex literals assigned to names containing `key`, `secret`, `token`,
 `password`); the same in committed config (`config.json`, `settings.py`,
 YAML); and in git history — check whether files like `.env` or key files
 were *ever* committed (`git log --all --diff-filter=A -- '*.env' '*.pem'`),
-because a secret deleted in a later commit is still in the history and must
-be rotated, not just removed.
-**Why:** hardcoded secrets are the #1 vibe-app breach class — 28.65M new
+because a secret deleted in a later commit is still readable in the
+history — revoke it where it was issued and generate a new one ("rotating"
+it); deleting the file is not enough.
+**Why:** hardcoded secrets are the most common way vibe-coded apps get
+breached — 28.65M new
 secrets hit public commits in 2025 (GitGuardian), and AI-assisted commits
 leak at roughly double the baseline rate (3.2% vs 1.5%).
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/secrets -->
@@ -64,11 +71,11 @@ equivalent template) listing variable *names* with placeholder values so
 the next person — or the next agent — knows what to configure without
 being handed the real values; and no real values inside the example file.
 **Why:** 60%+ of vibe-coded apps tested in Q1 2026 exposed API keys or
-database credentials — most of those leaks start as an env file that was
-never ignored.
+database credentials — a committed env file is the cheapest of those leaks
+to prevent.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/env-hygiene -->
 
-### 3. Does every mutating route check who's asking?
+### 3. Does every route that changes data check who's asking?
 
 **Look for:** every route/handler that creates, updates, or deletes data
 (POST/PUT/PATCH/DELETE, RPC mutations, server actions). For each, positive
@@ -91,24 +98,29 @@ Docker/compose files publishing the DB port; database URLs with public
 hostnames and no mention of network restriction. If the database is a
 managed service and the network posture isn't in the repo, return
 `CAN'T VERIFY` with this question: *"In your database dashboard, is public
-network access disabled (or restricted to your app's addresses), and is
-row-level security on if the client talks to the DB directly?"*
+network access disabled (or restricted to your app's own addresses)? And
+if your front end talks to the database directly, is row-level security —
+the feature that limits each signed-in user to their own rows — turned
+on?"*
 **Why:** Moltbook's production database was fully exposed three days after
-launch — the breach class where one setting is the whole story.
+launch — the case where one setting is the whole story.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/db-exposure -->
 
 ### 5. Do backups exist — and have you restored one, once?
 
 **Look for:** backup configuration in the repo (IaC backup blocks, scheduled
 dump jobs, platform config enabling point-in-time recovery) — that covers
-"exist". "Restored once" is not verifiable from a repo: ask the user
-directly — *"Have you ever actually restored a backup of this app's data,
-even once, into a scratch environment?"* — and record their answer in the
-report. `PASS` requires both: evidence backups run, and the user's yes.
-**Why:** an untested backup is a hope, not a backup — the industry's
-best-documented database-loss postmortems (GitLab 2017, public and
-blameless) are stories of backup mechanisms that all failed silently at
-restore time.
+"exist". If backups live in a managed database's dashboard rather than the
+repo, `CAN'T VERIFY` with *"Does your database provider's dashboard show
+backups actually running — and how far back do they go?"* "Restored once"
+is never verifiable from a repo: ask the user directly — *"Have you ever
+actually restored a backup of this app's data, even once, somewhere safe —
+not your live app?"* — and record their answer in the report. `PASS`
+requires both: evidence backups run, and the user's yes.
+**Why:** an untested backup is a hope, not a backup. In the industry's
+best-known database loss (GitLab, 2017 — they published the whole story),
+five separate backup mechanisms had all been failing silently; nobody
+found out until one was needed.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/backups -->
 
 ### 6. Would you know your app is down before a user tells you?
@@ -128,31 +140,33 @@ sleep.
 ### 7. Where do errors go when nobody's watching?
 
 **Look for:** an error-monitoring integration wired into the app — an SDK
-initialized in the entry point (with its DSN/key coming from env, not
-hardcoded — cross-check with check 1), or platform-native error tracking
-configured. `console.log` and unhandled-rejection silence are the
-`ATTENTION` evidence here: an app whose only error channel is stdout on a
-server nobody tails.
-**Why:** unmonitored errors mean your users — or an attacker probing your
-routes — know about failures before you do.
+initialized in the entry point (its key from env, not hardcoded —
+cross-check with check 1), or platform error tracking configured in the
+repo. If the app deploys to a platform that may capture errors outside the
+repo, `CAN'T VERIFY` with *"Does your hosting dashboard collect your app's
+errors — and does it alert you, or would you have to remember to look?"*
+`ATTENTION` needs positive evidence errors go nowhere: quote the entry
+point or handler where errors are only printed and nothing reports them.
+**Why:** unmonitored errors mean your users learn about failures before
+you do — and the failures nobody reports, you never learn about at all.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/error-monitoring -->
 
 ### 8. Can one script hammer your login all night?
 
-**Look for:** rate limiting on authentication routes (login, signup,
-password reset, token issuance) and on public unauthenticated POST
-endpoints (contact forms, comment endpoints, anything that writes or sends
-email/SMS/LLM calls): middleware, platform config, or gateway rules. Name
-the specific unprotected routes if you find them; if rate limiting lives at
-a proxy/CDN layer not represented in the repo, `CAN'T VERIFY` with *"Is
-rate limiting configured at your proxy/CDN for the auth and public POST
-routes?"*
-**Why:** unthrottled auth is the credential-stuffing entry class, and an
-unthrottled public POST that triggers paid work (email, LLM tokens) is a
-bill someone else runs up for you.
+**Look for:** rate limiting — anything capping how often one caller can
+hit a route — in two places: authentication routes (login, signup,
+password reset, token issuance) and public POST endpoints that trigger
+work or cost (contact forms, comments, anything sending email/SMS or
+calling an LLM). Evidence: middleware, platform config, or gateway rules.
+Name the specific unprotected routes; if rate limiting lives at a
+proxy/CDN layer not in the repo, `CAN'T VERIFY` with *"Is rate limiting
+configured at your proxy or CDN for the login and public POST routes?"*
+**Why:** an unprotected login form lets one script try thousands of stolen
+passwords overnight (credential stuffing) — and an unthrottled public
+endpoint that triggers paid work is a bill someone else runs up for you.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/rate-limiting -->
 
-### 9. Is your dependency tree pinned — and audited by its own tools?
+### 9. Will you deploy the exact code you tested?
 
 **Look for:** a committed lockfile matching the manifest (`package-lock.json`
 / `yarn.lock` / `pnpm-lock.yaml`, `poetry.lock`, `Cargo.lock`, `go.sum`, …);
@@ -161,9 +175,9 @@ run the ecosystem's **own** audit command if one exists (`npm audit`,
 `pnpm audit`, `pip-audit` if already installed, `cargo audit` if already
 installed — install nothing new) and report its summary counts verbatim.
 Do not hunt CVEs yourself; that is a scanner's job and you'd do it badly.
-**Why:** an unpinned tree means the app you tested is not the app you
-deploy — the supply-chain breach class starts with "it resolved to a
-different version in prod".
+**Why:** without a lockfile, the app you tested is not necessarily the app
+you deploy — the next install can silently pull different versions than
+the ones that worked.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/dependencies -->
 
 ### 10. Will you learn about a runaway bill from the invoice?
@@ -200,16 +214,17 @@ Repo: <name> · Date: <date> · Skill: skillboss-devops-check v0.1
 | … | …                          | …                                    |
 
 ## Findings
-<one block per non-PASS check: the evidence (file:line, quoted) for
-ATTENTION; the exact question to answer for CAN'T VERIFY; the one-line
-reason for N/A>
+<one block per non-PASS check: for ATTENTION, the evidence (file:line,
+quoted) plus a one-line plain-language first step; for CAN'T VERIFY, the
+exact question to answer; for N/A, the one-line reason>
 
 ## Questions for you
 <the collected CAN'T VERIFY questions, as a checklist>
 
-## Train the reflexes
-Each finding above is a trainable habit, not a one-time fix:
-https://skillboss.dev/demo — free, no account.
+## Fix first, then train the reflex
+Fix the ATTENTION items above first. Each one is also a reflex you can
+train so it doesn't come back: https://skillboss.dev/demo — free, no
+account.
 
 Ship Check run on <date> — it reviews the builder's habits, never
 certifies the app.
