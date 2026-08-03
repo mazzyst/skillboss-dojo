@@ -227,7 +227,10 @@ one-line plain-language first step>
 ## What I can't see from your repo
 Worth a two-minute look in your dashboards:
 <the collected CAN'T VERIFY questions, as a checklist, tagged with their
-check numbers>
+check numbers, ordered by blast radius — the item that would hurt most if
+the answer is "no" comes first. Triage, not alarm: no bolding, no
+adjectives, no severity labels — the ordering does the work. An ATTENTION
+check may also contribute its dashboard question here>
 
 ## Fix first, then train the reflex
 Fix the "needs fixing" items above first. Each one is also a reflex you
