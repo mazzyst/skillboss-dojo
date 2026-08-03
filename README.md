@@ -159,8 +159,8 @@ including "can't verify" when the evidence isn't in your repo.
 **Install:**
 
 - **Claude Code** — copy the folder into your repo:
-  `cp -r skills/skillboss-devops-check <your-repo>/.claude/skills/`, then
-  ask Claude to "run the ship check".
+  `mkdir -p <your-repo>/.claude/skills && cp -r skills/skillboss-devops-check <your-repo>/.claude/skills/`,
+  then ask Claude to "run the ship check".
 - **Cursor / Copilot / other** — paste `SKILL.md` into your rules or
   instructions file (e.g. `.cursor/rules/`), then ask your agent to run
   the Ship Check 10 against the repo.
