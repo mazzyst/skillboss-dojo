@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revue de mise en production — Hamdi Hadrich</title>
+<meta name="description" content="Une revue de mise en production indépendante : dix points vérifiés en lecture seule sur une archive de votre dépôt, trois priorités classées, et un brief d'investigation par priorité. Ni audit de sécurité, ni test d'intrusion.">
+<style>
+/* Charte SkillBoss (sb_brand.py). Fond sombre par défaut ; variante claire
+   sous prefers-color-scheme. Page autonome : aucune police, feuille de style
+   ni script externe — elle doit se charger sans rien demander à personne, et
+   ne rien apprendre sur qui la lit. */
+:root {
+  --bg: #0a0a0f;
+  --bg-2: #12121a;
+  --card: #1a1a26;
+  --line: #222233;
+  --gold: #f0a500;
+  --orange: #e8781a;
+  --red: #cc3333;
+  --green: #22c55e;
+  --ink: #f0f0f5;
+  --ink-2: #a0a0b0;
+  --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ffffff;
+    --bg-2: #f5f5f8;
+    --card: #f1f1f6;
+    --line: #dcdce4;
+    --gold: #9a6400;
+    --orange: #b8560f;
+    --red: #a82828;
+    --green: #15803d;
+    --ink: #12121a;
+    --ink-2: #4a4a58;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.65;
+}
+main { max-width: 46rem; margin: 0 auto; padding: 3.5rem 1.25rem 5rem; }
+h1 {
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  line-height: 1.15;
+  margin: 0 0 .75rem;
+  letter-spacing: -.02em;
+}
+h2 {
+  font-size: 1.2rem;
+  margin: 3rem 0 .75rem;
+  letter-spacing: -.01em;
+}
+h2 .num {
+  font-family: var(--mono);
+  font-size: .8rem;
+  color: var(--gold);
+  margin-right: .55rem;
+  vertical-align: .12em;
+}
+p { margin: 0 0 1rem; }
+a { color: var(--gold); text-underline-offset: .18em; }
+strong { color: var(--ink); }
+.lede { font-size: 1.1rem; color: var(--ink-2); margin-bottom: 1.75rem; }
+.rule { height: 1px; background: var(--line); border: 0; margin: 2.5rem 0 0; }
+
+/* Le bandeau de nature : la même mention que porte chaque rapport. Il est en
+   haut, avant tout argument — c'est le sujet, pas une note de bas de page. */
+.nature {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--orange);
+  background: var(--bg-2);
+  padding: .9rem 1.1rem;
+  border-radius: 4px;
+  font-size: .95rem;
+  color: var(--ink-2);
+}
+.nature strong { color: var(--ink); }
+
+/* Le flux du mail, en quatre étapes scellées. C'était une ligne unique qui
+   défilait et se tronquait sur téléphone au pire endroit : le lecteur perdait
+   la dernière étape, celle qui nomme ce qu'il reçoit. Une liste verticale ne
+   peut pas se tronquer, et elle laisse la place d'une ligne de détail par étape.
+
+   Les chiffres sont 壱弐参肆, le jeu formel que la banque japonaise emploie sur
+   les chèques précisément parce que 一二三 sont un empilement de traits
+   horizontaux : trop faciles à falsifier, et — la raison ici — trop faciles à
+   lire comme de la ponctuation plutôt que comme des nombres. Les glyphes
+   formels ont une densité comparable, donc les quatre se lisent comme une
+   série. Ils sont décoratifs : l'ORDRE est porté par <ol> et par la position
+   verticale, et chaque sceau est aria-hidden — rien n'est perdu pour un lecteur
+   d'écran ni pour une police incapable de les dessiner.
+
+   RISQUE DE POLICE, assumé : ces glyphes exigent une police CJK sur la machine
+   du VISITEUR. macOS, Windows, iOS et Android en fournissent une ; une install
+   Linux minimale peut ne pas en avoir, et afficherait des carrés (tofu).
+   Charger une webfont corrigerait ça et est interdit ici — une requête externe
+   est exactement ce que cette page ne doit pas faire. Le cadre du sceau et la
+   mise en page tiennent dans les deux cas. */
+.flow { list-style: none; margin: 1.5rem 0; padding: 0; display: grid; gap: .75rem; }
+.flow li { display: grid; grid-template-columns: 1.9rem 1fr; gap: .85rem; align-items: start; }
+.flow .seal {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  color: var(--gold);
+  /* Piles CJK système, la plus large d'abord. Aucune webfont, par règle. */
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP",
+               "Noto Sans CJK JP", "Source Han Sans", "MS Mincho", serif;
+  font-size: .85rem;
+  line-height: 1;
+}
+/* Le livrable est ce que le lecteur achète — le seul sceau plein. */
+.flow li:last-child .seal { background: var(--gold); color: var(--bg); }
+.flow .step { font-family: var(--mono); font-size: .85rem; color: var(--ink); }
+.flow .note { display: block; font-size: .85rem; color: var(--ink-2); }
+
+code, .cmd {
+  font-family: var(--mono);
+  font-size: .9rem;
+}
+.cmd {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: .8rem 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: var(--ink);
+}
+code:not(.cmd) {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: .1em .35em;
+}
+
+/* Les dix points. Deux colonnes quand la place existe, une sinon. */
+.checks {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  display: grid;
+  gap: .55rem 1.5rem;
+  /* min(15rem, 100%) plutôt que 15rem : sur un écran plus étroit que la piste,
+     la grille déborderait et la page se mettrait à défiler latéralement. */
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+}
+.checks li {
+  border-left: 2px solid var(--line);
+  padding: .1rem 0 .1rem .8rem;
+  font-size: .95rem;
+}
+.checks b { display: block; font-size: .8rem; color: var(--gold);
+            font-family: var(--mono); font-weight: 600; letter-spacing: .02em; }
+
+.files { margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.files li { margin-bottom: .7rem; }
+.files a {
+  display: inline-block;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 4px;
+  padding: .55rem .9rem;
+  text-decoration: none;
+  font-size: .95rem;
+}
+.files a:hover, .files a:focus { border-color: var(--gold); }
+.files .what { display: block; color: var(--ink-2); font-size: .85rem;
+               margin-top: .2rem; }
+
+.price { font-size: 1.05rem; }
+.price b { color: var(--gold); }
+
+footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: .9rem;
+  color: var(--ink-2);
+}
+footer a { color: var(--ink-2); }
+.src { font-size: .8rem; color: var(--ink-2); margin-top: 2.5rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Revue de mise en production</h1>
+  <p class="lede">
+    Un avis extérieur sur une application que vous n'avez pas écrite
+    ligne à ligne. Dix points vérifiés, trois priorités classées, et de quoi
+    les instruire.
+  </p>
+
+  <p class="nature">
+    <strong>Ce que c'est, et ce que ce n'est pas.</strong> Une revue
+    <strong>heuristique, par lecture</strong>. Ni audit de sécurité, ni test
+    d'intrusion, ni garantie. Elle atteste le travail effectué et les points
+    vérifiés — <strong>jamais</strong> que l'application « est sécurisée ».
+    Cette mention est imprimée sur chaque rapport ; elle ne se retire pas.
+  </p>
+
+  <ol class="flow">
+    <li><span class="seal" aria-hidden="true">壱</span>
+      <span><span class="step">votre dépôt</span>
+        <span class="note">le code que vous avez déjà</span></span></li>
+    <li><span class="seal" aria-hidden="true">弐</span>
+      <span><span class="step">une archive</span>
+        <span class="note">une commande, aucun accès accordé</span></span></li>
+    <li><span class="seal" aria-hidden="true">参</span>
+      <span><span class="step">revue en lecture seule</span>
+        <span class="note">dix points, rien n'est exploité</span></span></li>
+    <li><span class="seal" aria-hidden="true">肆</span>
+      <span><span class="step">3 priorités + 3 briefs</span>
+        <span class="note">ce qui vous revient</span></span></li>
+  </ol>
+
+  <h2><span class="num">01</span>En quoi consiste une revue</h2>
+  <p>
+    Dix points de mise en production, les mêmes pour tout le monde, dans le
+    même ordre. La liste est publique et vérifiable avant de me parler :
+    <a href="https://github.com/mazzyst/skillboss-dojo">la checklist Ship Check 10</a>.
+  </p>
+  <ul class="checks">
+    <li><b>SECRETS</b>Clés dans le code — et dans l'historique</li>
+    <li><b>ENV</b>Hygiène des fichiers d'environnement</li>
+    <li><b>AUTH</b>Authentification des routes qui écrivent</li>
+    <li><b>BASE</b>Base de données joignable depuis Internet</li>
+    <li><b>SAUVEGARDES</b>Existantes — et restaurées au moins une fois</li>
+    <li><b>DISPONIBILITÉ</b>Endpoint de santé et sonde externe</li>
+    <li><b>ERREURS</b>Supervision câblée, et regardée</li>
+    <li><b>DÉBIT</b>Limitation sur l'auth et les POST publics</li>
+    <li><b>DÉPENDANCES</b>Verrouillage et âge des versions</li>
+    <li><b>COÛTS</b>Garde-fou de dépense, et qui est prévenu</li>
+  </ul>
+  <p>
+    Cinq se vérifient dans le code. Cinq ne s'y voient pas — une sauvegarde
+    n'existe que si elle a été restaurée — et se traitent en conversation, pas
+    en formulaire.
+  </p>
+
+  <h2><span class="num">02</span>Comment vous me transmettez le code</h2>
+  <p>
+    Vous lancez une commande chez vous et vous m'envoyez le fichier obtenu.
+  </p>
+  <code class="cmd">git bundle create app.bundle --all</code>
+  <p>
+    C'est une archive de votre dépôt, historique compris.
+    <strong>Vous ne me donnez aucun accès</strong> : ni à votre compte, ni à
+    vos serveurs, ni à votre hébergement. Il n'y a donc rien à me retirer
+    ensuite — et rien à oublier de me retirer.
+  </p>
+  <p>
+    L'historique n'est pas un détail de confort : une clé supprimée du code y
+    reste lisible, et c'est le constat le plus fréquent de ce type de revue.
+    Sans historique, la moitié des trouvailles n'existent pas.
+  </p>
+  <p>
+    Si la commande vous pose problème, une clé de lecture seule sur le dépôt
+    fait l'affaire — vous la retirez à la remise. L'archive reste préférable :
+    elle ne vous demande rien à révoquer.
+  </p>
+
+  <h2><span class="num">03</span>Ce qu'il reste chez moi, après</h2>
+  <p>
+    <strong>Rien.</strong> L'archive et la copie de travail sont supprimées à
+    la remise du rapport, et le rapport l'atteste, sur l'exemplaire que vous
+    recevez. Le clone est dépointé de votre dépôt dès sa création : aucun envoi
+    accidentel n'est possible depuis ma machine.
+  </p>
+  <p>
+    Aucune valeur de secret n'est recopiée nulle part — seulement son
+    emplacement. Le générateur du rapport refuse de compiler s'il trouve une
+    chaîne à forme de clé dans mes notes : ce n'est pas une intention, c'est un
+    verrou.
+  </p>
+  <p>
+    Une chose à savoir, parce qu'elle ne se devine pas : la revue est réalisée
+    avec l'assistance d'un agent IA. Le contenu du dépôt transite donc par son
+    fournisseur, sur un compte professionnel. C'est écrit aussi sur la page de
+    périmètre que vous signez.
+  </p>
+
+  <h2><span class="num">04</span>Les briefs — un plan, jamais un correctif</h2>
+  <p>
+    Chaque priorité est livrée avec un <strong>brief d'investigation</strong> :
+    un texte que vous donnez à votre propre agent IA (Claude Code, Cursor…).
+    Il enquête sur votre stack — ce que je ne peux pas voir depuis une copie du
+    dépôt — pèse les options, et vous revient avec un plan chiffré en effort.
+  </p>
+  <p>
+    <strong>Un brief interdit explicitement à votre agent de modifier quoi que
+    ce soit.</strong> Pas de fichier créé, pas de commande qui écrit, pas
+    d'appel à vos systèmes, pas d'identifiant réutilisé « pour vérifier ». Il
+    produit un plan ; vous arbitrez ; vous appliquez si vous voulez.
+  </p>
+  <p>
+    Ce plan est celui de votre agent, pas le mien : je ne l'exécute pas, je ne
+    le relis pas, et il n'engage que vous. C'est la contrepartie honnête du
+    fait qu'il tourne là où j'ai décidé de ne pas aller.
+  </p>
+
+  <h2><span class="num">05</span>À quoi ressemble le livrable</h2>
+  <p>
+    Voici une revue complète sur une application fictive. C'est le format exact
+    que vous recevez — mêmes rubriques, même mise en page, même attestation.
+  </p>
+  <ul class="files">
+    <li>
+      <a href="exemple-rapport.pdf">Exemple de rapport (PDF)</a>
+      <span class="what">Une page : les trois priorités d'abord, puis les dix
+      points avec leur état et, pour chacun, quoi faire. Deux pages si les
+      constats sont denses.</span>
+    </li>
+    <li>
+      <a href="exemple-briefs.md">Exemple de briefs (Markdown)</a>
+      <span class="what">Les trois briefs qui accompagnent ce rapport, tels
+      qu'ils arrivent — à coller dans votre agent.</span>
+    </li>
+  </ul>
+
+  <h2><span class="num">06</span>Prix et délai</h2>
+  <p class="price">
+    <b>390 €</b> par application, rendu sous
+    <b>48–72 h</b> après réception de l'archive et de votre accord
+    écrit.<br>
+    <b>690 €</b> pour une application large ou multi-environnement,
+    sous 3–5 jours ouvrés. Le palier est <strong>mesuré</strong> sur l'archive, pas
+    estimé à l'œil — et s'il change quelque chose, je vous le dis avec les
+    chiffres avant de démarrer.
+  </p>
+  <p>
+    Ce que je certifie, sur chaque rapport : le travail effectué et les points
+    vérifiés. Rien d'autre.
+  </p>
+
+  <hr class="rule">
+
+  <footer>
+    <p>
+      <strong>Hamdi Hadrich</strong> — SkillBoss — culture DevOps et automatisation<br>
+      Écrivez-moi : <a href="mailto:contact@skillboss.dev">contact@skillboss.dev</a><br>
+      La checklist des dix points, en accès libre :
+      <a href="https://github.com/mazzyst/skillboss-dojo">github.com/mazzyst/skillboss-dojo</a>
+    </p>
+    <p class="src">
+      Cette page décrit une prestation payante. Elle est distincte du contenu
+      d'entraînement du dépôt, publié sous licence CC BY-SA 4.0.
+    </p>
+  </footer>
+
+</main>
+</body>
+</html>
