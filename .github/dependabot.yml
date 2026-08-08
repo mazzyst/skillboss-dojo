@@ -1,0 +1,34 @@
+# Dependency update automation.
+#
+# This repository ships content, so there is no npm ecosystem to watch — the only
+# moving dependency is the set of GitHub Actions the CI workflow calls. Without
+# this file they never move at all: `actions/checkout` would have stayed on v4
+# indefinitely, including through a security advisory, because nothing here
+# would ever tell anyone.
+#
+# That is the drift the product repo already learned about the hard way (its own
+# dependabot.yml records finding Next.js 14 end-of-life with unpatched CVEs
+# before anyone noticed). A public repository has the same exposure and fewer
+# eyes on it.
+#
+# Majors are NOT muted here, unlike the npm entry in the product repo. There,
+# a major is a migration project — Next 14→15, NestJS 10→11 — and a standing PR
+# for it is noise. An action major is a one-line change whose whole test is
+# whether CI stays green, so it is worth seeing as a PR. actions/checkout 4→7
+# was exactly that in the product repo.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: chore(ci)
+    groups:
+      # One PR for the routine bumps; a major arrives on its own so it can be
+      # judged on its own.
+      github-actions:
+        update-types:
+          - minor
+          - patch
