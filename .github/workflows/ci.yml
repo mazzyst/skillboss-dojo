@@ -1,0 +1,79 @@
+name: CI
+
+# This repository ships content, not code — so the gate checks the promises the
+# content makes rather than a build. Two of them are load-bearing:
+#
+#   · CONTRIBUTING.md tells contributors a human will review their kata against
+#     the format. The counting part of that review is mechanical, and a machine
+#     does it without getting bored — so the human reviewer spends their
+#     attention on the ambiguity bar, which is the part no script can judge.
+#   · docs/review/ sells a confidentiality posture. A page that quietly fetched
+#     a font would hand every visitor's IP to a third party and contradict its
+#     own argument. That check runs on every change, not on the day someone
+#     remembers to look.
+#
+# No dependency to install: Python 3 is already on the runner, and the checker
+# is standard library only, so a contributor can run the identical command
+# locally before opening a pull request.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  content:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # TODO (owner): pin this to a commit SHA. A moved tag on a third-party
+      # action is a supply-chain path into a public repository, and only a SHA
+      # closes it. Left as a tag because pinning requires reading the real SHA
+      # from actions/checkout, which this session could not verify — and an
+      # unverified SHA is worse than an honest tag.
+      - uses: actions/checkout@v4
+      - name: Kata format, relative links, review page
+        run: python3 .github/scripts/check-content.py
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # TODO (owner): pin to a commit SHA — see the note in the job above.
+      - uses: actions/checkout@v4
+      - name: Install gitleaks (pinned, checksum-verified official release)
+        env:
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          # Keep the ORIGINAL asset filename: the official checksums.txt lists
+          # `<sha256>  gitleaks_<ver>_linux_x64.tar.gz`, and `sha256sum -c` opens
+          # the file by that exact name.
+          asset="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -fsSL --retry 3 -o "$asset"      "${base}/${asset}"
+          curl -fsSL --retry 3 -o checksums.txt "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          grep " ${asset}\$" checksums.txt | sha256sum -c -
+          tar -xzf "$asset" gitleaks
+          ./gitleaks version
+      - name: Scan the working tree for secrets
+        # No custom config: this repository holds prose and kata artifacts, and
+        # the default ruleset currently reports nothing. If a kata ever needs a
+        # secret-shaped literal to teach the lesson, add a .gitleaks.toml
+        # allowlist keyed on that VALUE — never a blanket file exclusion.
+        run: |
+          "$RUNNER_TEMP/gitleaks" dir . \
+            --redact \
+            --no-banner \
+            --exit-code 1 \
+            --verbose

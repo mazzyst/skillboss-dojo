@@ -94,12 +94,28 @@ answer wrong burns trust, so we check every blank against every pool token:
 
 ## Process
 
-1. Fork, add your kata file, open a pull request. One kata per PR.
-2. In the PR description: which hall, and one sentence on the scenario's
+1. Fork, add your kata file, then check it before you open anything:
+
+   ```sh
+   python3 .github/scripts/check-content.py
+   ```
+
+   Python 3 only, nothing to install. It checks the mechanical half of the
+   format — that your declared blank count matches the artifact, that the pool
+   is alphabetized and sized 2.5–3× the blanks, that every answer exists in the
+   pool, and that the solution stays folded and below the exercise. CI runs the
+   same command, so a green run locally is a green run there.
+
+2. Open a pull request. One kata per PR.
+3. In the PR description: which hall, and one sentence on the scenario's
    source (experience, public postmortem, docs).
-3. A human reviews against the format and the ambiguity bar — expect
-   specific feedback, and possibly a round or two of tightening.
-4. On merge, your kata is in the repo under CC BY-SA 4.0 with your
+4. A human reviews against the **ambiguity bar** — whether the scenario is real
+   pressure, whether the distractors are ones a practitioner would actually
+   reach for, whether exactly one answer survives a careful reading. No script
+   judges that, which is why the script handles the counting: the review spends
+   its attention where it counts. Expect specific feedback, and possibly a
+   round or two of tightening.
+5. On merge, your kata is in the repo under CC BY-SA 4.0 with your
    authorship in the git history. Accepted katas may also be imported into
    the SkillBoss training bank, credited.
 
