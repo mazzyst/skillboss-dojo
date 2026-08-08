@@ -67,12 +67,14 @@ jobs:
           tar -xzf "$asset" gitleaks
           ./gitleaks version
       - name: Scan the working tree for secrets
-        # No custom config: this repository holds prose and kata artifacts, and
-        # the default ruleset currently reports nothing. If a kata ever needs a
-        # secret-shaped literal to teach the lesson, add a .gitleaks.toml
-        # allowlist keyed on that VALUE — never a blanket file exclusion.
+        # --config .gitleaks.toml: one kata teaches "move the key out of the
+        # code" and therefore has to SHOW a hardcoded key. That one placeholder
+        # is allowlisted BY VALUE, so a real key landing in the same file is
+        # still caught. Never allowlist the file — that would blind the scanner
+        # to the very place a real secret is most likely to be pasted.
         run: |
           "$RUNNER_TEMP/gitleaks" dir . \
+            --config .gitleaks.toml \
             --redact \
             --no-banner \
             --exit-code 1 \
