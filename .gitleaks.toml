@@ -1,0 +1,25 @@
+# gitleaks config for the secret-scan gate (.github/workflows/ci.yml).
+#
+# Full built-in ruleset, plus one allowlist for the placeholder a kata needs in
+# order to teach its lesson.
+#
+# ALLOWLISTED BY VALUE, NEVER BY FILE. The distinction is the whole point: a
+# real key committed into that same kata tomorrow is still caught, because only
+# this exact fake string is ignored. Excluding the file would switch the scanner
+# off for the one place in this repository most likely to attract a real secret
+# — the kata about secrets.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Teaching placeholders that must look like secrets to make their point"
+# Match against the detected secret string, not against paths.
+regexTarget = "match"
+regexes = [
+  # katas/security/move-the-key-out-of-the-code.md — the kata shows a key
+  # hardcoded in a source file, then has the reader move it to an environment
+  # variable. The bad example has to look like a key or the exercise has no
+  # teeth. Invented, twelve characters, matches no provider's real key format.
+  '''sk-abc123xyz''',
+]
