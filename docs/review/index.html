@@ -91,21 +91,37 @@ strong { color: var(--ink); }
 }
 .nature strong { color: var(--ink); }
 
-/* The flow line, taken from the mail unchanged. Horizontal scroll rather than
-   wrapping: broken over two lines it stops reading as a diagram. */
+/* The flow from the mail, as chips that wrap. The earlier single scrolling line
+   truncated on a phone at exactly the wrong place — the reader lost the last
+   step, which is the one naming what they get. Wrapping keeps the arrows, so it
+   stays a diagram rather than a broken sentence; it just occupies three lines
+   instead of one.
+
+   Each arrow lives with the chip it points AT, never the one before it, so a
+   wrapped line can never end on a dangling arrow. */
 .flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem;
+  margin: 1.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+.flow li { display: flex; align-items: center; gap: .4rem; }
+.flow .step {
   font-family: var(--mono);
-  font-size: .88rem;
+  font-size: .82rem;
   color: var(--ink);
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 4px;
-  padding: .85rem 1rem;
-  margin: 1.5rem 0;
-  overflow-x: auto;
-  white-space: nowrap;
+  padding: .5rem .7rem;
 }
-.flow b { color: var(--gold); font-weight: 600; }
+.flow b { color: var(--gold); font-weight: 600; padding-right: .1rem; }
+/* The deliverable is the one chip the reader is buying — ringed, not filled,
+   so it reads as emphasis rather than as a button. */
+.flow li:last-child .step { border-color: var(--gold); }
 
 code, .cmd {
   font-family: var(--mono);
@@ -194,10 +210,12 @@ footer a { color: var(--ink-2); }
     wording is printed on every report; it does not come off.
   </p>
 
-  <div class="flow">
-    your repo <b>&rarr;</b> an archive <b>&rarr;</b> a read-only review
-    <b>&rarr;</b> 3 priorities <b>+</b> 3 briefs
-  </div>
+  <ul class="flow">
+    <li><span class="step">your repo</span></li>
+    <li><b>&rarr;</b><span class="step">an archive</span></li>
+    <li><b>&rarr;</b><span class="step">a read-only review</span></li>
+    <li><b>&rarr;</b><span class="step">3 priorities + 3 briefs</span></li>
+  </ul>
 
   <h2><span class="num">01</span>What a review covers</h2>
   <p>
