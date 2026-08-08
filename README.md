@@ -44,7 +44,7 @@ before they become incidents.
 - [ ] Harden the dependency chain (lockfiles, audit, provenance)
 - [ ] Recognize the common injection and misconfiguration classes
 
-**Katas in this repo:** [Stop the secret leak](katas/security/stop-the-secret-leak.md)
+**Katas in this repo:** [Harden the dependency chain](katas/security/harden-the-dependency-chain.md) · [Move the key out of the code](katas/security/move-the-key-out-of-the-code.md) · [Scope the service token](katas/security/scope-the-service-token.md) · [Stop the secret leak](katas/security/stop-the-secret-leak.md)
 **Train it live:** [skillboss.dev](https://skillboss.dev) — The Gatekeeper takes challengers every Sunday.
 
 ### 🌙 Monday — Agile & Team Flow · *The Cadence*
@@ -58,6 +58,7 @@ can't do for you.
 - [ ] Keep the board honest: WIP limits and unclogging flow
 - [ ] Communicate during incidents: recover first, blame never
 
+**Katas in this repo:** [Pick the next thing by evidence](katas/agile/pick-the-next-thing-by-evidence.md) · [Rewire the retro](katas/agile/rewire-the-retro.md) · [Split the monster story](katas/agile/split-the-monster-story.md) · [Unclog the board](katas/agile/unclog-the-board.md)
 **Train it live:** [skillboss.dev](https://skillboss.dev) — The Cadence takes challengers every Monday.
 
 ### 🔀 Tuesday — Git & Version Control · *The Merge Warden*
@@ -71,7 +72,7 @@ pushing without stomping teammates.
 - [ ] Hunt regressions with `bisect`
 - [ ] Carry fixes across branches: `cherry-pick` vs `merge` vs `rebase`
 
-**Katas in this repo:** [Recover the lost branch](katas/git/recover-the-lost-branch.md)
+**Katas in this repo:** [Carry the fix across branches](katas/git/carry-the-fix-across-branches.md) · [Hunt the bad commit](katas/git/hunt-the-bad-commit.md) · [Recover the lost branch](katas/git/recover-the-lost-branch.md)
 **Train it live:** [skillboss.dev](https://skillboss.dev) — The Merge Warden takes challengers every Tuesday.
 
 ### ⚙️ Wednesday — Containers & Kubernetes · *The Orchestrator*
@@ -85,6 +86,7 @@ clean rollouts.
 - [ ] Build small, safe images (layers, users, scanning)
 - [ ] Know what the control plane actually reconciles
 
+**Katas in this repo:** [First container, first deploy](katas/k8s/first-container-first-deploy.md) · [Fix the crash-looping rollout](katas/k8s/fix-the-crash-looping-rollout.md) · [Right-size the pod](katas/k8s/right-size-the-pod.md) · [Roll out without a cliff](katas/k8s/roll-out-without-a-cliff.md)
 **Train it live:** [skillboss.dev](https://skillboss.dev) — The Orchestrator takes challengers every Wednesday.
 
 ### ☁️ Thursday — Cloud & Infrastructure · *The Nimbus*
@@ -98,6 +100,7 @@ idle bills.
 - [ ] Stop paying for idle: right-sizing and scale-to-zero
 - [ ] Understand the blast radius of a region or zone failure
 
+**Katas in this repo:** [Close the open bucket](katas/cloud/close-the-open-bucket.md) · [Stop paying for idle](katas/cloud/stop-paying-for-idle.md) · [Tame the shared state](katas/cloud/tame-the-shared-state.md)
 **Train it live:** [skillboss.dev](https://skillboss.dev) — The Nimbus takes challengers every Thursday.
 
 ### 🚦 Friday — Pipelines & CI/CD · *The Pipeline*
@@ -111,7 +114,7 @@ knuckles.
 - [ ] Progressive delivery: keep an exit while flipping traffic
 - [ ] Make rollback a button, not a war room
 
-**Katas in this repo:** [Gate the deploy job](katas/ci-cd/gate-the-deploy-job.md)
+**Katas in this repo:** [Flip the traffic, keep the exit](katas/ci-cd/flip-the-traffic-keep-the-exit.md) · [Gate the deploy job](katas/ci-cd/gate-the-deploy-job.md) · [Kill the flaky suite](katas/ci-cd/kill-the-flaky-suite.md) · [Ship on push, not on memory](katas/ci-cd/ship-on-push-not-on-memory.md)
 **Train it live:** [skillboss.dev](https://skillboss.dev) — The Pipeline takes challengers every Friday.
 
 ### 🔥 Saturday — SRE & Observability · *The Firewatch*
@@ -125,6 +128,7 @@ measure, pages you can trust.
 - [ ] Write blameless postmortems that change the system
 - [ ] Budget errors like the finite resource they are
 
+**Katas in this repo:** [Define the promise](katas/sre/define-the-promise.md) · [Page on burn, not on blips](katas/sre/page-on-burn-not-on-blips.md) · [Run the incident, not the panic](katas/sre/run-the-incident-not-the-panic.md) · [Wire the zero-th monitor](katas/sre/wire-the-zero-th-monitor.md)
 **Train it live:** [skillboss.dev](https://skillboss.dev) — The Firewatch takes challengers every Saturday.
 
 ---

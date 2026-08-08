@@ -13,6 +13,7 @@ CONTRIBUTING.md promises, and no script replaces it. This handles the counting,
 so the review can spend its attention on the parts that matter.
 """
 
+import math
 import os
 import re
 import sys
@@ -90,9 +91,16 @@ def check_kata(path, text, r):
     if not pool:
         r.fail(path, "the pool lists no `token`")
         return
-    lo, hi = 2.5 * declared, 3.0 * declared
-    if not lo - 1e-9 <= len(pool) <= hi + 1e-9:
-        r.fail(path, "pool has %d tokens; CONTRIBUTING wants 2.5-3x the %d blanks (%.1f-%.1f)"
+    # CONTRIBUTING says "roughly 2.5-3x the blank count". Rounding outward is what
+    # "roughly" means once it has to be code: floor(2.5n)..ceil(3n). Implementing
+    # the bound with no slack failed a committed kata on its first contact with
+    # real content (7 tokens for 3 blanks, i.e. 2.33x) — and a check that fails
+    # on content its author considers valid is a check that gets worked around.
+    # The band still rejects what it is there for: a pool of 5, or of 12, for
+    # three blanks.
+    lo, hi = math.floor(2.5 * declared), math.ceil(3.0 * declared)
+    if not lo <= len(pool) <= hi:
+        r.fail(path, "pool has %d tokens; CONTRIBUTING wants roughly 2.5-3x the %d blanks (%d-%d)"
                % (len(pool), declared, lo, hi))
     if pool != sorted(pool):
         r.fail(path, "pool is not alphabetized")
