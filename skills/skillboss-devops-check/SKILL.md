@@ -70,10 +70,9 @@ against it, don't just read the pattern; a committed `.env.example` (or
 equivalent template) listing variable *names* with placeholder values so
 the next person — or the next agent — knows what to configure without
 being handed the real values; and no real values inside the example file.
-**Why:** a scan of 5,600 AI-built applications found 400+ exposed secrets —
-API keys, tokens — in live production (Escape.tech, *The State of Security
-of Vibe Coded Apps*, October 2025) — and a committed env file is the
-cheapest of those leaks to prevent.
+**Why:** a committed env file is the cheapest secret leak there is to
+prevent — and among the hardest to undo, because deleting it from the code
+leaves it readable in the history.
 **Train it:** [skillboss.dev/demo/env-hygiene](https://skillboss.dev/demo/env-hygiene)
 
 ### 3. Does every route that changes data check who's asking?
