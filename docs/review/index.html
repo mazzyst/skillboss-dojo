@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pre-launch review — Hamdi Hadrich</title>
+<meta name="description" content="An independent pre-launch review: ten checks run read-only on an archive of your repository, three ranked priorities, and one investigation brief per priority. Not a security audit, not a penetration test.">
+<style>
+/* SkillBoss palette (sb_brand.py). Dark by default; light variant under
+   prefers-color-scheme. Self-contained page: no external font, stylesheet or
+   script — it must load without asking anyone for anything, and must learn
+   nothing about whoever reads it.
+
+   Twin of index.fr.html. The style block is deliberately duplicated rather
+   than shared: a single generated page has no build step to inline a shared
+   file, and an external stylesheet is exactly what this page must not have.
+   If you change the palette here, change it there in the same commit. */
+:root {
+  --bg: #0a0a0f;
+  --bg-2: #12121a;
+  --card: #1a1a26;
+  --line: #222233;
+  --gold: #f0a500;
+  --orange: #e8781a;
+  --red: #cc3333;
+  --green: #22c55e;
+  --ink: #f0f0f5;
+  --ink-2: #a0a0b0;
+  --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ffffff;
+    --bg-2: #f5f5f8;
+    --card: #f1f1f6;
+    --line: #dcdce4;
+    --gold: #9a6400;
+    --orange: #b8560f;
+    --red: #a82828;
+    --green: #15803d;
+    --ink: #12121a;
+    --ink-2: #4a4a58;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.65;
+}
+main { max-width: 46rem; margin: 0 auto; padding: 3.5rem 1.25rem 5rem; }
+h1 {
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  line-height: 1.15;
+  margin: 0 0 .75rem;
+  letter-spacing: -.02em;
+}
+h2 {
+  font-size: 1.2rem;
+  margin: 3rem 0 .75rem;
+  letter-spacing: -.01em;
+}
+h2 .num {
+  font-family: var(--mono);
+  font-size: .8rem;
+  color: var(--gold);
+  margin-right: .55rem;
+  vertical-align: .12em;
+}
+p { margin: 0 0 1rem; }
+a { color: var(--gold); text-underline-offset: .18em; }
+strong { color: var(--ink); }
+.lede { font-size: 1.1rem; color: var(--ink-2); margin-bottom: 1.75rem; }
+.rule { height: 1px; background: var(--line); border: 0; margin: 2.5rem 0 0; }
+
+/* The nature banner: the same wording every report carries. It sits at the
+   top, before any argument — it is the subject, not a footnote. */
+.nature {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--orange);
+  background: var(--bg-2);
+  padding: .9rem 1.1rem;
+  border-radius: 4px;
+  font-size: .95rem;
+  color: var(--ink-2);
+}
+.nature strong { color: var(--ink); }
+
+/* The flow from the mail, as four sealed steps. It was a single scrolling line
+   that truncated on a phone at exactly the wrong place — the reader lost the
+   last step, the one naming what they get back. A vertical list cannot
+   truncate, and it has room for a line of detail per step.
+
+   The numerals are 壱弐参肆, the formal set Japanese banking uses on cheques
+   precisely because 一二三 are a stack of horizontal strokes: too easy to alter,
+   and — the reason here — too easy to read as punctuation rather than as
+   numbers. The formal glyphs have matching density, so the four read as one
+   series. They are decorative: the ORDER is carried by <ol> and by vertical
+   position, and each seal is aria-hidden, so nothing is lost to a screen reader
+   or to a font that cannot draw them.
+
+   FONT RISK, deliberately accepted: these glyphs need a CJK font on the
+   VISITOR's machine. macOS, Windows, iOS and Android ship one; a bare Linux
+   install may not, and would show tofu boxes. Loading a webfont would fix it
+   and is forbidden here — an external request is exactly what this page must
+   not make. The seal's border and layout hold up either way. */
+.flow { list-style: none; margin: 1.5rem 0; padding: 0; display: grid; gap: .75rem; }
+.flow li { display: grid; grid-template-columns: 1.9rem 1fr; gap: .85rem; align-items: start; }
+.flow .seal {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  color: var(--gold);
+  /* System CJK stacks, widest first. No webfont, by rule. */
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP",
+               "Noto Sans CJK JP", "Source Han Sans", "MS Mincho", serif;
+  font-size: .85rem;
+  line-height: 1;
+}
+/* The deliverable is what the reader is buying — the one filled seal. */
+.flow li:last-child .seal { background: var(--gold); color: var(--bg); }
+.flow .step { font-family: var(--mono); font-size: .85rem; color: var(--ink); }
+.flow .note { display: block; font-size: .85rem; color: var(--ink-2); }
+
+code, .cmd {
+  font-family: var(--mono);
+  font-size: .9rem;
+}
+.cmd {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: .8rem 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: var(--ink);
+}
+code:not(.cmd) {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: .1em .35em;
+}
+
+/* The ten checks. Two columns where there is room, one where there is not. */
+.checks {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  display: grid;
+  gap: .55rem 1.5rem;
+  /* min(15rem, 100%) rather than 15rem: on a screen narrower than the track,
+     the grid would overflow and the page would start scrolling sideways. */
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+}
+.checks li {
+  border-left: 2px solid var(--line);
+  padding: .1rem 0 .1rem .8rem;
+  font-size: .95rem;
+}
+.checks b { display: block; font-size: .8rem; color: var(--gold);
+            font-family: var(--mono); font-weight: 600; letter-spacing: .02em; }
+
+.files { margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.files li { margin-bottom: .7rem; }
+.files a {
+  display: inline-block;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 4px;
+  padding: .55rem .9rem;
+  text-decoration: none;
+  font-size: .95rem;
+}
+.files a:hover, .files a:focus { border-color: var(--gold); }
+.files .what { display: block; color: var(--ink-2); font-size: .85rem;
+               margin-top: .2rem; }
+
+.price { font-size: 1.05rem; }
+.price b { color: var(--gold); }
+
+footer {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: .9rem;
+  color: var(--ink-2);
+}
+footer a { color: var(--ink-2); }
+.src { font-size: .8rem; color: var(--ink-2); margin-top: 2.5rem; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Pre-launch review</h1>
+  <p class="lede">
+    An outside opinion on an application you did not write line by line. Ten
+    checks, three ranked priorities, and what it takes to act on them.
+  </p>
+
+  <p class="nature">
+    <strong>What this review is.</strong> A <strong>heuristic review by
+    reading</strong>. Not a security audit, not a penetration test, not a
+    guarantee. It attests to the work done and the points checked —
+    <strong>never</strong> that the application &ldquo;is secure&rdquo;. This
+    wording is printed on every report; it does not come off.
+  </p>
+
+  <ol class="flow">
+    <li><span class="seal" aria-hidden="true">壱</span>
+      <span><span class="step">your repo</span>
+        <span class="note">the code you already have</span></span></li>
+    <li><span class="seal" aria-hidden="true">弐</span>
+      <span><span class="step">an archive</span>
+        <span class="note">one command, no access granted</span></span></li>
+    <li><span class="seal" aria-hidden="true">参</span>
+      <span><span class="step">a read-only review</span>
+        <span class="note">ten checks, nothing exercised</span></span></li>
+    <li><span class="seal" aria-hidden="true">肆</span>
+      <span><span class="step">3 priorities + 3 briefs</span>
+        <span class="note">what comes back to you</span></span></li>
+  </ol>
+
+  <h2><span class="num">01</span>What a review covers</h2>
+  <p>
+    Ten pre-launch checks, the same for everyone, in the same order. The list
+    is public, and you can judge it before we ever speak:
+    <a href="https://github.com/mazzyst/skillboss-dojo">the Ship Check 10 checklist</a>.
+  </p>
+  <ul class="checks">
+    <li><b>SECRETS</b>Keys in the code — and in the history</li>
+    <li><b>ENV</b>Environment file hygiene</li>
+    <li><b>ROUTE AUTH</b>Auth on the routes that write</li>
+    <li><b>DATABASE</b>Reachable from the public internet</li>
+    <li><b>BACKUPS</b>They exist — and one has been restored</li>
+    <li><b>UPTIME</b>Health endpoint and an outside probe</li>
+    <li><b>ERRORS</b>Monitoring wired, and watched</li>
+    <li><b>RATE LIMITING</b>Limits on auth and public POSTs</li>
+    <li><b>DEPENDENCIES</b>Lockfile and version age</li>
+    <li><b>COST</b>A spend guardrail, and who it alerts</li>
+  </ul>
+  <p>
+    Five are verifiable in the code. Five are not — a backup only exists once
+    it has been restored — and those are settled in conversation, not in a
+    form.
+  </p>
+
+  <h2><span class="num">02</span>How you send me the code</h2>
+  <p>
+    You run one command on your side and send me the file it produces.
+  </p>
+  <code class="cmd">git bundle create app.bundle --all</code>
+  <p>
+    That is an archive of your repository, history included.
+    <strong>You give me no access</strong> — not to your accounts, not to your
+    servers, not to your hosting. So there is nothing to revoke afterwards, and
+    nothing to forget to revoke.
+  </p>
+  <p>
+    The history is not a nicety. A key deleted from the code stays readable in
+    it, which is why the history is where secrets are found. Without it, half
+    the findings do not exist.
+  </p>
+  <p>
+    If the command gives you trouble, a read-only key on the repository does
+    the job — you revoke it on delivery. The archive is still better: it leaves
+    you nothing to revoke.
+  </p>
+
+  <h2><span class="num">03</span>What stays with me afterwards</h2>
+  <p>
+    <strong>Nothing.</strong> The archive and the working copy are deleted when
+    the report ships, and the report attests to it, on the copy you receive.
+    The clone is detached from your repository the moment it is made: no
+    accidental push is possible from my machine.
+  </p>
+  <p>
+    No secret value is copied anywhere — only its location. The report
+    generator refuses to build if it finds a key-shaped string in my notes:
+    that is not an intention, it is a lock.
+  </p>
+  <p>
+    One thing you would not guess, so it is said here: the review is carried
+    out with the help of an AI agent. The repository's contents therefore pass
+    through that provider, on a business account. It is written on the scope
+    page you sign, too.
+  </p>
+
+  <h2><span class="num">04</span>The briefs — a plan, never a fix</h2>
+  <p>
+    Each priority ships with an <strong>investigation brief</strong>: a text
+    you hand to your own AI agent (Claude Code, Cursor…). It investigates your
+    stack — what I cannot see from a copy of the repository — weighs the
+    options, and comes back with a plan costed in effort.
+  </p>
+  <p>
+    <strong>A brief explicitly forbids your agent to change anything.</strong>
+    No file created, no command that writes, no call to your systems, no
+    credential reused &ldquo;just to check&rdquo;. It produces a plan; you
+    decide; you apply it if you want to.
+  </p>
+  <p>
+    That plan is your agent's, not mine: I do not run it, I do not review it,
+    and it commits only you. That is the honest counterpart to it running where
+    I chose not to go.
+  </p>
+
+  <h2><span class="num">05</span>What the deliverable looks like</h2>
+  <p>
+    Here is a complete review of a fictional application. It is the exact
+    format you receive — same sections, same layout, same attestation.
+  </p>
+  <ul class="files">
+    <li>
+      <a href="sample-report.pdf">Sample report (PDF)</a>
+      <span class="what">One page: the three priorities first, then the ten
+      checks with their state and, for each, what to do. Two pages if the
+      findings are dense.</span>
+    </li>
+    <li>
+      <a href="sample-briefs.md">Sample briefs (Markdown)</a>
+      <span class="what">The three briefs that go with that report, exactly as
+      they arrive — to paste into your agent.</span>
+    </li>
+  </ul>
+
+  <h2><span class="num">06</span>Price and turnaround</h2>
+  <p class="price">
+    <b>&euro;390</b> per application, delivered in
+    <b>48–72 h</b> once the archive and your written go-ahead are
+    in.<br>
+    <b>&euro;690</b> for a large or multi-environment application, in
+    3–5 business days. The tier is <strong>measured</strong> on the archive, not
+    eyeballed — and if it changes anything, I tell you with the numbers before
+    starting.
+  </p>
+  <p>
+    What I certify, on every report: the work done and the points checked.
+    Nothing else.
+  </p>
+
+  <hr class="rule">
+
+  <footer>
+    <p>
+      <strong>Hamdi Hadrich</strong> — SkillBoss — DevOps culture and automation<br>
+      Write to me: <a href="mailto:contact@skillboss.dev">contact@skillboss.dev</a><br>
+      The ten-point checklist, freely available:
+      <a href="https://github.com/mazzyst/skillboss-dojo">github.com/mazzyst/skillboss-dojo</a>
+    </p>
+    <p class="src">
+      This page describes a paid service. It is separate from the repository's
+      training content, which is published under CC BY-SA 4.0.
+    </p>
+  </footer>
+
+</main>
+</body>
+</html>

@@ -169,6 +169,12 @@ including "can't verify" when the evidence isn't in your repo.
 an audit, not a pentest, not a guarantee, and it certifies nothing about
 your app.
 
+**Prefer an outside pair of eyes?** The same ten checks, run by a human on
+an app they didn't write, are a paid service — scope, method, and a sample
+deliverable are described here:
+[Pre-launch review](https://mazzyst.github.io/skillboss-dojo/review/). Also
+heuristic, and it says so.
+
 ## Try it without an account
 
 The product has a free demo at

@@ -60,7 +60,7 @@ it); deleting the file is not enough.
 breached — 28.65M new
 secrets hit public commits in 2025 (GitGuardian), and AI-assisted commits
 leak at roughly double the baseline rate (3.2% vs 1.5%).
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/secrets -->
+**Train it:** [skillboss.dev/demo/secrets](https://skillboss.dev/demo/secrets)
 
 ### 2. Is `.env` ignored — and is there a `.env.example`?
 
@@ -70,10 +70,11 @@ against it, don't just read the pattern; a committed `.env.example` (or
 equivalent template) listing variable *names* with placeholder values so
 the next person — or the next agent — knows what to configure without
 being handed the real values; and no real values inside the example file.
-**Why:** 60%+ of vibe-coded apps tested in Q1 2026 exposed API keys or
-database credentials — a committed env file is the cheapest of those leaks
-to prevent.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/env-hygiene -->
+**Why:** a scan of 5,600 AI-built applications found 400+ exposed secrets —
+API keys, tokens — in live production (Escape.tech, *The State of Security
+of Vibe Coded Apps*, October 2025) — and a committed env file is the
+cheapest of those leaks to prevent.
+**Train it:** [skillboss.dev/demo/env-hygiene](https://skillboss.dev/demo/env-hygiene)
 
 ### 3. Does every route that changes data check who's asking?
 
@@ -85,9 +86,9 @@ any mutating route where you can't find one. Pay special attention to
 "internal" or "admin" endpoints and to client-visible IDs used as the only
 gate.
 **Why:** a 1,072-app scan found 172 apps allowing unauthenticated data
-deletion, and Base44's breach was an auth bypass via a public app ID — the
-route existed, the check didn't.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/auth-routes -->
+deletion (Symbiotic Security), and Base44's breach was an auth bypass via a
+public app ID — the route existed, the check didn't.
+**Train it:** [skillboss.dev/demo/auth-routes](https://skillboss.dev/demo/auth-routes)
 
 ### 4. Can the public internet reach your database?
 
@@ -104,7 +105,7 @@ the feature that limits each signed-in user to their own rows — turned
 on?"*
 **Why:** Moltbook's production database was fully exposed three days after
 launch — the case where one setting is the whole story.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/db-exposure -->
+**Train it:** [skillboss.dev/demo/db-exposure](https://skillboss.dev/demo/db-exposure)
 
 ### 5. Do backups exist — and have you restored one, once?
 
@@ -121,7 +122,7 @@ requires both: evidence backups run, and the user's yes.
 best-known database loss (GitLab, 2017 — they published the whole story),
 five separate backup mechanisms had all been failing silently; nobody
 found out until one was needed.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/backups -->
+**Train it:** [skillboss.dev/demo/backups](https://skillboss.dev/demo/backups)
 
 ### 6. Would you know your app is down before a user tells you?
 
@@ -139,7 +140,7 @@ calls it (Dockerfile `HEALTHCHECK`, IaC, platform settings).
 **Why:** without a pulse, downtime is discovered by your users — the
 cheapest check on this list to fix, and the one that buys back the most
 sleep.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/health -->
+**Train it:** [skillboss.dev/demo/health](https://skillboss.dev/demo/health)
 
 ### 7. Where do errors go when nobody's watching?
 
@@ -153,7 +154,7 @@ errors — and does it alert you, or would you have to remember to look?"*
 point or handler where errors are only printed and nothing reports them.
 **Why:** unmonitored errors mean your users learn about failures before
 you do — and the failures nobody reports, you never learn about at all.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/error-monitoring -->
+**Train it:** [skillboss.dev/demo/error-monitoring](https://skillboss.dev/demo/error-monitoring)
 
 ### 8. Can one script hammer your login all night?
 
@@ -168,7 +169,7 @@ configured at your proxy or CDN for the login and public POST routes?"*
 **Why:** an unprotected login form lets one script try thousands of stolen
 passwords overnight (credential stuffing) — and an unthrottled public
 endpoint that triggers paid work is a bill someone else runs up for you.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/rate-limiting -->
+**Train it:** [skillboss.dev/demo/rate-limiting](https://skillboss.dev/demo/rate-limiting)
 
 ### 9. Will you deploy the exact code you tested?
 
@@ -182,7 +183,7 @@ Do not hunt CVEs yourself; that is a scanner's job and you'd do it badly.
 **Why:** without a lockfile, the app you tested is not necessarily the app
 you deploy — the next install can silently pull different versions than
 the ones that worked.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/dependencies -->
+**Train it:** [skillboss.dev/demo/dependencies](https://skillboss.dev/demo/dependencies)
 
 ### 10. Will you learn about a runaway bill from the invoice?
 
@@ -197,7 +198,7 @@ config (e.g., an API client with no max-token/usage parameter) is
 `ATTENTION` evidence.
 **Why:** metered services fail open — without an alert, the first symptom
 of a bug or an abuser is the invoice.
-**Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/cost-guardrails -->
+**Train it:** [skillboss.dev/demo/cost-guardrails](https://skillboss.dev/demo/cost-guardrails)
 
 ## The report
 
