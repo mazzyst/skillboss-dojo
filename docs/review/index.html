@@ -1,15 +1,20 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Revue de mise en production — Hamdi Hadrich</title>
-<meta name="description" content="Une revue de mise en production indépendante : dix points vérifiés en lecture seule sur une archive de votre dépôt, trois priorités classées, et un brief d'investigation par priorité. Ni audit de sécurité, ni test d'intrusion.">
+<title>Pre-launch review — Hamdi Hadrich</title>
+<meta name="description" content="An independent pre-launch review: ten checks run read-only on an archive of your repository, three ranked priorities, and one investigation brief per priority. Not a security audit, not a penetration test.">
 <style>
-/* Charte SkillBoss (sb_brand.py). Fond sombre par défaut ; variante claire
-   sous prefers-color-scheme. Page autonome : aucune police, feuille de style
-   ni script externe — elle doit se charger sans rien demander à personne, et
-   ne rien apprendre sur qui la lit. */
+/* SkillBoss palette (sb_brand.py). Dark by default; light variant under
+   prefers-color-scheme. Self-contained page: no external font, stylesheet or
+   script — it must load without asking anyone for anything, and must learn
+   nothing about whoever reads it.
+
+   Twin of index.fr.html. The style block is deliberately duplicated rather
+   than shared: a single generated page has no build step to inline a shared
+   file, and an external stylesheet is exactly what this page must not have.
+   If you change the palette here, change it there in the same commit. */
 :root {
   --bg: #0a0a0f;
   --bg-2: #12121a;
@@ -73,8 +78,8 @@ strong { color: var(--ink); }
 .lede { font-size: 1.1rem; color: var(--ink-2); margin-bottom: 1.75rem; }
 .rule { height: 1px; background: var(--line); border: 0; margin: 2.5rem 0 0; }
 
-/* Le bandeau de nature : la même mention que porte chaque rapport. Il est en
-   haut, avant tout argument — c'est le sujet, pas une note de bas de page. */
+/* The nature banner: the same wording every report carries. It sits at the
+   top, before any argument — it is the subject, not a footnote. */
 .nature {
   border: 1px solid var(--line);
   border-left: 3px solid var(--orange);
@@ -86,8 +91,8 @@ strong { color: var(--ink); }
 }
 .nature strong { color: var(--ink); }
 
-/* La ligne de flux, reprise du mail à l'identique. Défilement horizontal
-   plutôt que retour à la ligne : cassée en deux, elle cesse d'être un schéma. */
+/* The flow line, taken from the mail unchanged. Horizontal scroll rather than
+   wrapping: broken over two lines it stops reading as a diagram. */
 .flow {
   font-family: var(--mono);
   font-size: .88rem;
@@ -124,15 +129,15 @@ code:not(.cmd) {
   padding: .1em .35em;
 }
 
-/* Les dix points. Deux colonnes quand la place existe, une sinon. */
+/* The ten checks. Two columns where there is room, one where there is not. */
 .checks {
   list-style: none;
   padding: 0;
   margin: 1.25rem 0;
   display: grid;
   gap: .55rem 1.5rem;
-  /* min(15rem, 100%) plutôt que 15rem : sur un écran plus étroit que la piste,
-     la grille déborderait et la page se mettrait à défiler latéralement. */
+  /* min(15rem, 100%) rather than 15rem: on a screen narrower than the track,
+     the grid would overflow and the page would start scrolling sideways. */
   grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
 }
 .checks li {
@@ -175,157 +180,155 @@ footer a { color: var(--ink-2); }
 <body>
 <main>
 
-  <h1>Revue de mise en production</h1>
+  <h1>Pre-launch review</h1>
   <p class="lede">
-    Un avis extérieur sur une application que vous n'avez pas écrite
-    ligne à ligne. Dix points vérifiés, trois priorités classées, et de quoi
-    les instruire.
+    An outside opinion on an application you did not write line by line. Ten
+    checks, three ranked priorities, and what it takes to act on them.
   </p>
 
   <p class="nature">
-    <strong>Ce que c'est, et ce que ce n'est pas.</strong> Une revue
-    <strong>heuristique, par lecture</strong>. Ni audit de sécurité, ni test
-    d'intrusion, ni garantie. Elle atteste le travail effectué et les points
-    vérifiés — <strong>jamais</strong> que l'application « est sécurisée ».
-    Cette mention est imprimée sur chaque rapport ; elle ne se retire pas.
+    <strong>What this review is.</strong> A <strong>heuristic review by
+    reading</strong>. Not a security audit, not a penetration test, not a
+    guarantee. It attests to the work done and the points checked —
+    <strong>never</strong> that the application &ldquo;is secure&rdquo;. This
+    wording is printed on every report; it does not come off.
   </p>
 
   <div class="flow">
-    votre dépôt <b>→</b> une archive <b>→</b> revue en lecture seule <b>→</b>
-    3 priorités <b>+</b> 3 briefs
+    your repo <b>&rarr;</b> an archive <b>&rarr;</b> a read-only review
+    <b>&rarr;</b> 3 priorities <b>+</b> 3 briefs
   </div>
 
-  <h2><span class="num">01</span>En quoi consiste une revue</h2>
+  <h2><span class="num">01</span>What a review covers</h2>
   <p>
-    Dix points de mise en production, les mêmes pour tout le monde, dans le
-    même ordre. La liste est publique et vérifiable avant de me parler :
-    <a href="https://github.com/mazzyst/skillboss-dojo">la checklist Ship Check 10</a>.
+    Ten pre-launch checks, the same for everyone, in the same order. The list
+    is public, and you can judge it before we ever speak:
+    <a href="https://github.com/mazzyst/skillboss-dojo">the Ship Check 10 checklist</a>.
   </p>
   <ul class="checks">
-    <li><b>SECRETS</b>Clés dans le code — et dans l'historique</li>
-    <li><b>ENV</b>Hygiène des fichiers d'environnement</li>
-    <li><b>AUTH</b>Authentification des routes qui écrivent</li>
-    <li><b>BASE</b>Base de données joignable depuis Internet</li>
-    <li><b>SAUVEGARDES</b>Existantes — et restaurées au moins une fois</li>
-    <li><b>DISPONIBILITÉ</b>Endpoint de santé et sonde externe</li>
-    <li><b>ERREURS</b>Supervision câblée, et regardée</li>
-    <li><b>DÉBIT</b>Limitation sur l'auth et les POST publics</li>
-    <li><b>DÉPENDANCES</b>Verrouillage et âge des versions</li>
-    <li><b>COÛTS</b>Garde-fou de dépense, et qui est prévenu</li>
+    <li><b>SECRETS</b>Keys in the code — and in the history</li>
+    <li><b>ENV</b>Environment file hygiene</li>
+    <li><b>ROUTE AUTH</b>Auth on the routes that write</li>
+    <li><b>DATABASE</b>Reachable from the public internet</li>
+    <li><b>BACKUPS</b>They exist — and one has been restored</li>
+    <li><b>UPTIME</b>Health endpoint and an outside probe</li>
+    <li><b>ERRORS</b>Monitoring wired, and watched</li>
+    <li><b>RATE LIMITING</b>Limits on auth and public POSTs</li>
+    <li><b>DEPENDENCIES</b>Lockfile and version age</li>
+    <li><b>COST</b>A spend guardrail, and who it alerts</li>
   </ul>
   <p>
-    Cinq se vérifient dans le code. Cinq ne s'y voient pas — une sauvegarde
-    n'existe que si elle a été restaurée — et se traitent en conversation, pas
-    en formulaire.
+    Five are verifiable in the code. Five are not — a backup only exists once
+    it has been restored — and those are settled in conversation, not in a
+    form.
   </p>
 
-  <h2><span class="num">02</span>Comment vous me transmettez le code</h2>
+  <h2><span class="num">02</span>How you send me the code</h2>
   <p>
-    Vous lancez une commande chez vous et vous m'envoyez le fichier obtenu.
+    You run one command on your side and send me the file it produces.
   </p>
   <code class="cmd">git bundle create app.bundle --all</code>
   <p>
-    C'est une archive de votre dépôt, historique compris.
-    <strong>Vous ne me donnez aucun accès</strong> : ni à votre compte, ni à
-    vos serveurs, ni à votre hébergement. Il n'y a donc rien à me retirer
-    ensuite — et rien à oublier de me retirer.
+    That is an archive of your repository, history included.
+    <strong>You give me no access</strong> — not to your accounts, not to your
+    servers, not to your hosting. So there is nothing to revoke afterwards, and
+    nothing to forget to revoke.
   </p>
   <p>
-    L'historique n'est pas un détail de confort : une clé supprimée du code y
-    reste lisible, et c'est le constat le plus fréquent de ce type de revue.
-    Sans historique, la moitié des trouvailles n'existent pas.
+    The history is not a nicety. A key deleted from the code stays readable in
+    it, which is why the history is where secrets are found. Without it, half
+    the findings do not exist.
   </p>
   <p>
-    Si la commande vous pose problème, une clé de lecture seule sur le dépôt
-    fait l'affaire — vous la retirez à la remise. L'archive reste préférable :
-    elle ne vous demande rien à révoquer.
-  </p>
-
-  <h2><span class="num">03</span>Ce qu'il reste chez moi, après</h2>
-  <p>
-    <strong>Rien.</strong> L'archive et la copie de travail sont supprimées à
-    la remise du rapport, et le rapport l'atteste, sur l'exemplaire que vous
-    recevez. Le clone est dépointé de votre dépôt dès sa création : aucun envoi
-    accidentel n'est possible depuis ma machine.
-  </p>
-  <p>
-    Aucune valeur de secret n'est recopiée nulle part — seulement son
-    emplacement. Le générateur du rapport refuse de compiler s'il trouve une
-    chaîne à forme de clé dans mes notes : ce n'est pas une intention, c'est un
-    verrou.
-  </p>
-  <p>
-    Une chose à savoir, parce qu'elle ne se devine pas : la revue est réalisée
-    avec l'assistance d'un agent IA. Le contenu du dépôt transite donc par son
-    fournisseur, sur un compte professionnel. C'est écrit aussi sur la page de
-    périmètre que vous signez.
+    If the command gives you trouble, a read-only key on the repository does
+    the job — you revoke it on delivery. The archive is still better: it leaves
+    you nothing to revoke.
   </p>
 
-  <h2><span class="num">04</span>Les briefs — un plan, jamais un correctif</h2>
+  <h2><span class="num">03</span>What stays with me afterwards</h2>
   <p>
-    Chaque priorité est livrée avec un <strong>brief d'investigation</strong> :
-    un texte que vous donnez à votre propre agent IA (Claude Code, Cursor…).
-    Il enquête sur votre stack — ce que je ne peux pas voir depuis une copie du
-    dépôt — pèse les options, et vous revient avec un plan chiffré en effort.
+    <strong>Nothing.</strong> The archive and the working copy are deleted when
+    the report ships, and the report attests to it, on the copy you receive.
+    The clone is detached from your repository the moment it is made: no
+    accidental push is possible from my machine.
   </p>
   <p>
-    <strong>Un brief interdit explicitement à votre agent de modifier quoi que
-    ce soit.</strong> Pas de fichier créé, pas de commande qui écrit, pas
-    d'appel à vos systèmes, pas d'identifiant réutilisé « pour vérifier ». Il
-    produit un plan ; vous arbitrez ; vous appliquez si vous voulez.
+    No secret value is copied anywhere — only its location. The report
+    generator refuses to build if it finds a key-shaped string in my notes:
+    that is not an intention, it is a lock.
   </p>
   <p>
-    Ce plan est celui de votre agent, pas le mien : je ne l'exécute pas, je ne
-    le relis pas, et il n'engage que vous. C'est la contrepartie honnête du
-    fait qu'il tourne là où j'ai décidé de ne pas aller.
+    One thing you would not guess, so it is said here: the review is carried
+    out with the help of an AI agent. The repository's contents therefore pass
+    through that provider, on a business account. It is written on the scope
+    page you sign, too.
   </p>
 
-  <h2><span class="num">05</span>À quoi ressemble le livrable</h2>
+  <h2><span class="num">04</span>The briefs — a plan, never a fix</h2>
   <p>
-    Voici une revue complète sur une application fictive. C'est le format exact
-    que vous recevez — mêmes rubriques, même mise en page, même attestation.
+    Each priority ships with an <strong>investigation brief</strong>: a text
+    you hand to your own AI agent (Claude Code, Cursor…). It investigates your
+    stack — what I cannot see from a copy of the repository — weighs the
+    options, and comes back with a plan costed in effort.
+  </p>
+  <p>
+    <strong>A brief explicitly forbids your agent to change anything.</strong>
+    No file created, no command that writes, no call to your systems, no
+    credential reused &ldquo;just to check&rdquo;. It produces a plan; you
+    decide; you apply it if you want to.
+  </p>
+  <p>
+    That plan is your agent's, not mine: I do not run it, I do not review it,
+    and it commits only you. That is the honest counterpart to it running where
+    I chose not to go.
+  </p>
+
+  <h2><span class="num">05</span>What the deliverable looks like</h2>
+  <p>
+    Here is a complete review of a fictional application. It is the exact
+    format you receive — same sections, same layout, same attestation.
   </p>
   <ul class="files">
     <li>
-      <a href="exemple-rapport.pdf">Exemple de rapport (PDF)</a>
-      <span class="what">Une page : les trois priorités d'abord, puis les dix
-      points avec leur état et, pour chacun, quoi faire. Deux pages si les
-      constats sont denses.</span>
+      <a href="sample-report.pdf">Sample report (PDF)</a>
+      <span class="what">One page: the three priorities first, then the ten
+      checks with their state and, for each, what to do. Two pages if the
+      findings are dense.</span>
     </li>
     <li>
-      <a href="exemple-briefs.md">Exemple de briefs (Markdown)</a>
-      <span class="what">Les trois briefs qui accompagnent ce rapport, tels
-      qu'ils arrivent — à coller dans votre agent.</span>
+      <a href="sample-briefs.md">Sample briefs (Markdown)</a>
+      <span class="what">The three briefs that go with that report, exactly as
+      they arrive — to paste into your agent.</span>
     </li>
   </ul>
 
-  <h2><span class="num">06</span>Prix et délai</h2>
+  <h2><span class="num">06</span>Price and turnaround</h2>
   <p class="price">
-    <b>390 €</b> par application, rendu sous
-    <b>48–72 h</b> après réception de l'archive et de votre accord
-    écrit.<br>
-    <b>690 €</b> pour une application large ou multi-environnement,
-    sous 3–5 jours ouvrés. Le palier est <strong>mesuré</strong> sur l'archive, pas
-    estimé à l'œil — et s'il change quelque chose, je vous le dis avec les
-    chiffres avant de démarrer.
+    <b>&euro;390</b> per application, delivered in
+    <b>48–72 h</b> once the archive and your written go-ahead are
+    in.<br>
+    <b>&euro;690</b> for a large or multi-environment application, in
+    3–5 business days. The tier is <strong>measured</strong> on the archive, not
+    eyeballed — and if it changes anything, I tell you with the numbers before
+    starting.
   </p>
   <p>
-    Ce que je certifie, sur chaque rapport : le travail effectué et les points
-    vérifiés. Rien d'autre.
+    What I certify, on every report: the work done and the points checked.
+    Nothing else.
   </p>
 
   <hr class="rule">
 
   <footer>
     <p>
-      <strong>Hamdi Hadrich</strong> — SkillBoss — culture DevOps et automatisation<br>
-      Écrivez-moi : <a href="mailto:contact@skillboss.dev">contact@skillboss.dev</a><br>
-      La checklist des dix points, en accès libre :
+      <strong>Hamdi Hadrich</strong> — SkillBoss — DevOps culture and automation<br>
+      Write to me: <a href="mailto:contact@skillboss.dev">contact@skillboss.dev</a><br>
+      The ten-point checklist, freely available:
       <a href="https://github.com/mazzyst/skillboss-dojo">github.com/mazzyst/skillboss-dojo</a>
     </p>
     <p class="src">
-      Cette page décrit une prestation payante. Elle est distincte du contenu
-      d'entraînement du dépôt, publié sous licence CC BY-SA 4.0.
+      This page describes a paid service. It is separate from the repository's
+      training content, which is published under CC BY-SA 4.0.
     </p>
   </footer>
 
