@@ -91,37 +91,44 @@ strong { color: var(--ink); }
 }
 .nature strong { color: var(--ink); }
 
-/* The flow from the mail, as chips that wrap. The earlier single scrolling line
-   truncated on a phone at exactly the wrong place — the reader lost the last
-   step, which is the one naming what they get. Wrapping keeps the arrows, so it
-   stays a diagram rather than a broken sentence; it just occupies three lines
-   instead of one.
+/* The flow from the mail, as four sealed steps. It was a single scrolling line
+   that truncated on a phone at exactly the wrong place — the reader lost the
+   last step, the one naming what they get back. A vertical list cannot
+   truncate, and it has room for a line of detail per step.
 
-   Each arrow lives with the chip it points AT, never the one before it, so a
-   wrapped line can never end on a dangling arrow. */
-.flow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: .4rem;
-  margin: 1.5rem 0;
-  padding: 0;
-  list-style: none;
+   The numerals are 壱弐参肆, the formal set Japanese banking uses on cheques
+   precisely because 一二三 are a stack of horizontal strokes: too easy to alter,
+   and — the reason here — too easy to read as punctuation rather than as
+   numbers. The formal glyphs have matching density, so the four read as one
+   series. They are decorative: the ORDER is carried by <ol> and by vertical
+   position, and each seal is aria-hidden, so nothing is lost to a screen reader
+   or to a font that cannot draw them.
+
+   FONT RISK, deliberately accepted: these glyphs need a CJK font on the
+   VISITOR's machine. macOS, Windows, iOS and Android ship one; a bare Linux
+   install may not, and would show tofu boxes. Loading a webfont would fix it
+   and is forbidden here — an external request is exactly what this page must
+   not make. The seal's border and layout hold up either way. */
+.flow { list-style: none; margin: 1.5rem 0; padding: 0; display: grid; gap: .75rem; }
+.flow li { display: grid; grid-template-columns: 1.9rem 1fr; gap: .85rem; align-items: start; }
+.flow .seal {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  color: var(--gold);
+  /* System CJK stacks, widest first. No webfont, by rule. */
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP",
+               "Noto Sans CJK JP", "Source Han Sans", "MS Mincho", serif;
+  font-size: .85rem;
+  line-height: 1;
 }
-.flow li { display: flex; align-items: center; gap: .4rem; }
-.flow .step {
-  font-family: var(--mono);
-  font-size: .82rem;
-  color: var(--ink);
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: .5rem .7rem;
-}
-.flow b { color: var(--gold); font-weight: 600; padding-right: .1rem; }
-/* The deliverable is the one chip the reader is buying — ringed, not filled,
-   so it reads as emphasis rather than as a button. */
-.flow li:last-child .step { border-color: var(--gold); }
+/* The deliverable is what the reader is buying — the one filled seal. */
+.flow li:last-child .seal { background: var(--gold); color: var(--bg); }
+.flow .step { font-family: var(--mono); font-size: .85rem; color: var(--ink); }
+.flow .note { display: block; font-size: .85rem; color: var(--ink-2); }
 
 code, .cmd {
   font-family: var(--mono);
@@ -210,12 +217,20 @@ footer a { color: var(--ink-2); }
     wording is printed on every report; it does not come off.
   </p>
 
-  <ul class="flow">
-    <li><span class="step">your repo</span></li>
-    <li><b>&rarr;</b><span class="step">an archive</span></li>
-    <li><b>&rarr;</b><span class="step">a read-only review</span></li>
-    <li><b>&rarr;</b><span class="step">3 priorities + 3 briefs</span></li>
-  </ul>
+  <ol class="flow">
+    <li><span class="seal" aria-hidden="true">壱</span>
+      <span><span class="step">your repo</span>
+        <span class="note">the code you already have</span></span></li>
+    <li><span class="seal" aria-hidden="true">弐</span>
+      <span><span class="step">an archive</span>
+        <span class="note">one command, no access granted</span></span></li>
+    <li><span class="seal" aria-hidden="true">参</span>
+      <span><span class="step">a read-only review</span>
+        <span class="note">ten checks, nothing exercised</span></span></li>
+    <li><span class="seal" aria-hidden="true">肆</span>
+      <span><span class="step">3 priorities + 3 briefs</span>
+        <span class="note">what comes back to you</span></span></li>
+  </ol>
 
   <h2><span class="num">01</span>What a review covers</h2>
   <p>
