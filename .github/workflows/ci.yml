@@ -35,12 +35,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      # TODO (owner): pin this to a commit SHA. A moved tag on a third-party
-      # action is a supply-chain path into a public repository, and only a SHA
-      # closes it. Left as a tag because pinning requires reading the real SHA
-      # from actions/checkout, which this session could not verify — and an
-      # unverified SHA is worse than an honest tag.
-      - uses: actions/checkout@v4
+      # Pinned to a commit SHA, not a tag. A tag is a movable pointer: whoever
+      # controls the action can repoint v7 at different code, and every workflow
+      # trusting that tag runs it on the next push. A SHA cannot be repointed.
+      # It matters more here than in a private repo — this workflow file is
+      # public, so it doubles as a map of what an attacker would target.
+      #
+      # To refresh by hand — this is exactly how the value below was obtained:
+      #   git ls-remote --tags https://github.com/actions/checkout | grep 'refs/tags/v7$'
+      # If that tag also has a `^{}` twin, it is annotated and the `^{}` SHA is
+      # the commit — use that one. v7 is lightweight, so its SHA is already the
+      # commit. Dependabot bumps SHA pins too and rewrites the trailing comment,
+      # so this stays current without hand-editing.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Kata format, relative links, review page
         run: python3 .github/scripts/check-content.py
 
@@ -48,8 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      # TODO (owner): pin to a commit SHA — see the note in the job above.
-      - uses: actions/checkout@v4
+      # SHA-pinned — see the note in the job above.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install gitleaks (pinned, checksum-verified official release)
         env:
           GITLEAKS_VERSION: 8.30.1
