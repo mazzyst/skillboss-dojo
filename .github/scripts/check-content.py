@@ -13,6 +13,7 @@ CONTRIBUTING.md promises, and no script replaces it. This handles the counting,
 so the review can spend its attention on the parts that matter.
 """
 
+import glob
 import math
 import os
 import re
@@ -165,15 +166,15 @@ def check_relative_links(r):
 
 
 def check_review_page(r):
-    """The review page must fetch nothing.
+    """Every review page must fetch nothing.
 
-    It sells a confidentiality posture; a page that hands its visitors' IP to a
-    CDN for a font would contradict that in silence. Navigation links out are
-    fine — the browser only follows them if the reader clicks."""
-    page = os.path.join("docs", "review", "index.html")
-    if not os.path.exists(page):
-        return 0
-    html = open(page, encoding="utf-8").read()
+    They sell a confidentiality posture; a page that hands its visitors' IP to
+    a CDN for a font would contradict that in silence. Navigation links out are
+    fine — the browser only follows them if the reader clicks. ALL html files
+    under docs/review are checked, not a hardcoded index.html: the French twin
+    (index.fr.html) makes the identical promise to a different reader, and a
+    page this check never reads is a promise nothing verifies."""
+    pages = sorted(glob.glob(os.path.join("docs", "review", "*.html")))
     patterns = [
         (r"<script\b", "a <script> tag"),
         (r"<link\b", "a <link> tag (stylesheet, preconnect, icon…)"),
@@ -183,14 +184,16 @@ def check_review_page(r):
         (r"<(?:img|iframe|video|audio|source|embed|object)\b", "an embedded media tag"),
         (r"\bsrc\s*=\s*[\"']https?:", "a remote src attribute"),
     ]
-    for pat, what in patterns:
-        if re.search(pat, html, re.I):
-            r.fail(page, "contains %s — this page must load nothing" % what)
-    # Every local link must resolve, or a download button 404s.
-    for target in re.findall(r'href="([^"#:]+)"', html):
-        if not os.path.exists(os.path.join(os.path.dirname(page), target)):
-            r.fail(page, "dead local link %r" % target)
-    return 1
+    for page in pages:
+        html = open(page, encoding="utf-8").read()
+        for pat, what in patterns:
+            if re.search(pat, html, re.I):
+                r.fail(page, "contains %s — this page must load nothing" % what)
+        # Every local link must resolve, or a download button 404s.
+        for target in re.findall(r'href="([^"#:]+)"', html):
+            if not os.path.exists(os.path.join(os.path.dirname(page), target)):
+                r.fail(page, "dead local link %r" % target)
+    return len(pages)
 
 
 def main():
@@ -207,8 +210,8 @@ def main():
                                                n, "" if n == 1 else "s"))
     before = len(r.failures)
     n = check_review_page(r)
-    print("  %s review page (%s)" % ("ok  " if len(r.failures) == before else "FAIL",
-                                     "present" if n else "absent, skipped"))
+    print("  %s review pages (%s)" % ("ok  " if len(r.failures) == before else "FAIL",
+                                      "%d checked" % n if n else "none, skipped"))
 
     if r.failures:
         print("\n%d problem%s:" % (len(r.failures), "" if len(r.failures) == 1 else "s"))
