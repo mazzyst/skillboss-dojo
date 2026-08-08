@@ -70,9 +70,10 @@ against it, don't just read the pattern; a committed `.env.example` (or
 equivalent template) listing variable *names* with placeholder values so
 the next person — or the next agent — knows what to configure without
 being handed the real values; and no real values inside the example file.
-**Why:** 60%+ of vibe-coded apps tested in Q1 2026 exposed API keys or
-database credentials — a committed env file is the cheapest of those leaks
-to prevent.
+**Why:** a scan of 5,600 AI-built applications found 400+ exposed secrets —
+API keys, tokens — in live production (Escape.tech, *The State of Security
+of Vibe Coded Apps*, October 2025) — and a committed env file is the
+cheapest of those leaks to prevent.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/env-hygiene -->
 
 ### 3. Does every route that changes data check who's asking?
@@ -85,8 +86,8 @@ any mutating route where you can't find one. Pay special attention to
 "internal" or "admin" endpoints and to client-visible IDs used as the only
 gate.
 **Why:** a 1,072-app scan found 172 apps allowing unauthenticated data
-deletion, and Base44's breach was an auth bypass via a public app ID — the
-route existed, the check didn't.
+deletion (Symbiotic Security), and Base44's breach was an auth bypass via a
+public app ID — the route existed, the check didn't.
 **Train it:** [skillboss.dev/demo](https://skillboss.dev/demo)<!-- S-4: /demo/auth-routes -->
 
 ### 4. Can the public internet reach your database?
