@@ -179,6 +179,32 @@ deliverable are described here:
 [Pre-launch review](https://mazzyst.github.io/skillboss-dojo/review/). Also
 heuristic, and it says so.
 
+## The Ship-Ready Starter Pack
+
+[`ship-ready/`](ship-ready/) is the same judgment, aimed at the moment you
+START a project instead of the moment you ship it. Ten systems, each
+holding back a named villain, each linking a free drill:
+
+![The Ship-Ready map — ten systems, ten villains](ship-ready/ship-ready-map.png)
+
+- **[`SHIP-READY.md`](ship-ready/SHIP-READY.md)** — the floor. Paste it
+  whole into your coding agent and let it apply the ten systems to your
+  project.
+- **[`rules/`](ship-ready/rules/)** — the floor as standing agent rules,
+  per stack (generic, Next.js + Supabase, Lovable). Same text works as
+  Cursor rules, CLAUDE.md material, or Copilot instructions. Missing your
+  stack? Pull requests welcome.
+- **[`INCIDENTS.md`](ship-ready/INCIDENTS.md)** — real incidents from the
+  vibe-coding wave, blameless and cited, each mapped to the reflex that
+  would have stopped it.
+- **[`ci/secret-scan.yml`](ship-ready/ci/secret-scan.yml)** — a drop-in
+  workflow that blocks the next hardcoded key before it enters history.
+
+The guided room lives at [skillboss.dev/launch](https://skillboss.dev/launch)
+— brief, floor, and drill, one tap from your clipboard. Same limits as the
+Ship Check, honestly: heuristics your own agent applies, not a guarantee,
+and it certifies nothing about your app.
+
 ## Try it without an account
 
 The product has a free demo at
