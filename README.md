@@ -245,6 +245,11 @@ account.
 your filled `state/journal.md`, the RUN CLEARED line, what held, what the
 kit got wrong. It says what you did; it certifies nothing about your app.
 
+**The author runs it too.** [`EXAMPLE-RUN-LIVE.md`](EXAMPLE-RUN-LIVE.md) is
+the journal of the SkillBoss run itself — the gate reports with their
+evidence, and the defects that run found in this kit. Rendered from the
+repository's own `state/journal.md`, never edited here.
+
 ## Try it without an account
 
 The product has a free demo at
