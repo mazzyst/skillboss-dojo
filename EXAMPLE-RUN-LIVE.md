@@ -504,3 +504,41 @@ choice: GO. 10-ARCHITECTURE flips to PASSED, evidence pointing at this
   the ladder. The belt says the questions were faced, not that the
   answers were all perfect: one of them is owed by gate 40 and the record
   says so on the Parked table.
+
+2026-09-03 — DECISION: gate 20 opens, and the history scan finally runs
+context: gate 00 recorded that the CI secret scan reads the working tree
+  and never the history. Gate 20 owns that gap. gitleaks 8.30.1 was
+  fetched, pinned by version, and run twice: once over the full git
+  history, once over a clean extraction of HEAD — the second being what a
+  CI runner actually sees, since a working copy carries build artifacts a
+  runner does not.
+options: report the working-copy scan, which counted 25 findings and
+  would have been a false alarm built from my own build output; report
+  only what a fresh checkout shows.
+choice: both, separated. History: 131 commits, ~58 MB, THREE findings.
+  Clean checkout of HEAD: the same three, nothing else. No real
+  credential exists anywhere in this repository's history — that is the
+  headline, and it is the first time anyone can say it with a command
+  behind it rather than a belief.
+
+  The three are all in start-guide/tools/test-hooks.sh, lines 39, 41 and
+  61: the fixtures written at SG-2A so the kit's own secret guard could
+  be seen firing. Location, never value: they are the vendor's published
+  documentation examples, not live keys.
+
+2026-09-03 — DECISION: my own lot would have turned the secret gate red
+context: the same clean-checkout scan exits 1. The repository's CI runs
+  `gitleaks dir .` on every pull request, so the secret-scan job fails
+  the moment a pull request opens on this branch. CI has never run here —
+  0 runs on this branch, because the workflow fires on pull requests and
+  on pushes to main, and neither has happened.
+options: notice it at merge time, when a red job looks like a mystery;
+  record it now, at the gate whose subject it is, and name the fix.
+choice: record it now. The fixtures came in with SG-2A, the lot that made
+  the guards honest — and they would have broken the guard that watches
+  this repository. The kit found its author's own mistake, which is the
+  most useful thing a dogfood can do. The fix belongs at this gate and is
+  the human's to approve: allowlist those three values BY VALUE in
+  .gitleaks.toml, never by file, exactly as the public mirror does for
+  its teaching kata, so a real key landing in that same file is still
+  caught tomorrow.
