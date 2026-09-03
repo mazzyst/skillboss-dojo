@@ -492,3 +492,15 @@ choice: the second, recorded above, with the drift named here rather than
   hidden. The human's GO on the gate is still theirs to give, and if they
   meant the wording literally they say so and this entry is corrected by
   the next one.
+
+2026-09-03 — DECISION: gate 10 closes, and the run belt turns YELLOW
+context: the second gate 10 report was read with its seven evidenced
+  boxes, its one waived box and the named price of that waiver. The human
+  typed GO on 2026-09-03.
+options: hold for the manual end-to-end run; GO on the report as it
+  stands, waiver included.
+choice: GO. 10-ARCHITECTURE flips to PASSED, evidence pointing at this
+  date's second report. Three gates faced — 00, 05, 10 — earns YELLOW on
+  the ladder. The belt says the questions were faced, not that the
+  answers were all perfect: one of them is owed by gate 40 and the record
+  says so on the Parked table.
