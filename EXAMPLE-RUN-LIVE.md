@@ -259,3 +259,24 @@ choice: GO, 2026-09-03. 05-AGENT-WORKBENCH flips to PASSED. The run belt
   two gates faced is not three. The journal is published beside the kit
   on the public mirror as EXAMPLE-RUN-LIVE.md, a rendering of this file
   and never a second source: a run nobody can read is a claim.
+
+2026-09-03 — DECISION: the release exists, and the measurement clock starts
+context: the owner published start-guide-v2 on the public mirror — tag on
+  main at 0579329, one uploaded asset, skillboss-start-guide-v2.zip,
+  100817 bytes, whose GitHub-computed digest reads
+  sha256:8ea039a08deaa7b9c62344c1900cd5c3b5b3b38f5d7a4c27794472ea6e2313f0,
+  the same checksum this repository prints on /start and in the notes.
+  Three independent copies now agree: dist/, the served download, and the
+  release asset.
+options: leave the release unrecorded, since it is not gate work; record
+  it here, because the measurement clock the whole roadmap depends on
+  starts at this moment and the record should say when.
+choice: record it. https://github.com/mazzyst/skillboss-dojo/releases/tag/start-guide-v2
+  is the object I-1 measures; the 30-day read falls on 2026-10-03 and the
+  60-day read on 2026-11-02, both already written into the measurement
+  note. One thing is imperfect and is written down rather than fixed
+  quietly: the release BODY is a link to an uploaded RELEASE-NOTES-v2.md
+  attachment instead of the notes themselves, so the checksum, the
+  changelog and the honesty line are one click away rather than on the
+  page. The fix is the owner's — paste the markdown into the body — and
+  it costs nothing but a moment.
