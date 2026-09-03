@@ -736,3 +736,29 @@ risks accepted by human: a production database whose closure rests on a
   holding emails and public pages with no way for a person to leave it.
 cost: 1 session, tokens unknown - DECLARED by the coach, not measured
 verdict: GO-READY, two boxes waived
+
+2026-09-03 — WAIVER: SKIP db-not-public because the production rule is
+  not in the repository and the one-line fix can lock the owner out of
+  their own database at the moment it syncs — the human's call, revisited
+  at gate 70
+
+2026-09-03 — WAIVER: SKIP data-minimum's deletion path because no account
+  deletion exists in the product and the fix is a feature, not a line —
+  revisited at gate 90
+
+2026-09-03 — DECISION: gate 20 closes, and the run belt turns ORANGE
+context: GATE REPORT — 20-SECURITY was read with its five evidenced boxes
+  and its two waived ones, each waiver carrying the fix it needs and the
+  gate that revisits it. The human typed GO on 2026-09-03.
+options: hold the gate until the database's closure is declared and an
+  account can be deleted, which stops the run on two items that belong to
+  a platform console and a product roadmap; GO on the report as written,
+  with both gaps named, dated and parked.
+choice: GO. 20-SECURITY flips to PASSED, evidence pointing at this date's
+  report. Four gates faced — 00, 05, 10, 20 — earns ORANGE on the ladder.
+  What the belt says and does not say is worth writing down at this
+  particular gate: it says the security questions were faced with
+  commands behind the answers, and it says nothing about whether this
+  application is secure. Two of its answers are owed by later gates, and
+  the Parked table names both. The kit hardens the builder; it never
+  certifies the app.
