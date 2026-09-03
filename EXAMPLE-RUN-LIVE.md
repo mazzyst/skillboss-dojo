@@ -280,3 +280,160 @@ choice: record it. https://github.com/mazzyst/skillboss-dojo/releases/tag/start-
   changelog and the honesty line are one click away rather than on the
   page. The fix is the owner's — paste the markdown into the body — and
   it costs nothing but a moment.
+
+2026-09-03 — DECISION: the release body is fixed (correcting today's
+  earlier entry)
+context: the entry above recorded that the release body linked an
+  uploaded copy of the notes instead of carrying their text. The owner
+  pasted the raw markdown; the page now renders the checksum table, the
+  changelog and the honesty line directly.
+options: edit the earlier entry, which the journal forbids; append a
+  correction that says what it corrects.
+choice: append. The flaw was real when it was written and the record
+  keeps both states — that is what append-only is for. What remains true
+  from that entry: the tag, the asset and the digest, unchanged.
+
+2026-09-03 — DECISION: the four decision records are written after the
+  fact, and say so
+context: gate 10 asks for a journal entry per irreversible choice —
+  database, framework, hosting, auth. In this repository all four were
+  made before the run started, and `docs/technical-architecture.md`
+  states WHAT was chosen without ever stating WHY.
+options: skip the box because the choices are old; invent rationale that
+  sounds good; write the records now, reconstructed from the documents
+  and the code, and label them as reconstructions.
+choice: reconstruct and label. The four entries below carry what the
+  repository actually shows; where the reason is not written anywhere, it
+  is given as the coach's reading and marked as such, never as the
+  builder's remembered intent. A decision record invented in hindsight is
+  worse than none — it launders a guess into a fact.
+
+2026-09-03 — DECISION (reconstructed): PostgreSQL with Prisma for data
+context: the product stores users, tracks, a question bank, one daily
+  challenge per user per track, answers and leaderboards — relational
+  data with hard uniqueness rules. Reconstructed from
+  `backend/prisma/schema.prisma` and `docs/data-model.md`.
+options: a document store, which would push the (userId, trackId,
+  challengeDate) uniqueness into application code; PostgreSQL with a
+  query builder; PostgreSQL with Prisma.
+choice: PostgreSQL with Prisma. The one-attempt-per-day rule is enforced
+  by a database unique constraint and caught as P2002 in
+  `quiz-submission.service.ts:479` — the rule cannot be bypassed by a
+  racing request, which is exactly the property a document store would
+  have made the application's problem. Reversing this is expensive: the
+  schema, the migrations and every service read.
+
+2026-09-03 — DECISION (reconstructed): NestJS and Next.js App Router, one
+  TypeScript monorepo
+context: one language across client and server, an API that must keep
+  correct answers hidden until submit, and a client that must feel like
+  an arcade cabinet. Reconstructed from `README.md`, the workspaces in
+  the root `package.json` and `docs/technical-architecture.md` §1.
+options: a single Next.js application with route handlers; a separate
+  API in another language; NestJS beside Next.js in one repository.
+choice: NestJS beside Next.js. The scoring and the no-leak guarantee live
+  in services with no HTTP awareness, which is what makes them testable
+  without a browser; the monorepo keeps one type language across the
+  wire. The cost is two build pipelines, accepted.
+
+2026-09-03 — DECISION (reconstructed): Render, deployed by CD after a
+  green CI, with autoDeploy off
+context: a solo builder, no platform team, and a deploy that must never
+  fire from an untested commit. Reconstructed from
+  `.github/workflows/cd.yml` and `render.yaml`.
+options: a VPS, which buys control and costs patching; serverless, which
+  fits the traffic shape but complicates the database connection; a PaaS.
+choice: Render as a PaaS, with `autoDeploy: false` so the workflow is the
+  only deploy path, SHA-pinned actions, and a health poll that gates the
+  release. Moving hosts later is a day of work, not a rewrite — this is
+  the least irreversible of the four.
+
+2026-09-03 — DECISION (reconstructed): OAuth with a JWT bearer, and no
+  passwords at all
+context: the audience is professionals on LinkedIn and the product wants
+  a visible profile; storing passwords would add a breach surface for no
+  product gain. Reconstructed from `backend/src/auth/` and the `User`
+  model in `schema.prisma`.
+options: email and password with the storage and reset flows that
+  implies; magic links, which need a mail provider; OAuth against
+  providers the audience already uses.
+choice: LinkedIn and GitHub OAuth, then a signed JWT bearer. No password
+  hash exists in the schema, so no password can leak from it. The guard
+  fails closed: a token that fails verification raises Unauthorized
+  rather than falling through (`jwt-auth.guard.ts:69-70`).
+
+GATE REPORT — 10-ARCHITECTURE                    date: 2026-09-03
+boxes: [x] diagram-committed
+           evidence: docs/technical-architecture.md lines 7-26, an ASCII
+           diagram of the three tiers that names the dependency direction
+           on its face: "Controllers -> Services -> Prisma ORM ->
+           Database"
+       [x] boundaries-hold
+           evidence: backend/src is split by domain, each with its
+           controller and service (quiz, auth, leaderboard, profile...);
+           `grep -l "PrismaService|prisma\." backend/src --include=
+           *.controller.ts` returns nothing — the single controller that
+           mentions Prisma imports a TYPE only
+           (admin.controller.ts:12, `import { DraftStatus } from
+           '@prisma/client'`). No service imports express or takes @Res.
+           On the client, API calls live in frontend/src/lib/*-api.ts and
+           hooks; the grep for fetch( inside components returns only a
+           test asserting a component does NOT fetch.
+       [x] twelve-factor-config
+           evidence: .env.example at the repository root, 140 lines, six
+           of them empty-valued placeholders; configuration is read
+           through backend/src/config/env.validation.ts and
+           backend/src/app.config.ts. Two string literals are named
+           rather than hidden: 'http://localhost:3000' in
+           auth.controller.ts:241 and app.config.ts:64 is a FALLBACK
+           after `config.get('FRONTEND_URL')`, and SITE_URL in
+           content/generation/kata-markdown.ts:32 is the public site's
+           address inside generated content, not configuration.
+       [x] no-silent-catch
+           evidence: 120 catch blocks scanned across backend/src and
+           frontend/src (tests excluded); zero match the empty-catch
+           pattern. Two catch bodies contain only a comment, both
+           deliberate and both about writing to localStorage:
+           frontend/src/lib/terminal-pace.ts:92 and
+           frontend/src/lib/ship-ready-storage.ts:86, "Private mode /
+           quota / disabled — the ghost stays in-memory this mount".
+           Degrading in memory is the handling.
+       [x] auth-fails-closed
+           evidence: backend/src/auth/jwt-auth.guard.ts:69-70 —
+           `} catch {` then `throw new UnauthorizedException('Invalid or
+           expired token.');`. A verification that throws produces a
+           refusal, never a pass-through; the same file raises
+           Unauthorized for a missing bearer (line 61) and for a payload
+           that does not typecheck (lines 79, 84).
+       [x] seams-injected
+           evidence: constructor injection at
+           quiz-submission.service.ts:41-47 — prisma, selection, scoring,
+           leaderboard and badges all arrive as parameters, so storage is
+           fakeable; and the clock is a defaulted parameter rather than a
+           hardwired call, e.g. admin-metrics.service.ts:211
+           `async getOverview(now: Date = new Date())`, which a test
+           pins by passing a fixed date.
+       [x] decision-records
+           evidence: the four entries of 2026-09-03 above — data,
+           framework, hosting, auth — each labelled (reconstructed),
+           preceded by the entry explaining why they are written after
+           the fact.
+       [ ] skeleton-proven
+           status: OPEN — no automated end-to-end proof of the slice
+           exists today. The Playwright job is commented out in
+           .github/workflows/ci.yml ("Still deferred (do not enable
+           yet): e2e Playwright flows"), so CI proves the units and the
+           integration with a mocked Prisma, not one request through
+           every layer. The deploy is health-gated and green — CD run
+           126, https://github.com/mazzyst/skillboss/actions/runs/33552011253,
+           conclusion success on 12bcbf91 — which proves the app serves
+           and answers /api/health, not that the daily run completes.
+           This coach cannot close the gap itself: the egress proxy
+           refuses skillboss.dev (connect_rejected), so it cannot
+           exercise the URL by hand. What closes it is one run by the
+           human, output trimmed into this journal — or gate 40 wiring
+           the e2e job that proves it on every push.
+waivers: none
+risks accepted by human: none
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: HOLD (1 box open)
