@@ -542,3 +542,197 @@ choice: record it now. The fixtures came in with SG-2A, the lot that made
   .gitleaks.toml, never by file, exactly as the public mirror does for
   its teaching kata, so a real key landing in that same file is still
   caught tomorrow.
+
+2026-09-03 — DECISION: the fixtures are invented lookalikes, and today's
+  entry called them something else
+context: the entry above, "gate 20 opens, and the history scan finally
+  runs", describes the three findings in start-guide/tools/test-hooks.sh
+  as "the vendor's published documentation examples". They are not. They
+  are strings written at SG-2A, SHAPED like the published examples but
+  not equal to them — the fixture ends ABCDEFG where the vendor's own
+  document ends EXAMPLE.
+options: edit that sentence, which this journal forbids; leave it, which
+  leaves a false claim standing on a public record, about credentials of
+  all subjects.
+choice: correct it here, append-only. The difference is worth the entry:
+  a vendor's published example is a string its issuer guarantees is dead,
+  while an invented lookalike is only as dead as the person who invented
+  it. Both are safe in this repository — neither was ever issued by
+  anyone, and no scanner can tell them apart, which is precisely what
+  makes them usable as fixtures — but the record should say which kind it
+  holds. This entry corrects that one sentence. The finding itself —
+  three fixture strings, zero real credentials in 131 commits — stands
+  exactly as written.
+
+2026-09-03 — DECISION: the two secret-scan fixes are applied, and each is
+  proved by a command
+context: the human approved both fixes named at the opening of this gate:
+  allowlist the fixture values BY VALUE, and add the history scan to CI
+  beside the working-tree one.
+options: allowlist by FILE, which is shorter and would blind the scanner
+  to a real key landing in that same file forever; allowlist by value,
+  which forgives two known-dead strings and nothing else.
+choice: by value, and proved rather than asserted. Evidence, location
+  never value:
+  - .gitleaks.toml — the two fixture strings appended to the `regexes`
+    allowlist, with the comment above them naming what they are and why
+    they exist.
+  - .github/workflows/ci.yml, job `secret-scan` — the checkout now
+    carries `fetch-depth: 0`, and a second step, "Scan the whole git
+    history for secrets", runs `gitleaks git .` beside the existing
+    `gitleaks dir .`. Without the full clone the history step would read
+    a one-commit repository and report clean on a history that still
+    holds the key: the depth is not a detail, it is the step.
+  Three commands, run after the change:
+  - `gitleaks git . --config .gitleaks.toml --redact` → 132 commits
+    scanned, ~58 MB, no leaks found, exit 0.
+  - `gitleaks dir .` over a clean extraction of the tree as it will be
+    committed (1099 files, `git archive` plus the two changed files) → no
+    leaks found, exit 0. That extraction, not a working copy, is what a
+    runner sees.
+  - the value-scoping proof: a DIFFERENT AWS-shaped string appended to
+    that same fixture file, then the same scan → leaks found: 1, exit 1,
+    the finding pointing at start-guide/tools/test-hooks.sh. The
+    allowlist forgives two strings, not a file.
+  The gap gate 00 recorded is closed, and the red job this run's own
+  earlier lot would have caused is gone before any pull request opens.
+
+2026-09-03 — DECISION: the personal-data list is named here, field by
+  field, and the deletion path is the honest half
+context: gate 20's data-minimum box wants the personal-data list and the
+  deletion path in this journal — not only in a document that a reader of
+  the run would never open.
+options: point at the document and call the box done; copy the whole
+  section here; name the fields, name the sources, and state plainly what
+  exists and what does not.
+choice: the third.
+  COLLECTED, all of it either returned by an OAuth provider or typed by
+  the user: provider id (LinkedIn or GitHub), email, display name, avatar
+  URL, and an optional self-typed headline; quiz results — scores,
+  answers, timings, dates; opt-in public fields — handle, https contact
+  link, repository link, up to five credential links; and debrief text
+  the user posts deliberately. Location:
+  backend/prisma/schema.prisma, `model User`, and
+  docs/security-and-privacy.md §8, which lists every field with its
+  origin.
+  NOT COLLECTED, and the schema has nowhere to put it: IP, user agent,
+  referrer, location, device fingerprint, third-party trackers. The two
+  counters the product keeps — gate signals and the meeting counter — are
+  integers per day or per page, structurally unable to answer "who".
+  Same section.
+  MINIMUM for the mission: yes. The mission is a public builder record,
+  so an identity and a results history are the product; every public
+  field beyond that is opt-in and defaults to off.
+  DELETION PATH: none. docs/security-and-privacy.md §8 records it as
+  "account deletion (post-MVP)", and today no endpoint, no script and no
+  documented manual procedure exists. A debrief can be deleted by its
+  author, hard and immediate; an account cannot be deleted at all. That
+  is the gap. It is named in the gate report rather than dressed up.
+
+2026-09-03 — DECISION: two doors this gate could not close, and what each
+  one costs
+context: five boxes were evidenced from the code and the configuration in
+  an afternoon. Two came back short — the database's door, and the user's
+  exit.
+options: check them on a reasonable belief — the platform surely defaults
+  to closed, deletion is surely rare — and move on; leave both boxes open
+  and hold the gate indefinitely; evidence what is true, name what is
+  missing, and put each gap in front of the human with the fix it needs.
+choice: the third.
+  THE OPEN DOOR. Nothing in this repository declares the production
+  database closed to the internet. render.yaml's `databases:` block names
+  the database, its database name and its user, and stops: there is no
+  `ipAllowList` key, and nothing else in the repository closes that door.
+  What IS evidenced: the application reaches the database privately —
+  DATABASE_URL comes from `fromDatabase`, never a typed host — and the
+  development database in docker-compose.yml is bound to 127.0.0.1, so
+  the local half is shut. The production half rests on a platform default
+  that nobody here has read from the platform. That is a belief, and
+  replacing beliefs with evidence is the whole of this gate. The fix is
+  one line, `ipAllowList: []` in that block, and it is the human's to
+  approve rather than the coach's to apply: it can lock a person out of
+  their own psql the moment the blueprint syncs.
+  THE EXIT. There is no way for a user to delete their account — see the
+  entry above. The fix is a feature, not a line, and it does not belong
+  in this lot.
+
+2026-09-03 — PARKED: declare the production database closed, not assumed
+  closed (revisit at gate 70)
+
+2026-09-03 — PARKED: give a person a way to delete their account and
+  their data (revisit at gate 90)
+
+GATE REPORT — 20-SECURITY                        date: 2026-09-03
+boxes: [x] secrets-out-of-code
+           evidence: .env.example at the repository root; .gitignore
+           excludes .env. History: `gitleaks git . --config
+           .gitleaks.toml --redact` → 132 commits, no leaks found, exit
+           0. The tree as it commits, extracted clean: `gitleaks dir .` →
+           no leaks found, exit 0. Both now run on every pull request —
+           .github/workflows/ci.yml, job `secret-scan`, two steps, the
+           checkout at fetch-depth: 0. Locations only; no value is
+           reproduced here or there.
+       [x] authz-deny-by-default
+           evidence: backend/src/auth/jwt-auth.guard.ts — JwtAuthGuard is
+           registered globally (backend/src/auth/auth.module.ts,
+           APP_GUARD) and refuses any request without a signature-valid
+           Bearer token unless the route carries @Public(). The default
+           answer is no; being public is the thing that has to be written
+           down. One mutating route: POST /api/v1/quiz/submit
+           (backend/src/quiz/quiz.controller.ts) takes its user from
+           @CurrentUser(), never from the body, and is throttled per user
+           on top.
+       [x] input-validated
+           evidence: a global ValidationPipe with whitelist,
+           forbidNonWhitelisted and transform (backend/src/app.config.ts)
+           — an unknown field is a 400, not a silent pass. Boundary
+           example: backend/src/quiz/dto/submit.dto.ts — @IsUUID on both
+           ids, @IsInt @Min(0) on the timing, the answer array bounded
+           5..14, and no correctness or score field exists to send.
+           Query mechanism: Prisma. The only raw SQL in the codebase,
+           backend/src/content/review/dedup-query.ts, is `Prisma.sql`
+           tagged templates with every interpolation a bound parameter;
+           `$queryRawUnsafe` appears zero times across backend/src and
+           frontend/src.
+       [x] least-privilege
+           evidence: OAuth scopes are identity-only and pinned as
+           constants — GITHUB_SCOPES = read:user, user:email
+           (backend/src/auth/github.service.ts) and LINKEDIN_SCOPES =
+           openid, profile, email
+           (backend/src/auth/linkedin.service.ts). No write scope of any
+           kind is requested. Both images drop out of root: `USER node`
+           in backend/Dockerfile and in frontend/Dockerfile. The database
+           role is the application's own (render.yaml, databases: user),
+           not a shared administrator. Secrets are declared `sync: false`
+           in render.yaml, so their values live in the platform and never
+           in this repository.
+       [~] db-not-public
+           status: half evidenced. Development is shut —
+           docker-compose.yml binds Postgres to 127.0.0.1. Production is
+           not declared anywhere: render.yaml carries no ipAllowList. See
+           the DECISION of this date, "two doors this gate could not
+           close". Waived pending the human's call on the one-line fix.
+       [x] dependency-floor
+           evidence: package-lock.json at the repository root, one
+           lockfile for the workspaces. Audit command and today's result:
+           `npm audit --omit=dev` → 2 vulnerabilities, 1 moderate and 1
+           high (qs, nanoid); both packages are maintained and neither
+           sits on an auth or crypto path. No audit step runs in CI yet —
+           this gate's own text puts THE ROTTEN PLANK at gate 50, and
+           that is where the CI step and these two findings are owed.
+       [~] data-minimum
+           evidence: the list is in this journal, field by field, in the
+           DECISION of this date; its sources are
+           docs/security-and-privacy.md §8 and
+           backend/prisma/schema.prisma `model User`. The deletion path
+           does not exist — no endpoint, no script, no documented manual
+           procedure. Waived with a revisit at gate 90.
+waivers: SKIP db-not-public — the production rule is not in the
+  repository; the one-line fix is proposed and the human decides.
+  SKIP data-minimum's deletion path — no account deletion exists in the
+  product; the fix is a feature, not a line.
+risks accepted by human: a production database whose closure rests on a
+  platform default nobody in this repository has read; a live product
+  holding emails and public pages with no way for a person to leave it.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: GO-READY, two boxes waived
