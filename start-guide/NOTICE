@@ -1,0 +1,42 @@
+SkillBoss Start Guide
+Copyright 2026 Hamdi Hadrich
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file.
+
+Apache-2.0 section 4(d) requires this NOTICE to travel with every copy and
+every derivative work. That is deliberate here: what follows is what the
+kit is FOR, and it should reach whoever ends up holding a copy.
+
+WHAT THIS KIT CLAIMS, AND WHAT IT DOES NOT
+
+The Start Guide is a coach, not a certification: its guardrails are
+heuristic defaults applied by your own agent. It hardens the builder; it
+never certifies the app.
+
+- Free, forever. There is no paid tier of this kit and no feature held
+  back from it.
+- Heuristic, and says so. Nothing in this kit inspects, scans, or
+  certifies your application.
+- The builder, never the app. Run belts and the run's record speak about the
+  person and the process. No claim like "built ship-ready" or "secured by
+  SkillBoss" about an application may be derived from this kit.
+- No telemetry. As published, this kit makes no network request and sends
+  nothing anywhere. Every measurement it prints is computed on your own
+  machine from your own git history, or declared by a human and labelled
+  as declared.
+
+TRADEMARKS
+
+"SkillBoss" and the SkillBoss brand, name, and logo are NOT licensed by
+this repository, and Apache-2.0 section 6 grants no rights in them. You may
+state that a project "used the SkillBoss Start Guide". You may not use the
+SkillBoss name or brand to certify, endorse, or badge an application --
+"secured by SkillBoss", "SkillBoss verified" and the like. The kit refuses
+that claim about itself; this notice refuses it about you.
+
+MODIFIED COPIES
+
+You may adapt this kit and redistribute your adaptation under Apache-2.0,
+including commercially. Two conditions, both from the license itself:
+state in your own NOTICE that you changed it, and do not present the
+result as the SkillBoss Start Guide.

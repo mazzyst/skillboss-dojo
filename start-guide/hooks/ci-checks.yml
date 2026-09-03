@@ -1,0 +1,68 @@
+# SkillBoss Start Guide — the CI floor (Gate 50).
+#
+# Copy to .github/workflows/checks.yml, or translate the steps to whatever
+# CI you run: the shape is the point, not the platform. Deliberately uses
+# no third-party action — only your own commands and shell, so it works
+# anywhere and recommends no vendor.
+#
+# Stage order is the floor: lint, test, build, scan. Cheap checks fail
+# first; nothing is published before the scan.
+name: checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ONE command, the same one you run locally and the same one the
+      # pre-push hook runs. If these three ever diverge, the floor is gone.
+      - name: Lint, test, build
+        run: ./scripts/check.sh
+
+      # The history scan, on the whole history, not just this commit: a
+      # secret removed from HEAD but alive in an old commit is still leaked.
+      # Location, never value: the finding names the commit and the file,
+      # never the line — CI logs are public on a public repository. Same
+      # shape and skip list as the pre-commit guard, case-insensitive.
+      - name: Secret scan (history)
+        run: |
+          set -e
+          hits=$(git log -p --all | awk '
+            BEGIN {
+              kw = "(api[_-]?key|secret|password|passwd|token|private[_-]?key)[a-z0-9_-]*[[:space:]]*[:=][[:space:]]*[\"\047]?"
+              skip = "(example|sample|placeholder|changeme|your[_-]|xxx|<|process\\.env|os\\.environ|getenv)"
+              sha = "?"; file = "?"
+            }
+            /^commit / { sha = substr($2, 1, 8); next }
+            /^\+\+\+ / { file = substr($0, 5); sub(/^b\//, "", file); next }
+            /^\+/ {
+              l = tolower($0)
+              if (l ~ skip) next
+              if (l ~ /begin [a-z ]*private key/) { print "  " sha " " file; next }
+              if (match(l, kw)) {
+                rest = substr(l, RSTART + RLENGTH)
+                if (match(rest, /^[a-z0-9_\/+-]+/) && RLENGTH >= 12) print "  " sha " " file
+              }
+            }
+          ' | sort -u | head -20)
+          if [ -n "$hits" ]; then
+            echo "Credential-shaped strings found in history (commit and file only; values withheld):"
+            echo "$hits"
+            echo "Rotate the value, then clean the history."
+            exit 1
+          fi
+          echo "No credential-shaped string found."
+
+      # Dependencies: the lockfile must be present and current.
+      - name: Dependency floor
+        run: |
+          set -e
+          ls package-lock.json yarn.lock pnpm-lock.yaml poetry.lock go.sum Cargo.lock 2>/dev/null \
+            || { echo "No lockfile found. Gate 20 asks for one: exact versions, committed."; exit 1; }

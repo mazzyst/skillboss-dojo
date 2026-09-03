@@ -1,0 +1,67 @@
+# Run report — the one issue form the Start Guide's public home carries
+# (SG-5, rulings-platform-sg5-2026-09 R3). It is the human-in-the-loop
+# channel for the signal the measurement note ranks above every counter:
+# a public run, someone's repository holding a filled state/journal.md.
+# Counted by hand, never scraped. No email, no personal field: GitHub
+# already knows who is filing, and the kit asks for nothing more.
+#
+# Versioned in the private monorepo at start-guide/tools/mirror/ and
+# exported beside the kit by tools/export-mirror.py.
+name: Run report
+description: You ran the SkillBoss Start Guide on a project. Tell us what held, and what the kit got wrong.
+title: "Run report: <project>"
+labels: ["run-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for running it. This report says what **you** did — the gates you faced,
+        what the guards caught — and nothing about what your app *is*. The Start Guide is a
+        coach, not a certification: its guardrails are heuristic defaults applied by your own
+        agent. It hardens the builder; it never certifies the app.
+  - type: input
+    id: repository
+    attributes:
+      label: The repository that holds the run
+      description: A public repository containing the filled `state/journal.md` and `state/scoreboard.md`. A private one cannot be read, and a run that cannot be read is a claim.
+      placeholder: https://github.com/<you>/<project>
+    validations:
+      required: true
+  - type: input
+    id: cleared
+    attributes:
+      label: The RUN CLEARED line — or where the run stopped
+      description: As the coach printed it, e.g. `10/10 gates faced · 3/3 milestones · BLACK`, or `stopped at 40-TESTS, day 9`. Stopping is a valid report.
+      placeholder: 10/10 gates faced · 3/3 milestones · BLACK
+    validations:
+      required: true
+  - type: input
+    id: held
+    attributes:
+      label: What held
+      description: One line from your scoreboard's Caught table — the thing a guard or a gate stopped before it shipped. `nothing broke through` is a real answer.
+      placeholder: day 4  a password-shaped value in src/mail.ts — stopped at pre-commit
+    validations:
+      required: false
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What the kit got wrong
+      description: The gate that asked for the wrong evidence, the default you had to fight, the screen that lied, the hook that fired on nothing. This is the part we can act on.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Kit version
+      description: The first line of your `start-guide/MANIFEST.md`.
+      placeholder: SkillBoss Start Guide v2
+    validations:
+      required: false
+  - type: checkboxes
+    id: honesty
+    attributes:
+      label: The claim this report makes
+      options:
+        - label: This reports what the builder did. It certifies nothing about the app, and I will not present it as if it did.
+          required: true

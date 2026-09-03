@@ -1,0 +1,43 @@
+#!/bin/sh
+# SkillBoss Start Guide — pre-push guard (Gate 40).
+#
+# One rule, made mechanical: a red test suite blocks. The contract says
+# tests are part of "done"; prose forgets, this does not.
+#
+# It runs YOUR one command — the same one CI runs (Gate 50). It looks for,
+# in order: $START_GUIDE_CHECK, ./scripts/check.sh, then the conventional
+# script of your ecosystem. If it finds none, it says so and lets you push:
+# a hook that guesses wrong is worse than a hook that admits it.
+MODE="warn"
+[ -n "$START_GUIDE_HOOK_MODE" ] && MODE="$START_GUIDE_HOOK_MODE"
+
+say() { printf '%s\n' "$*" >&2; }
+
+cmd=""
+if [ -n "$START_GUIDE_CHECK" ]; then cmd="$START_GUIDE_CHECK"
+elif [ -x ./scripts/check.sh ]; then cmd="./scripts/check.sh"
+elif [ -f package.json ] && grep -q '"test"' package.json; then cmd="npm test"
+elif [ -f pyproject.toml ] || [ -f pytest.ini ]; then cmd="python3 -m pytest"
+elif [ -f go.mod ]; then cmd="go test ./..."
+elif [ -f Cargo.toml ]; then cmd="cargo test"
+fi
+
+if [ -z "$cmd" ]; then
+  say "  START GUIDE — no check command found. Set START_GUIDE_CHECK, or add scripts/check.sh (Gate 50: one command to green)."
+  exit 0
+fi
+
+say "  START GUIDE — running your checks before push: $cmd"
+if sh -c "$cmd"; then
+  say "  START GUIDE — green. Pushing."
+  exit 0
+fi
+
+say ""
+say "  START GUIDE — the suite is RED. A red suite blocks every gate."
+if [ "$MODE" = "block" ]; then
+  say "  Push refused (hook mode: block). Fix it, or push with --no-verify and record why."
+  exit 1
+fi
+say "  Warning only (hook mode: warn). Switch MODE to \"block\" in .git/hooks/pre-push when ready."
+exit 0

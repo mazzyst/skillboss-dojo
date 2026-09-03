@@ -1,0 +1,88 @@
+#!/bin/sh
+# SkillBoss Start Guide — pre-commit guard (Gate 05).
+#
+# Three checks that must not depend on an agent remembering them:
+#   1. no environment file committed (except the example)
+#   2. no credential-shaped string in the staged diff
+#   3. a heads-up when dependencies change
+#
+# MODE: starts at "warn" on purpose (progressive enablement). It prints and
+# lets the commit through. Change the line below to "block" once you have
+# seen it work, and it refuses the commit instead.
+MODE="warn"
+[ -n "$START_GUIDE_HOOK_MODE" ] && MODE="$START_GUIDE_HOOK_MODE"
+
+fail=0
+say() { printf '%s\n' "$*" >&2; }
+flag() { say "  START GUIDE — $1"; fail=1; }
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+[ -z "$staged" ] && exit 0
+
+# 1 — environment files. .env.example is the one that belongs in git.
+for f in $staged; do
+  case "$f" in
+    *.env.example|*.env.sample) : ;;
+    .env|*.env|.env.*|*/.env.*)
+      flag "environment file staged: $f — real values never enter git" ;;
+  esac
+done
+
+# 2 — credential-shaped strings in what is being added. Location, never
+# value: the finding names the FILE and the LINE and the shape of the key,
+# never the secret itself — not even its first characters. Matching is
+# case-insensitive, because API_KEY= is the common casing, and a compound
+# name (aws_secret_access_key, auth_token) counts as its keyword. The
+# value must be at least twelve characters of key-like material; the
+# skip list drops examples, placeholders and environment lookups.
+# POSIX awk only: no {n,m} intervals (mawk), no gawk extensions.
+hits=$(git diff --cached -U0 --diff-filter=ACM | awk '
+  BEGIN {
+    kw = "(api[_-]?key|secret|password|passwd|token|private[_-]?key)[a-z0-9_-]*[[:space:]]*[:=][[:space:]]*[\"\047]?"
+    skip = "(example|sample|placeholder|changeme|your[_-]|xxx|<|process\\.env|os\\.environ|getenv)"
+    file = "?"; line = 0
+  }
+  /^\+\+\+ / { file = substr($0, 5); sub(/^b\//, "", file); next }
+  /^@@/      { s = $3; sub(/^\+/, "", s); sub(/,.*/, "", s); line = s + 0; next }
+  /^\+/ {
+    n = line; line++
+    l = tolower($0)
+    if (l ~ skip) next
+    if (l ~ /begin [a-z ]*private key/) {
+      print "    " file ":" n " — private-key block (value withheld)"
+      next
+    }
+    if (match(l, kw)) {
+      key = substr(l, RSTART, RLENGTH)
+      sub(/[[:space:]]*[:=].*/, "", key)
+      rest = substr(l, RSTART + RLENGTH)
+      if (match(rest, /^[a-z0-9_\/+-]+/) && RLENGTH >= 12)
+        print "    " file ":" n " — " key "-shaped value (value withheld)"
+    }
+    next
+  }
+')
+if [ -n "$hits" ]; then
+  flag "credential-shaped value in the staged diff:"
+  printf '%s\n' "$hits" | while read -r line; do say "$line"; done
+  say "    If it is a real secret: unstage it, move it to your environment."
+fi
+
+# 3 — dependency changes are a decision, not a detail (Gate 20 floor).
+for f in $staged; do
+  case "$f" in
+    package.json|*/package.json|requirements*.txt|pyproject.toml|go.mod|Gemfile|composer.json|Cargo.toml)
+      say "  START GUIDE — dependencies changed in $f. New package? Confirm you chose it, and that the lockfile is staged too." ;;
+  esac
+done
+
+if [ "$fail" -eq 1 ]; then
+  if [ "$MODE" = "block" ]; then
+    say ""
+    say "  Commit refused (hook mode: block). Fix, or commit with --no-verify if you accept the risk on the record."
+    exit 1
+  fi
+  say ""
+  say "  Warning only (hook mode: warn). Switch MODE to \"block\" in .git/hooks/pre-commit when ready."
+fi
+exit 0

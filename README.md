@@ -205,6 +205,46 @@ The guided room lives at [skillboss.dev/launch](https://skillboss.dev/launch)
 Ship Check, honestly: heuristics your own agent applies, not a guarantee,
 and it certifies nothing about your app.
 
+## The Start Guide
+
+**Free · offline · Apache-2.0**
+
+[`start-guide/`](start-guide/) is a delivery coach for the moment BEFORE
+the first line of code. Unzip it into your repository, say **Hello World**
+to your coding agent, and your project is walked through ten locked
+gates — kickoff, working with AI agents, architecture, security by design,
+tests, CI/CD, Docker, deployment, observability, and the final boss:
+SHIP. Nothing gets built until the first gate opens; nothing advances
+without evidence and your explicit GO.
+
+- **[`HELLO-WORLD.md`](start-guide/HELLO-WORLD.md)** — the wake-up. Your
+  agent reads it once; the coach is on.
+- **[`THE-RUN.md`](start-guide/THE-RUN.md)** — the method in one page:
+  Evidence-Gated Delivery, four laws, two paths.
+- **[`gates/`](start-guide/gates/)** — the ten gates, each with its
+  guardrails, its boxes and the villains it faces.
+- **[`hooks/`](start-guide/hooks/)** — three rules that ship as real git
+  hooks (no secret committed, no environment file in git, no red suite
+  pushed) and a fourth that draws your run screen after every commit.
+  Offline, from your own git history.
+- **[`USER-GUIDE.en.md`](start-guide/USER-GUIDE.en.md)** ·
+  **[`USER-GUIDE.fr.md`](start-guide/USER-GUIDE.fr.md)** — the human's
+  guide, in English and French.
+
+The folder is, byte for byte, the ZIP served at
+[skillboss.dev/start](https://skillboss.dev/start), where the checksum is
+printed; each version is also a release on this repository with that one
+asset. It works offline, forever: no network call, no telemetry, no
+account.
+
+> The Start Guide is a coach, not a certification: its guardrails are
+> heuristic defaults applied by your own agent. It hardens the builder;
+> it never certifies the app.
+
+**Ran it?** Open a *Run report* issue — the public repository that holds
+your filled `state/journal.md`, the RUN CLEARED line, what held, what the
+kit got wrong. It says what you did; it certifies nothing about your app.
+
 ## Try it without an account
 
 The product has a free demo at
@@ -220,3 +260,9 @@ keep derivatives under the same license.
 
 The **SkillBoss application** (backend, frontend, infrastructure) is a
 separate work, not covered by this license and not open source.
+
+The **Start Guide** (`start-guide/`) is the exception: it is licensed
+[Apache-2.0](start-guide/LICENSE) with a [NOTICE](start-guide/NOTICE) that
+travels with every copy, so it can be adapted and redistributed,
+including commercially. The SkillBoss name and brand are not licensed by
+either license and never badge an application.
