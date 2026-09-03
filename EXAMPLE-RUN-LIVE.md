@@ -437,3 +437,58 @@ waivers: none
 risks accepted by human: none
 cost: 1 session, tokens unknown - DECLARED by the coach, not measured
 verdict: HOLD (1 box open)
+
+2026-09-03 — WAIVER: SKIP skeleton-proven because the end-to-end proof
+belongs at gate 40, where the Playwright job gets wired and runs on every
+push, rather than as a one-off command pasted into this journal
+  (recorded by the coach from the human's approval of that recommendation
+  on 2026-09-03, not typed by them verbatim; they may restate it in their
+  own words and this entry will be corrected by a new one. Revisit at
+  gate 40.)
+
+2026-09-03 — DECISION: the open box becomes gate 40's work, not a
+  forgotten line
+context: gate 10's skeleton-proven box could be closed three ways — one
+  manual run pasted here, a human waiver, or deferral to the gate whose
+  subject it already is. The coach cannot close it itself: the Playwright
+  job is commented out in CI and the egress proxy refuses the live URL.
+options: a manual run, which proves the slice once and proves nothing on
+  the next push; a bare waiver, which drops the question; deferral to
+  gate 40 with a revisit condition on the record.
+choice: deferral, waived with its revisit. The trade is explicit and
+  worth naming: the run belt reaches YELLOW on a gate that was faced with
+  one box unevidenced, and in exchange the proof becomes automatic
+  instead of anecdotal. If gate 40 ships without that job, this waiver
+  becomes a broken promise and the record will show it.
+
+GATE REPORT — 10-ARCHITECTURE                    date: 2026-09-03
+boxes: [x] diagram-committed, boundaries-hold, twelve-factor-config,
+           no-silent-catch, auth-fails-closed, seams-injected,
+           decision-records
+           evidence: unchanged, see the GATE REPORT — 10-ARCHITECTURE of
+           this same date above; nothing was re-read or re-claimed here
+       [~] skeleton-proven
+           waived: see the WAIVER of 2026-09-03 above — the proof moves
+           to gate 40, where the e2e job runs on every push. Deploy
+           evidence as it stands today: CD run 126, conclusion success,
+           https://github.com/mazzyst/skillboss/actions/runs/33552011253
+waivers: SKIP skeleton-proven — deferred to gate 40 (revisit condition on
+  the record)
+risks accepted by human: one gate faced with its end-to-end proof owed by
+  a later gate. Named, dated, and revisited at 40.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: GO-READY
+
+2026-09-03 — DECISION: the coach's own wording was wrong, and the record
+  says how
+context: the recommendation the human approved was worded "leave the gate
+  open and wire the e2e job at gate 40". Those two cannot both happen:
+  gates open in order, so gate 40 never starts while gate 10 stays open.
+options: follow the wording literally and deadlock the run; treat the
+  approval as covering the intent — the proof moves to gate 40 — and use
+  the mechanism the kit provides for exactly that, a waiver carrying its
+  revisit.
+choice: the second, recorded above, with the drift named here rather than
+  hidden. The human's GO on the gate is still theirs to give, and if they
+  meant the wording literally they say so and this entry is corrected by
+  the next one.
