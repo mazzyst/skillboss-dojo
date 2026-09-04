@@ -1705,3 +1705,142 @@ context: the three Coach Play questions and two shape questions were put
   rehearsed-on-staging stay OPEN — they need the human to do the thing
   and say where it lives, or to waive it. A default accepted is not a
   box checked.
+
+2026-09-04 — FINDING: this agent cannot read the platform's own spec from
+  this environment, and that decides who writes the platform config
+context: the ipAllowList box needs one line in render.yaml, and
+  render.yaml's own header says to verify keys against
+  https://render.com/docs/blueprint-spec because Render's spec evolves.
+  I tried. The network egress proxy refuses render.com: EGRESS_BLOCKED.
+choice: do not write it. Two independent reasons, and the second is the
+  one that generalises. First, the human explicitly holds this line —
+  `ipAllowList: []` can lock a person out of their own psql the moment
+  the blueprint syncs, which is why gate 20 put it here instead of
+  applying it. Second, and worth the record: an agent that cannot read a
+  platform's current spec is an agent writing that platform's config
+  from memory, and memory of a spec that "evolves" is exactly the kind of
+  confident wrong answer that reads like evidence. "ok pour reco" was a
+  general approval; it does not turn an unverifiable line into a checked
+  box. The ask goes back with the verification step named.
+
+2026-09-04 — FINDING: the artifact this project throws away is the one it
+  has already tested
+context: the Parked ask says "build the shipping artifact once and
+  promote it — CI and Render build the same source twice, and only one
+  is ever tested". Reading the pipeline to cost the fix turned up
+  something better than expected, and it changes the size of the job.
+  CI's e2e job ALREADY builds both production images:
+  .github/workflows/ci.yml line 369 runs `docker compose up -d --build
+  --wait postgres backend`, then line 393 the frontend, and
+  docker-compose.yml builds the SAME two Dockerfiles Render builds
+  (gate 60's compose-parity box evidenced exactly this). It then runs
+  sixteen Playwright suites through a real browser against those
+  containers, proves the healthcheck, inspects the container users —
+  and at job end the runner is destroyed and both images go with it.
+  So the true state is not "we would have to start building images".
+  It is: this pipeline builds the production images, tests them harder
+  than anything else in the run tests anything, and DELETES them. Render
+  then builds a third and a fourth from the same source, at deploy time,
+  and ships those. The tested bytes and the shipped bytes have never
+  once been the same bytes, and it is not for want of a build.
+  Two consequences that are already live rather than theoretical, and
+  they belong to gate 70 rather than gate 50 because they are about the
+  way back: RUNBOOK.md §5 records the first — a rollback to SHA X
+  rebuilds X from source at rollback time, so the rollback path depends
+  on a build nobody has shown to be reproducible, and upstream layers
+  move. The second is that a green CI is not evidence about production
+  bytes at all; it is evidence about a build with the same inputs.
+  Not fixed in this lot, deliberately. The remaining work is a registry,
+  image tags, credentials on Render's side, and a render.yaml switch
+  from dockerfilePath to an image reference — a change to HOW this
+  product deploys, needing both the human's console and the spec I
+  cannot currently read (see the finding above). Costed and put to the
+  human rather than started.
+
+GATE REPORT — 70-DEPLOYMENT                      date: 2026-09-04
+boxes: [x] rollback-written-first
+           evidence: RUNBOOK.md at the repository root, §1 (the code)
+           and §2 (the database). §1 carries three named options with
+           the actual commands, including the deploy-hook call
+           `POST "<hook>&ref=<SHA>"` that .github/workflows/cd.yml
+           already makes internally, and the API-before-web ordering
+           with the reason it is not cosmetic. Two things stated rather
+           than glossed. The gate wants this "dated before the first
+           deploy" and SkillBoss deployed months before this run began,
+           so the file says so in its opening lines instead of
+           pretending otherwise. And every procedure in it is marked
+           REHEARSED or NOT REHEARSED; today all of them read NOT
+           REHEARSED. The box is "written", and it is written; the
+           rehearsal boxes are separately open below and stay that way.
+       [x] migrations-expand-contract
+           evidence: CLAUDE.md §5 gains the convention with its
+           mechanism attached — `backend/tools/start-prod.sh` runs
+           `prisma migrate deploy` at every container start and
+           `backend/prisma/migrations/` holds zero down.sql across 23
+           migrations, therefore an older deploy reverses no schema
+           change. Short form in AGENTS.md for non-Claude agents.
+           The latest migration pair, as the checklist asks:
+           20260830120000_add_open_to_briefs is a single
+           `ALTER TABLE "BuilderProfile" ADD COLUMN "openToBriefs"
+           BOOLEAN NOT NULL DEFAULT false` — additive, with a DEFAULT so
+           the NOT NULL is safe on a populated table, and a comment
+           saying it was hand-checked for DROPs. Better than the one
+           pair: `grep -rlE "DROP COLUMN|DROP TABLE"` across all 23
+           migrations returns NOTHING. The convention was being followed
+           before anyone wrote it down; what was missing was the reason,
+           which is what makes it survive the first person in a hurry.
+       [x] deploys-scripted
+           evidence: .github/workflows/cd.yml is the only deploy path,
+           and render.yaml keeps `autoDeploy: false` on both services so
+           there is no second un-gated path racing it. The SHA is pinned
+           (`&ref=${SHA}`), never "whatever main points at now"; each
+           service's health endpoint is polled until it reports that
+           exact commit before the next service is touched; a
+           `concurrency` group with cancel-in-progress false means a
+           mid-flight deploy is never cut in half. The journal records
+           no manual-step deploy. The one production reversal on record
+           (2026-07-19) went through this same scripted path as a revert
+           on main, and its lesson is IN the file: full-history checkout
+           plus a `git merge-base --is-ancestor` supersession check, so a
+           run whose SHA was overtaken stops instead of burning its
+           40-minute window on a dead commit.
+       [ ] rehearsed-on-staging
+           status: OPEN. There is no staging target. render.yaml
+           declares two web services and one database, all production.
+           The gate's profile note offers n/a-with-reason only when NO
+           deploy target has been chosen; this project has one, so that
+           relief does not apply and the box is honestly open. Creating
+           a staging service is a recurring-cost decision that belongs
+           to the human, not to the coach. Waiver candidate, named as
+           such — the human decides, and the risk is stated once: today
+           production is the first environment that ever sees a change
+           in its real shape.
+       [ ] restore-rehearsed
+           status: OPEN. No restore has ever been performed, on any
+           target. RUNBOOK.md §3 names where the backups live (Render
+           dashboard, skillboss-db, Backups) and gives the rehearsal
+           procedure against a scratch database, including the step most
+           rehearsals skip: prove it with content counts, not with a
+           zero exit code. Until the rehearsal has a journal entry, this
+           is a belief. THE LOST WEEKEND is the one villain at this gate
+           that is currently unopposed.
+       [ ] billing-alert-set
+           status: OPEN. Nothing in the repository sets a spend alert
+           and nothing is known to be set on the account. RUNBOOK.md §4
+           names where it would live and the three paid line items it
+           would cover (skillboss-api starter, skillboss-web starter,
+           skillboss-db basic-256mb, one instance each).
+waivers: none yet. rehearsed-on-staging is the candidate and is the
+  human's call, not the coach's.
+risks accepted by human: none new recorded. Three ASSUMPTIONs from
+  "ok pour reco" are on the record above, labelled and reversible, and
+  explicitly NOT counted as evidence for the three open boxes.
+parked debts, on arrival at this gate: neither is closed. The database
+  is still only assumed closed — the one-line fix is unverifiable from
+  this environment (EGRESS_BLOCKED on render.com) and is the human's in
+  any case. The artifact is still rebuilt rather than promoted, and this
+  gate found that CI already builds and browser-tests the production
+  images before deleting them, which makes the fix smaller than it
+  looked and its absence worse than it looked.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: HOLD (3 boxes open)
