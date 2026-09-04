@@ -1098,3 +1098,25 @@ verdict: GO-READY
   "dependencies changed" as fact on any staged manifest file — a guard
   that asserts something it has not checked (revisit: its own kit lot,
   with the ZIP rebuild and checksum update a shipped-file change requires)
+
+2026-09-03 — DECISION: gate 40 closes, and the run belt does not move yet
+context: GATE REPORT — 40-TESTS was read with its five evidenced boxes
+  and no waiver, and with the four findings that came out of turning
+  things on rather than writing them. The human typed GO on 2026-09-03.
+options: hold for the frontend healthcheck and the kit's hook wording,
+  both of which this gate found and neither of which is a test; GO on the
+  report as written, with both parked at the gate that owns them.
+choice: GO. 40-TESTS flips to PASSED, evidence pointing at this date's
+  report, and gate 10's `skeleton-proven` comes off the Parked table
+  paid: the daily slice is proved end to end on every code push.
+  The belt stays ORANGE, and that is the point of writing this down.
+  GREEN needs 40 AND 50 on the ladder — a suite that runs is half of it,
+  and the other half is the pipeline that refuses to ship without it.
+  Gate 50 opens next, owing the dependency audit and the two known
+  vulnerabilities this run has been carrying since gate 20.
+  One thing is worth keeping at the top of this entry rather than buried
+  in it: five CI runs were needed to reach a green e2e job, and two of
+  them were red because of me. A shallow-clone scan I reported as a full
+  one, and a locator that matched two elements and identified neither.
+  Both are on the record, in the same words as everyone else's mistakes.
+  A kit that only ever caught other people's would not be worth running.
