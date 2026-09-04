@@ -1333,3 +1333,36 @@ THE ROTTEN PLANK — faced at this gate. `npm audit --package-lock-only
 Proved to fire: exit 1 against the morning's lockfile naming both
 advisories, exit 0 against the current one. Full CI green on 81f3031:
 https://github.com/mazzyst/skillboss/actions/runs/33878284797
+
+2026-09-03 — WAIVER: SKIP build-once-promote because closing it means
+  publishing images to a registry and switching render.yaml from
+  dockerfilePath to an image reference — a change to how this product is
+  deployed, and therefore gate 70's decision with the human, not a
+  pipeline lot's to slip in
+
+2026-09-03 — DECISION: gate 50 closes, and the run belt turns GREEN
+context: GATE REPORT — 50-CICD was read with its five evidenced boxes,
+  its one waiver, and the two things it named rather than glossed — a
+  feature branch whose first automatic check arrives at pull-request
+  time, and a shipping artifact that has never been the artifact CI
+  tested. The human typed GO on 2026-09-03.
+options: hold until the artifact is built once and promoted, which stops
+  the run on a deployment-architecture change three gates before the gate
+  that owns it; GO on the report as written, with the gap named, dated
+  and parked at 70.
+choice: GO. 50-CICD flips to PASSED, evidence pointing at this date's
+  report. Six gates faced — 00, 05, 10, 20, 40, 50 — and 40 plus 50
+  together earn GREEN on the ladder.
+  What GREEN says here, precisely, because a belt is exactly the kind of
+  thing that invites reading more into it than it holds: this project has
+  a suite that runs on one command, and a pipeline that refuses to ship
+  without it. That is all. It does not say the tests are good, or that
+  the pipeline catches everything — this same gate found that the artifact
+  the pipeline blesses is not the artifact users receive, and that gap is
+  on the record, unclosed, with the gate that owns it named.
+  Halfway up the ladder is a fair place to say the quiet part: five of
+  the six gates so far produced a finding that no amount of reading the
+  code would have surfaced. They came from running the command, turning
+  the job on, waiting on the healthcheck, scanning the whole history.
+  The kit's value in this run has not been its checklists. It has been
+  that a checklist forced someone to actually pull the lever.
