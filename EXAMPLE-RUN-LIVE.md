@@ -762,3 +762,339 @@ choice: GO. 20-SECURITY flips to PASSED, evidence pointing at this date's
   application is secure. Two of its answers are owed by later gates, and
   the Parked table names both. The kit hardens the builder; it never
   certifies the app.
+
+2026-09-03 — DECISION: gate 40 opens, and the one command was two
+context: gate 40's first box asks for the one command that runs the whole
+  suite, green. `npm test` was run on this repository as it clones: 33
+  backend suites red, 77 tests failing, in five seconds.
+options: report the red suite as a product defect, which is what it looks
+  like; read the failure before believing it.
+choice: read it. Every failure was the same line —
+  `err instanceof Prisma.PrismaClientKnownRequestError` throwing
+  "Right-hand side of 'instanceof' is not an object", because
+  `@prisma/client` ships a stub until `prisma generate` runs, and the
+  namespace is empty. `npx prisma generate` then turned 33 red suites
+  into 72 green ones without touching a line of product code.
+  So the suite was never red. The COMMAND was, and that is the finding:
+  the gate asks for one command, and this repository needs two, with the
+  second one unwritten anywhere a newcomer would look. CI never noticed
+  because .github/workflows/ci.yml generates the client explicitly before
+  it tests — the pipeline is correct and the human's terminal is not,
+  which is the worst shape for this kind of gap: it only ever hurts the
+  person who has the least context.
+  Fixed in package.json with an npm `pretest` hook that generates first.
+  Proved by removing the generated client, putting the tree back into
+  fresh-clone state, and running the one command: the hook fires,
+  generates, and the suite comes back green — exit 0, 3402 tests passed,
+  23 skipped (the RUN_DB_TESTS-gated database specs, which CI runs
+  separately against a real Postgres).
+
+2026-09-03 — DECISION: the five critical flows, and the three that get a
+  browser on every push
+context: gate 40 asks the coach to derive three to five flows from
+  state/mission.md whose breakage would betray the mission, and the human
+  to confirm them. The mission's "shipped" is one named person using the
+  daily run end to end.
+options: name every flow the product has, which makes the list a
+  catalogue and protects nothing in particular; name the ones that carry
+  the mission.
+choice: five, confirmed by the human on 2026-09-03.
+  1. the stack answers and an authenticated session lands on the quiz —
+     frontend/e2e/smoke.e2e.ts (the repository already calls it Flow 1)
+  2. the base run: five questions, one shot each, submit, result —
+     frontend/e2e/base-only.e2e.ts (Flow 2)
+  3. Challenge Mode: unlock, tiers, authoritative submit —
+     frontend/e2e/challenge.e2e.ts
+  4. no correctness leaks before submit — expectNoCorrectnessLeak and
+     watchNoLeakResponses, asserted inside flows 2 and 3
+  5. one attempt per day: the duplicate submit is a 409 —
+     backend/src/quiz/quiz-submission.service.spec.ts
+  Flows 1 to 3 get a real browser on every code push. The other thirteen
+  Playwright suites cover rooms outside the daily slice and stay a manual
+  pass: a gate asks for a smoke over the walking skeleton, not a full
+  browser regression on every pull request. Adding a fourth is a decision
+  about pull-request latency, and it will be made deliberately or not at
+  all.
+
+2026-09-03 — DECISION: the e2e job is written, blocking, and pays gate
+  10's waiver
+context: gate 10 could not check `skeleton-proven`: nothing proved the
+  daily slice end to end on any push, because the e2e job was a comment
+  in the workflow reading "still deferred (do not enable yet)". The
+  waiver named this gate as the revisit.
+options: a non-blocking job, which reports and never stops anything and
+  would have paid the debt in monkey money; a blocking one.
+choice: blocking, on the human's call. .github/workflows/ci.yml now
+  carries an `e2e` job that brings the compose stack up with `--wait` on
+  the healthchecks the services already declare (no sleep anywhere in the
+  job), runs exactly what a real deploy runs — `prisma migrate deploy`
+  then the precompiled seed — installs the Chromium pinned by the
+  frontend workspace, and drives the three critical flows. It needs a
+  green unit suite first: the pyramid's slow tip is the last line, never
+  the first. On failure it uploads the Playwright report and dumps the
+  stack logs, because a red end-to-end run without what the browser saw
+  is a mystery, not a signal.
+  No secret is referenced in the job. The stack runs on the development
+  defaults committed in docker-compose.yml, so nothing there can leak.
+  The harness provisions its user, resets its daily run and mints its
+  token INSIDE the backend container; the answer key never leaves it.
+  Cost: about six to nine billed minutes on a code pull request, zero on
+  a docs-only one.
+
+2026-09-03 — DECISION: the bug-fix ritual goes in the memory file, where
+  the next session will actually read it
+context: gate 40 asks for the regression ritual to be written into the
+  project's memory file. CLAUDE.md said tests are part of "done"; it did
+  not say to reproduce a bug with a failing test BEFORE fixing it.
+options: leave it as a habit, which is a habit only as long as the person
+  holding it is in the room; write it where every agent session starts.
+choice: CLAUDE.md §5, one rule: reproduce with a failing test, watch it
+  fail, then fix — in that order. A bug fixed without a test is a bug
+  scheduled to return. The gate's own example is today's: the secret-scan
+  job would have gone red on the first pull request, and nothing would
+  have said so beforehand. The missing test was not a unit test — it was
+  the history scan itself, added at gate 20.
+
+2026-09-03 — DECISION: the gate-20 scan covered a shallow clone, and CI
+  said so within two seconds
+context: the first CI run on this branch turned the secret-scan job red
+  on the step gate 20 had just added. Locally that same command had
+  reported "132 commits scanned, no leaks found, exit 0". On the runner
+  it reported 943 commits and two findings.
+options: treat the runner as flaky, re-run, and hope; read the number.
+choice: read the number, because 132 against 943 is not a flake, it is a
+  different repository. This session's clone is SHALLOW — `.git/shallow`
+  exists, and the two flagged commits were not even present locally
+  (`git cat-file -t` → absent). So the gate-20 evidence "132 commits,
+  ~58 MB, no leaks found" was true of what I scanned and NOT true of this
+  repository's history. It overstated its coverage by a factor of seven.
+  That correction stands on the record beside the original claim; the
+  original entry is not edited.
+  What the honest scan says, after `git fetch --unshallow origin` (1086
+  commits reachable, 943 scanned by gitleaks, the runner's number
+  exactly): the two findings were real findings, and both are test
+  fixtures that no longer exist at HEAD —
+  - backend/test/admin.integration.spec.ts at commit f4af3fa: the metrics
+    scrape token BEFORE it was renamed to the self-documenting
+    `test-only-...` value that HEAD carries and .gitleaks.toml already
+    allowlisted. A spec-local string; METRICS_TOKEN's real value has only
+    ever come from the environment.
+  - frontend/src/components/activation/InAppBrowserNotice.test.tsx at
+    commit f96f2f0: a hand-written fake JWT inside the test that proves
+    the copy-link never carries a session token. Header {"alg":"HS256"},
+    payload {"sub":"u-1"}, signature spelled out in leetspeak. Never
+    issued by anything.
+  Both are now allowlisted BY VALUE, each with the commit and the reason
+  written above it, and the proof still holds: a DIFFERENT
+  scrape-secret in that same file, in the same shape, still fails the
+  scan — exit 1. Full history after the fix: 943 commits, no leaks found,
+  exit 0, the same result the runner will now reach.
+  Two things follow, and both are worth more than the fix. First: the
+  claim "zero real credentials in this repository's history" is now
+  earned rather than assumed — it was checked against all 943 commits,
+  not 132. Second: neither finding could EVER have been seen by
+  `gitleaks dir`, because neither string exists at HEAD. The history scan
+  justified itself on its first run, on the author's own repository,
+  within two seconds of being enabled. That is the whole argument for
+  gate 20's guardrail, and it did not need to be argued.
+
+2026-09-03 — DECISION: the kit's own pre-commit hook says "dependencies"
+  when it means "this file"
+context: committing the gate-40 lot printed "START GUIDE — dependencies
+  changed in package.json. New package? Confirm you chose it, and that
+  the lockfile is staged too." Nothing was added: the change was two
+  script entries.
+options: ignore it as noise, which is how a warning stops being read;
+  record it.
+choice: record it. start-guide/hooks/pre-commit line 75 fires on ANY
+  staged manifest file and states the dependency change as a fact it has
+  not checked. It is a warning, not a block, and its advice is sound when
+  it happens to be right — but a guard that asserts something false is a
+  guard people learn to skim. The honest wording names the file, not the
+  conclusion. Kit defect, found by the dogfood, fixed in a kit lot of its
+  own (with the ZIP rebuild and checksum update any shipped-file change
+  requires) — not smuggled into a gate.
+
+2026-09-03 — DECISION: the e2e job's first run failed, and it found a
+  healthcheck nobody had ever waited on
+context: run 33866725092 brought the compose stack up with
+  `docker compose up -d --build --wait` and stopped after twelve minutes
+  on one line: `container skillboss-frontend-1 is unhealthy`. The
+  frontend process itself was fine — its own log says Next is listening
+  on 0.0.0.0:3000 — so the SERVER was up and the PROBE was failing.
+options: re-run and hope, which is the answer this kit refuses; raise
+  the timeout, which buys silence rather than an answer; read what the
+  failure actually says.
+choice: read it, and two things came out.
+  First, my own job was wrong. docker-compose.yml documents the order at
+  the top of the file: up, THEN migrate, THEN seed. I waited on all three
+  services BEFORE migrating — a wait placed in front of the thing it is
+  waiting for. The job now brings up postgres and the backend (whose
+  healthcheck is the DB-free /api/health route), migrates and seeds, and
+  only then starts the frontend.
+  Second, and this one belongs to the repository, not to the job: the
+  frontend container's healthcheck has apparently NEVER passed.
+  `docker compose up -d` does not block on health and nothing declares
+  `depends_on` the frontend, so that container has been sitting there
+  marked unhealthy since the healthcheck was written, and no one had a
+  reason to look. This job is the first thing in the project's life that
+  ever waited on it. Nothing was broken by it — the app serves, the local
+  stack works — which is precisely why it survived: a signal nobody reads
+  can be wrong for months at no cost, right up until something starts
+  depending on it.
+  The job does not paper over it and does not depend on it either. It
+  waits for the frontend the way the browser actually needs it —
+  an HTTP 200 on :3000 from the runner, bounded at ninety seconds — which
+  is the real dependency; the container's internal probe was only ever a
+  proxy for that, and a broken proxy must not block a real proof. A
+  diagnostic step now prints each container's health state on any
+  failure, so the next red run names its cause in one line instead of
+  costing another quarter of an hour.
+  Fixing the healthcheck is its own lot. It is on the Caught table, with
+  its cause still open: the probe is a busybox `wget` against
+  localhost:3000 inside an alpine image that has one, so the reason it
+  fails is not yet known — and writing a guess into the record would be
+  the same mistake as re-running and hoping.
+
+2026-09-03 — DECISION: the daily slice is proved, and the eighth test was
+  stale
+context: run 33869380661 drove a real browser over the three critical
+  flows: 7 passed, 1 failed, in 49.7 seconds. Everything gate 10's waiver
+  owed is green — the base run through submit to a result, the Challenge
+  run unlocking Super then Ultra then Beast with its full clear and its
+  share variant, the no-leak watch, the absence of a Next or a manual
+  Submit during gameplay, the harness login reaching the authenticated
+  quiz, and the backend's health route.
+options: call 7 of 8 good enough, which is how a suite starts lying;
+  raise a timeout until it passes, which is the same thing more slowly;
+  read the one failure.
+choice: read it. `smoke.e2e.ts:18` looked for a landing region whose
+  accessible name matched /today.s boss$/i. No such region exists. The
+  CROSSROADS redesign moved the boss framing OUT of the region's
+  accessible name — it is now "One arena, two kinds of builders" — and
+  INTO the live cue line inside it, which still reads "Live · Today's
+  boss · resets 00:00 UTC" and still renders without a login. The
+  promise the test was written to protect is intact; the locator was
+  pointing at a name the page stopped using.
+  Nothing caught it because nothing ever ran it. That is the second half
+  of the same finding as the healthcheck: sixteen Playwright suites sat
+  in this repository behind a commented-out CI job, and an e2e suite no
+  runner executes rots exactly as quietly as a healthcheck nobody waits
+  on. Both were found in the same hour, by the same act of turning
+  something on.
+  The three assertions are re-pointed at what the page actually renders —
+  the hero is visible, the live cue names today's boss and its reset
+  clock, and the public surface still leaks no correctness — with a
+  comment saying what went stale and why, so the next redesign has a
+  note. This is a stale locator being fixed, not a failing assertion
+  being weakened: the behaviour it guards is unchanged, and the leak
+  assertion is untouched. It could not be verified locally — this
+  container has no Docker daemon — so CI is the verification, which is
+  the honest order for a test that only CI can run.
+
+2026-09-03 — DECISION: 90 seconds was too tight, and the number explains
+  the healthcheck
+context: the step that waits for the frontend took 87 seconds on run
+  33869380661, against a bound of 90. It passed, and it would have gone
+  red on a slower runner for no reason at all.
+options: leave it and let the job flake, which would teach everyone to
+  re-run rather than read; raise it.
+choice: raised to 180 seconds, and the observation is worth more than
+  the fix. The container healthcheck's own budget is start_period 30s
+  plus five retries at ten-second intervals — it gives up at 80 seconds
+  on a service that answered at 87. That is a probable cause for the
+  finding above, now with a measurement behind it rather than a guess:
+  the probe is not wrong about how to ask, it simply stops asking before
+  the answer arrives. The fix still belongs to its own lot, because
+  changing a healthcheck's timing is a decision about what "healthy"
+  means, not a line to slip into a test gate.
+
+2026-09-03 — DECISION: my replacement assertion was under-specified, and
+  strict mode said so
+context: the re-pointed smoke test failed again — not on the region,
+  which resolved correctly, but on `/today.s boss/i` INSIDE it, which
+  matched two elements: the live cue line and the proof card's "Today's
+  boss, proved."
+options: pick the first match, which is what a non-strict runner would
+  silently do and what makes a suite quietly meaningless; name the thing
+  I actually meant.
+choice: the second. The cue is one line, so it is asserted as one line —
+  /live.*today.s boss.*resets 00:00 utc/i — which also folds in the reset
+  clock, the only part of that line present whether or not a theme clears
+  the gate. The boss designation beside it is deliberately NOT asserted:
+  it depends on the seeded bank, and a seed must not decide whether a
+  smoke test passes.
+  Worth recording plainly: this was my error, on the fix for someone
+  else's, and the tool caught it in thirty-five seconds. Playwright's
+  strict mode refusing an ambiguous locator is the same principle as this
+  kit's "no box checked without evidence" — a locator that matches two
+  things has identified neither, and a green tick under it would have
+  been worth nothing.
+
+GATE REPORT — 40-TESTS                           date: 2026-09-03
+boxes: [x] one-command-suite
+           evidence: `npm test` at the repository root → exit 0.
+           Backend 72 suites passed, 6 skipped (993 tests passed, 23
+           skipped — the RUN_DB_TESTS-gated database specs, which CI runs
+           separately against a real Postgres). Frontend 156 suites, 2409
+           tests, all passed. 3402 assertions of a suite in one command.
+           The command became ONE command in this lot: package.json gains
+           a `pretest` hook, and the proof is in the DECISION of this date
+           — the generated Prisma client was deleted to put the tree back
+           into fresh-clone state, and the hook regenerated it and the
+           suite came back green. In CI: run 33873508729, job `test`,
+           every step green.
+       [x] critical-flows-covered
+           evidence: five flows derived from state/mission.md and
+           confirmed by the human on 2026-09-03 —
+           1 the stack answers and a session lands on the quiz →
+             frontend/e2e/smoke.e2e.ts
+           2 the base run, five questions one shot each, submit, result →
+             frontend/e2e/base-only.e2e.ts
+           3 Challenge Mode: unlock, tiers, authoritative submit →
+             frontend/e2e/challenge.e2e.ts
+           4 no correctness before submit → expectNoCorrectnessLeak and
+             watchNoLeakResponses, asserted inside 2 and 3
+           5 one attempt per day, the duplicate is a 409 →
+             backend/src/quiz/quiz-submission.service.spec.ts
+       [x] skeleton-smoke
+           evidence: .github/workflows/ci.yml, job `e2e` — new in this
+           lot, and blocking. Run 33873508729, step "The three critical
+           flows": 8 passed (34.6s), a real Chromium against the compose
+           stack after `prisma migrate deploy` and the precompiled seed —
+           the same two commands a production deploy runs.
+           https://github.com/mazzyst/skillboss/actions/runs/33873508729
+           This box is also the payment of gate 10's waiver: the daily
+           slice is now proved end to end on every code push, not once by
+           hand.
+       [x] deterministic-suite
+           evidence: no sleeps and no live network in any unit spec — a
+           search over backend/src and frontend/src for
+           `setTimeout`-based waits and for `fetch('http`, `axios.`,
+           `got(` across every *.spec.ts / *.test.ts / *.test.tsx returns
+           nothing; 15 suites drive time through `useFakeTimers` instead.
+           The only poll anywhere in the pipeline is the e2e job's wait
+           for the frontend to answer on :3000 — infrastructure waiting
+           for a server to boot, not a test waiting for a race.
+       [x] regression-ritual
+           evidence: CLAUDE.md §5 — "Every fixed bug gets its regression
+           test first: reproduce it with a failing test, watch it fail,
+           then fix it — in that order." Written in this lot; the memory
+           file is what every agent session reads before anything else.
+           Latest example, from this same day: the CI secret-scan job
+           would have gone red on the first pull request, and nothing
+           said so beforehand. The missing test was not a unit test — it
+           was the history scan itself, added at gate 20.
+waivers: none
+risks accepted by human: none new. The one waiver this gate inherited —
+  gate 10's `skeleton-proven` — is paid, and comes off the Parked table.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: GO-READY
+
+2026-09-03 — PARKED: make the frontend container's healthcheck pass, or
+  say why it should not exist (revisit at gate 60)
+
+2026-09-03 — PARKED: fix the kit's own pre-commit hook, which states
+  "dependencies changed" as fact on any staged manifest file — a guard
+  that asserts something it has not checked (revisit: its own kit lot,
+  with the ZIP rebuild and checksum update a shipped-file change requires)
