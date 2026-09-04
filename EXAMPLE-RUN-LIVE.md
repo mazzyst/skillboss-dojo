@@ -1552,3 +1552,156 @@ choice: GO. 60-DOCKER flips to PASSED, evidence pointing at the
   tests is still not the artifact that ships, and the production
   database is still only assumed closed. Both are on the Parked table
   and both are gate 70's, which opens now.
+
+2026-09-04 — GATE OPENED: 70-DEPLOYMENT
+context: gate 60 has its GO. The gate that opens asks whether this project
+  rehearsed the way back before it went forward, and it arrives carrying
+  two debts from the Parked table — the artifact built twice and tested
+  once (gate 50), and a production database only assumed closed (gate 20).
+
+2026-09-04 — FINDING: the one command is red on a fresh clone, and CI
+  cannot see it because CI repairs the thing it is meant to test
+context: the kit's pre-push hook fired RED on this session's first push.
+  Two separate facts sat underneath that word, and reading the output
+  rather than trusting my reading of it — the lesson gate 60 paid for —
+  separated them.
+  ONE, this container: node_modules was not the lockfile's install
+  (eslint 10.1.0 resolving against a config that pins 9.39.5,
+  eslint-config-next absent). `npm ci` settled it. The suite is green:
+  `sh scripts/check.sh` → 156 suites, 2409 tests, `green: all`. Nothing
+  in the repository was red. That is the honest half.
+  TWO, the repository, and this one is real: `sh scripts/check.sh` is RED
+  on a genuinely fresh clone. Measured, not inferred — `npm ci` then
+  `sh scripts/check.sh typecheck` → exit code 2 and **307** TypeScript
+  errors. I record 307 rather than the "~25" my first glance at a
+  truncated tail suggested, because the count was worth measuring and my
+  impression of it was not evidence.
+  THE MECHANISM, and it is the interesting part. `npm ci` does not leave
+  NO Prisma client; it leaves a STUB — a `.prisma` directory that
+  resolves cleanly and carries no models. So `tsc --noEmit` never fails
+  on a missing module, which would have named its own cause. It fails on
+  307 errors that read like broken source: "Module '@prisma/client' has
+  no exported member 'ContentStatus'". Nothing in any of the 307 says
+  `prisma generate`. I confirmed this is the stub and not absence by
+  moving the generated client aside instead — 23 migrations' worth of
+  models gone, and typecheck PASSED, because an unresolvable re-export
+  inside a .d.ts is swallowed by skipLibCheck. Deleting is not the same
+  as stubbing, and a reproduction that gets the wrong answer for the
+  wrong reason is worse than none. The first attempt was that; the
+  second was `npm ci`, which is what a contributor actually does.
+  WHY IT SURVIVED GATE 40 AND GATE 50. Gate 40 found this exact class
+  ("the one command was two") and fixed it for `npm test`, with the root
+  `pretest` hook. It did not fix it here, because scripts/check.sh runs
+  typecheck BEFORE test — so the contributor meets the stub first, every
+  time, and never reaches the hook that would have saved them. Gate 50
+  then wrote scripts/check.sh as the one command and had CI call it, and
+  CI has been green ever since, on a path no human has ever walked:
+  .github/workflows/ci.yml ran `npm run db:generate -w backend` as its
+  own step immediately before `./scripts/check.sh typecheck`. The
+  pipeline was repairing the condition it was supposed to be reporting.
+  This is the same shape as the gate 60 healthcheck, one layer up: a
+  guard that has never been in a position to fail is not a guard, and
+  its greenness is not information.
+
+2026-09-04 — DECISION: fix the one command, and remove the step that was
+  hiding it rather than only the symptom
+context: two things could be called "the fix" — make scripts/check.sh
+  generate the client, or stop CI from pre-arranging it. Only one of
+  them is a fix; the other is what keeps it fixed.
+options: patch scripts/check.sh alone, which restores the contributor's
+  path and leaves CI still blind to the next regression of it; remove
+  CI's generate step alone, which turns CI red and proves the problem
+  without solving it; do both, in that order.
+choice: both. scripts/check.sh gains a `generate()` stage that runs
+  before `typecheck` (idempotent, ~0.4s). And the "Generate Prisma
+  client" step is REMOVED from ci.yml's lint job, so that job now runs
+  `npm ci` and then the contributor's command with NOTHING pre-arranged
+  between them. That removal is the regression guard, and it is the
+  gate-60 pattern applied deliberately rather than discovered by
+  accident: the `--wait` that caught the wrong healthcheck fix worked
+  because it made CI able to fail. This does the same.
+  The twin step in the `test` job STAYS, and the distinction is recorded
+  in the file itself: `./scripts/check.sh test` generates its own client
+  via `pretest`, but `npm run test:integration` does not go through that
+  hook and needs one. Removing it there would break a real thing to
+  satisfy a symmetry.
+  Reproduce-then-fix, in that order, per CLAUDE.md §5 — the regression
+  test came first and it is CI's own job, not a new spec file:
+    BEFORE  npm ci && sh scripts/check.sh typecheck  → exit 2, 307 errors
+    AFTER   npm ci && sh scripts/check.sh            → exit 0, 0 errors,
+            156 suites, 2409 tests, `green: all`
+  Both runs from the same `npm ci` starting state, in this container.
+
+2026-09-04 — DECISION: the runbook goes to RUNBOOK.md at the repository
+  root, and it says out loud which of its procedures are hypotheses
+context: gate 70's first box wants the rollback command written down.
+  This repository has no runbook. What it has is
+  docs/devops-and-deployment.md §8, three lines that say "Rollback =
+  deploy previous tag" and "Database rollback: apply down-migration OR
+  restore from backup". Both halves name things that do not exist here:
+  `git tag` returns ZERO tags, and there are zero `down.sql` files across
+  23 migrations. A rollback plan that names a missing artifact is worse
+  than none, because it will be believed once, under pressure.
+options: correct docs/devops-and-deployment.md, which CLAUDE.md forbids
+  without an explicit ask and which the human did not give; write the
+  runbook somewhere new.
+choice: RUNBOOK.md at the root — a new file, not an edit to docs/. The
+  doc is left alone and the runbook says, in §2, that it is the
+  operative text where the two disagree.
+  Three things it does that a template would not:
+  It marks every procedure REHEARSED or NOT REHEARSED, and today every
+  one of them reads NOT REHEARSED. That is the true state and the gate's
+  boxes should reflect it rather than be talked past.
+  It states the gate's own framing problem in its first lines: gate 70
+  wants a rollback plan "dated before the first deploy", and SkillBoss
+  deployed months before this run started. Backdating the spirit of that
+  requirement would be the first piece of theatre on this record.
+  It leads with the database, not the code (§2 before §1 in reading
+  order, and §1 points at §2 before its first command). The real finding
+  of this box: `start-prod.sh` runs `prisma migrate deploy` at every
+  container start and no down migration exists, so deploying an older
+  SHA rolls the code back and the database not at all. Across a
+  destructive migration there is no rollback — there is a restore, and
+  the restore has never been performed. Everything else in the file is
+  procedure; that sentence is the one that changes what someone does.
+
+2026-09-04 — DECISION: expand-migrate-contract goes in the memory files,
+  with its mechanism attached
+context: gate 70 wants the migration convention in the memory file.
+  CLAUDE.md §5 already says committed migrations are never edited — that
+  is immutability, a different rule, and having it there is probably why
+  nobody noticed the other one was missing.
+choice: one entry in CLAUDE.md §5 and its short form in AGENTS.md, both
+  stating not just the rule but WHY it binds here specifically: migrate
+  deploy at every boot, zero down.sql, therefore an older deploy reverses
+  no schema change. A convention with its mechanism attached survives the
+  first person who thinks it is bureaucracy.
+
+2026-09-04 — ASSUMPTION: the human answered "ok pour reco", accepting the
+  recommended defaults on the lot-1 questions
+context: the three Coach Play questions and two shape questions were put
+  to the human. The reply accepted the recommendations rather than
+  answering each. Recorded here as ASSUMPTIONs in the gate-00 manner —
+  labelled, reversible, and never counted as evidence.
+  a. the runbook lives at RUNBOOK.md, root, not in docs/ — APPLIED.
+  b. the scripts/check.sh finding rides in this lot rather than being
+     parked, on card rule 6 (a red suite blocks the gate you are on) —
+     APPLIED.
+  c. Coach Play Q1, "what happens in the five minutes after a bad
+     deploy": taken as the 2026-07-19 shape, a revert on main, since
+     that is the one reversal on this record. Written as Option A and
+     labelled NOT REHEARSED, because the record shows it happened once
+     in an emergency, not that it was ever rehearsed as a procedure.
+  d. Coach Play Q2, "when was the last restore": taken as NEVER. This is
+     the assumption I am least willing to let stand quietly, so it is
+     stated twice — here, and in RUNBOOK.md §3.
+  e. Coach Play Q3, "the monthly ceiling and who is told": taken as NOT
+     SET. RUNBOOK.md §4 names where it would live and the three paid
+     line items it would cover.
+  What an ASSUMPTION cannot do, and this is the line that matters: c, d
+  and e describe the world outside this repository, and no reply of mine
+  makes them true. They are enough to write a runbook against. They are
+  NOT evidence, so restore-rehearsed, billing-alert-set and
+  rehearsed-on-staging stay OPEN — they need the human to do the thing
+  and say where it lives, or to waive it. A default accepted is not a
+  box checked.
