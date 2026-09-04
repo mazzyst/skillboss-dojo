@@ -1120,3 +1120,216 @@ choice: GO. 40-TESTS flips to PASSED, evidence pointing at this date's
   one, and a locator that matched two elements and identified neither.
   Both are on the record, in the same words as everyone else's mistakes.
   A kit that only ever caught other people's would not be worth running.
+
+2026-09-03 — DECISION: gate 50 opens, and there was no one command —
+  there were three
+context: gate 50's first question is "what is the one command today, and
+  does CI run exactly it?" The honest answer was that three things
+  claimed to check this repository and no two agreed. A contributor ran
+  `npm test`. The kit's pre-push hook, finding no scripts/check.sh, fell
+  back to `npm test`. CI ran lint, typecheck, build, unit tests,
+  integration tests, a migrate-and-seed rehearsal, database specs, two
+  secret scans and a browser suite — with every command typed into the
+  workflow YAML.
+options: declare `npm test` the one command, which would mean CI checks
+  nine things the developer never runs and the phrase means nothing;
+  write the command down once and have everything call it.
+choice: scripts/check.sh — lint, typecheck, tests, in the order that
+  fails cheapest first. Three things converge on it and none of them
+  needed configuring:
+  - a contributor runs `sh scripts/check.sh`;
+  - the kit's pre-push hook finds ./scripts/check.sh on its own, because
+    that path is second in its resolution order, ahead of the `npm test`
+    guess — the hook was written expecting this gate to happen;
+  - CI CALLS it instead of re-typing it:
+    `./scripts/check.sh lint`, `./scripts/check.sh typecheck` in the
+    lint job, `./scripts/check.sh test` in the test job.
+  The stage arguments are worth defending, since a strict reading of the
+  guardrail wants CI to run the script once. Splitting by stage keeps the
+  jobs on separate runners — the documented cost model this pipeline was
+  built around — while the commands themselves live in exactly one file.
+  The property that matters is that there is no second copy to drift, and
+  there is none. If the human reads the guardrail more strictly than I
+  have, that is theirs to say and the gate is where they say it.
+  What is deliberately NOT in the script: `npm run build`, which produces
+  the artifact rather than judging the code, and the integration,
+  database and browser suites, which need a Postgres or a compose stack.
+  A check command that cannot pass on a laptop with no Docker is a check
+  command people learn to skip.
+  Evidence: `sh scripts/check.sh` → exit 0, lint clean, typecheck clean,
+  3402 tests passed, 23 skipped. Printed "green: all".
+
+2026-09-03 — DECISION: THE ROTTEN PLANK is faced, with the human's
+  approval on the record
+context: gate 50 owns the dependency audit, and this run has carried two
+  known production vulnerabilities since gate 20 — nanoid (high) and qs
+  (moderate), both transitive. CLAUDE.md §6 forbids any package upgrade
+  without the human's explicit approval, so the fix could not be quietly
+  applied along with the pipeline work.
+options: wire the audit non-blocking and leave the two in place, which
+  the gate refuses because a scan that cannot fail is not a scan; park
+  the whole box; measure the fix exactly, put the numbers in front of the
+  human, and act on their answer.
+choice: the third. Measured first, in a scratch copy, so the ask carried
+  facts rather than a promise: `npm audit fix --package-lock-only
+  --omit=dev` changes exactly two transitive pins — nanoid 3.3.16 to
+  3.3.18, qs 6.15.3 to 6.16.0 — with package.json untouched, nothing
+  added, nothing removed. The human approved on 2026-09-03. Applied: the
+  diff is package-lock.json alone, 12 lines, and `npm audit --omit=dev`
+  now reports 0 vulnerabilities. `sh scripts/check.sh` after the bump:
+  exit 0, 3402 tests.
+  The audit step is now the FIRST thing in the scan stage
+  (.github/workflows/ci.yml, job `secret-scan`), ahead of the two secret
+  scans, because it is the cheapest check in the pipeline:
+  `--package-lock-only` reads the committed lockfile and asks the
+  registry, so it needs no `npm ci` and no node_modules — seconds. It is
+  blocking, scoped with `--omit=dev` to what actually ships, and floored
+  at `--audit-level=moderate` so a `low` cannot wedge a merge on its own.
+  Proved to fire, not assumed to: the same command against the lockfile
+  as it stood this morning exits 1 and names both advisories; against the
+  current one it exits 0. That pair of runs is the evidence, and it is
+  the difference between a guard and a decoration.
+
+2026-09-03 — DECISION: the stage order is inverted from the kit's list,
+  and it is right anyway
+context: gate 50 names the order lint, test, build, scan, artifact, for
+  two stated reasons — cheap checks fail first, and the security scan
+  runs before anything is published. This pipeline runs the SCAN first:
+  `secret-scan` has no `needs`, and both `lint-typecheck` and `test`
+  need it.
+options: reorder the pipeline to match the list, which would make the
+  cheapest job wait behind the most expensive ones; evidence what is
+  configured and say why it satisfies the reasons rather than the
+  sequence.
+options weighed honestly, because this is the kind of place where a coach
+  can quietly grade itself: the list is the kit's, and I am the kit's
+  author running the kit on my own repository.
+choice: evidence what is configured. The scan job is the cheapest thing
+  in the pipeline — one billed minute, no `npm ci`, and with
+  `--package-lock-only` the audit needs no node_modules — so scan-first
+  IS cheap-checks-first here, not an exception to it. It is also
+  unavoidably before publish, since everything else needs it. And it
+  hosts the docs-only detection the other jobs read, so it must run
+  first regardless.
+  Order as configured, top to bottom:
+    1 scan — dependency audit, then the working-tree secret scan, then
+      the full-history one (job `secret-scan`, no needs)
+    2 lint, typecheck, build (job `lint-typecheck`, needs secret-scan)
+      and unit + integration + migration rehearsal + database specs
+      (job `test`, needs secret-scan) — in parallel, on separate runners
+    3 browser end-to-end (job `e2e`, needs secret-scan and test)
+  If the human reads the guardrail as a literal sequence rather than as
+  its two reasons, the gate is where they say so and the pipeline gets
+  reordered. It is their list; I only argue for the reading.
+
+2026-09-03 — DECISION: the artifact CI tests is not the artifact that
+  ships, and this gate cannot fix it
+context: gate 50's last box is build-once-promote — the artifact is built
+  once and promoted, because rebuilding per environment means testing one
+  thing and shipping another. CI runs `npm run build`. Render, on the
+  deploy hook CD fires, builds its OWN images from source:
+  render.yaml declares `runtime: docker` with `dockerfilePath` for both
+  services, so the platform compiles the Dockerfiles again on its side.
+  The build CI proved is discarded; the build that serves users has never
+  been tested by anything.
+options: call it satisfied because both builds come from the same vetted
+  SHA, which is the comfortable answer and the wrong one — two builds of
+  the same source are still two builds, and the guardrail exists because
+  they can differ (a base image that moved, a registry that resolved
+  differently, a build arg present on one side only); check the box on a
+  promise; evidence the gap.
+choice: evidence the gap. This is a real violation and it is NOT this
+  gate's to fix: closing it means publishing images to a registry from
+  CI and switching render.yaml from `dockerfilePath` to an `image:`
+  reference, which is a change to how this product is deployed. That
+  belongs to gate 70, with the human's decision, not to a pipeline lot
+  slipped in under a tests gate.
+  What is true today and worth keeping: CD does pin the deploy to the
+  SHA that CI vetted, waits until the service actually serves that SHA,
+  and deploys the API before the web. The promotion discipline is there;
+  it is the single-artifact discipline that is missing.
+
+2026-09-03 — PARKED: build the shipping artifact once and promote it —
+  today CI and Render build the same source twice, and only one of the
+  two is ever tested (revisit at gate 70)
+
+GATE REPORT — 50-CICD                            date: 2026-09-03
+boxes: [x] one-command-wired
+           evidence: scripts/check.sh — lint, typecheck, tests, in the
+           order that fails cheapest first. Local: `sh scripts/check.sh`
+           → exit 0, "green: all", 3402 tests. CI CALLS it rather than
+           re-typing it: .github/workflows/ci.yml, job `lint-typecheck`
+           runs `./scripts/check.sh lint` and `./scripts/check.sh
+           typecheck`, job `test` runs `./scripts/check.sh test`. The
+           kit's pre-push hook resolves to the same file with no
+           configuration — ./scripts/check.sh is second in its lookup
+           order, ahead of the `npm test` guess. Three callers, one
+           definition. See the DECISION of this date on why the stage
+           arguments exist and what is deliberately outside the script.
+       [x] ci-on-push
+           evidence: .github/workflows/ci.yml `on:` — push to main
+           (with paths-ignore for docs, brand, .claude and *.md),
+           pull_request targeting main, and workflow_dispatch. Latest run
+           on the default branch: run 33551510956, conclusion success,
+           https://github.com/mazzyst/skillboss/actions/runs/33551510956
+           Named rather than glossed: a feature branch gets no automatic
+           run until a pull request opens. This very branch carried
+           twenty commits with ZERO automatic runs — all six runs on it
+           were manual dispatches, and the red secret-scan that gate 20
+           introduced was found only because I dispatched one by hand.
+           Under the normal flow the first signal would have arrived at
+           pull-request time, which is when it matters and later than it
+           could be. The trade is deliberate and documented in the
+           workflow's own cost model; it is the human's to revisit.
+       [x] stage-order
+           evidence: the job graph, top to bottom —
+             1 scan: dependency audit, working-tree secrets, full-history
+               secrets (job `secret-scan`, no needs)
+             2 lint + typecheck + build (job `lint-typecheck`) and unit +
+               integration + migration rehearsal + database specs (job
+               `test`), in parallel, both needing `secret-scan`
+             3 browser end-to-end (job `e2e`, needs secret-scan and test)
+           This inverts the kit's listed sequence and satisfies both of
+           its stated reasons — see the DECISION of this date, which
+           argues the case rather than assuming it.
+       [x] pipeline-secrets-vaulted
+           evidence: a search over both workflow files returns exactly
+           two secret references, and both are NAMES, not values —
+           `secrets.RENDER_DEPLOY_HOOK_API` and
+           `secrets.RENDER_DEPLOY_HOOK_WEB` in .github/workflows/cd.yml.
+           A pattern search for a literal token, secret, password or key
+           of 16+ characters across both files returns nothing. The
+           values live in the repository's GitHub Actions secrets, and
+           the pipeline's own gitleaks steps scan these YAML files on
+           every run like any other file. Location, never value.
+       [x] branch-protection
+           evidence: the default branch reports protected=true on the
+           GitHub API (branch `main`, listed 2026-09-03). The workflow
+           itself records what it requires: the `build` job exists solely
+           as a skipped stub because main's required checks still list
+           "build", and a required check that never reports would wedge
+           every merge (.github/workflows/ci.yml, the STUB comment).
+       [~] build-once-promote
+           status: NOT satisfied, and not this gate's to fix. CI runs
+           `npm run build`; Render builds its own images from source on
+           the deploy hook — render.yaml declares `runtime: docker` with
+           `dockerfilePath` for both services. Two builds of one SHA, and
+           the one that serves users is the untested one. See the
+           DECISION of this date. Closing it means publishing images to a
+           registry and switching render.yaml to an `image:` reference,
+           which changes how this product is deployed: gate 70's
+           decision, with the human, not a pipeline lot slipped in here.
+           Waived with a revisit at gate 70.
+waivers: SKIP build-once-promote — the fix is a deployment-architecture
+  change, parked for gate 70 with the gap named in full.
+risks accepted by human: a production deployment whose artifact has never
+  been the artifact CI tested; and a branch model where a feature branch's
+  first automatic check arrives when its pull request opens.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: GO-READY, one box waived
+
+THE ROTTEN PLANK — faced at this gate. `npm audit --package-lock-only
+--omit=dev --audit-level=moderate`, blocking, first in the scan stage.
+Proved to fire: exit 1 against the morning's lockfile naming both
+advisories, exit 0 against the current one. Full CI green on 81f3031:
+https://github.com/mazzyst/skillboss/actions/runs/33878284797
