@@ -1923,3 +1923,38 @@ context: the human's standing offer was to cost the registry option.
   Not started. It touches the deploy architecture, needs the spec I
   cannot read, and step 4 is the human's regardless. On the table with
   numbers attached; the human decides whether it is this week's work.
+
+2026-09-04 — WAIVER: the human's words, verbatim
+  SKIP rehearsed-on-staging because pas de budget pour un second
+  environnement
+context: recorded as typed, in the language it was typed in. The risk
+  was stated once when the box was named a waiver candidate in
+  GATE REPORT — 70-DEPLOYMENT, and it is not restated here: the kit's
+  no-guilt rule is that the coach states a risk once, records the
+  decision, and never argues twice. Budget is a real constraint and a
+  legitimate reason; this is the human exercising the authority the
+  contract gives them.
+amendment to the report of this date: the box
+  [ ] rehearsed-on-staging, recorded there as OPEN, is now [~] WAIVED.
+  The journal is append-only, so the report above stands as written and
+  this entry is the correction. The verdict moves from HOLD (3 boxes
+  open) to HOLD (2 boxes open): restore-rehearsed and billing-alert-set
+  remain, and both are still the human's console.
+what the waiver does NOT cover, recorded so the accepted risk is precise
+  rather than vague — this is bookkeeping, not a second argument:
+  Something adjacent already exists and it is worth naming so nobody
+  later mistakes this gap for total. CI's e2e job builds the SAME two
+  production Dockerfiles through docker-compose and runs sixteen
+  Playwright suites against the running containers, with the frontend
+  healthcheck blocking. So the ARTIFACT SHAPE is rehearsed on every
+  push, in a production-shaped container stack, before anything merges.
+  What is NOT rehearsed, and what this waiver accepts: the production
+  CONFIGURATION and the production DATA. The compose stack runs
+  NODE_ENV=development with a placeholder JWT secret and a seeded
+  scratch database. Nothing exercises the real environment variables,
+  the real OAuth callbacks, the real migration against a populated
+  database, or the real platform's behaviour. Those meet production
+  for the first time in production.
+  Which makes the remaining open box heavier, not lighter, and that is
+  a fact rather than a plea: with no staging, the restore rehearsal is
+  the only remaining proof that a bad day is survivable.
