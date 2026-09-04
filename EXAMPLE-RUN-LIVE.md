@@ -1844,3 +1844,82 @@ parked debts, on arrival at this gate: neither is closed. The database
   looked and its absence worse than it looked.
 cost: 1 session, tokens unknown - DECLARED by the coach, not measured
 verdict: HOLD (3 boxes open)
+
+2026-09-04 — DECISION: make the restore rehearsal one command, because a
+  procedure in prose is a procedure that gets postponed
+context: three boxes are open and all three sit outside this repository.
+  The human answered "ok pour reco" again. Two of the three cannot move
+  on any answer — they need a console I cannot reach — and the third
+  needs the human's own words. So the useful question is not what an
+  approval unlocks; it is what stands between the human and the box.
+  For restore-rehearsed the answer was legible: RUNBOOK.md §3 describes
+  the rehearsal in prose, and THE LOST WEEKEND does not win by being
+  hard. It wins by making the rehearsal feel like an afternoon.
+choice: scripts/restore-rehearsal.sh. One command plus a download.
+  It starts a scratch Postgres container, restores the dump into it,
+  prints content counts, and destroys it.
+  Three things it refuses, mechanically rather than by convention,
+  because a script that touches databases and trusts its caller is a
+  loaded weapon: it never accepts a URL (the guard runs before the
+  file-exists test — see the correction below), so it cannot reach
+  across a network; it runs the scratch container with NO volume, so
+  there is nothing to persist and nothing to point at production; and
+  it uses a distinct container name and port so it cannot collide with
+  the dev stack in docker-compose.yml.
+  The design point worth keeping: it prints the counts and REFUSES to
+  grade them. A restore that succeeds into an empty database exits 0,
+  and that is precisely the failure this exercise exists to catch. The
+  script says so in its closing lines and tells the human the box stays
+  open until the journal has the entry.
+  Not tested end to end, and this is the honest limit: this container
+  has the docker binary but no daemon, so the guards were exercised
+  (usage, URL refusal, missing file) and the restore path was NOT. It
+  is `sh -n` clean. First real run is the human's, and if it breaks
+  there, that is a finding for the record like any other.
+
+2026-09-04 — CORRECTION: my own guard could never print
+context: the URL refusal in scripts/restore-rehearsal.sh was placed
+  AFTER the file-exists check. A URL was therefore rejected — but as
+  "no such file", with the explicit refusal message unreachable.
+  Caught by running it rather than by reading it.
+  Recorded because the run's rule is that the coach's own errors go to
+  the register in the same terms as everyone else's, and because the
+  shape is worth naming: the guard was present, correct, and mute. A
+  test that only asserted "a URL is rejected" would have passed. This
+  is the same family as the healthcheck at gate 60 and the CI step at
+  this one — a thing that looks like protection while never being in a
+  position to speak.
+fix: the case statement moved above the file test, with a comment
+  saying why the order matters. Verified: the message now prints.
+
+2026-09-04 — DECISION: the artifact promotion is costed, not started
+context: the human's standing offer was to cost the registry option.
+  Here it is, so the decision is theirs on numbers rather than on vibes.
+  What already exists, and it is most of the work: CI builds both
+  production images (docker compose --build, the same two Dockerfiles
+  Render uses) and runs sixteen Playwright suites against them. What is
+  missing is four steps, not a project.
+  THE SHAPE. 1. Tag the images CI already builds with the commit SHA.
+  2. Push them to GHCR (ghcr.io, same GitHub account, no new vendor and
+  no new bill — a private package on a personal account is free at this
+  scale). 3. Switch render.yaml from `dockerfilePath` to an image
+  reference. 4. Give Render read credentials for the registry.
+  THE COST, declared honestly as estimates and not measured: steps 1-2
+  are a CI lot, and they ADD a few minutes to every CI run because the
+  push is real bytes. Step 3 is a render.yaml change I cannot currently
+  verify against the spec (render.com is EGRESS_BLOCKED here — see the
+  finding of this date), so it needs to be written from somewhere with
+  access to the spec. Step 4 is console work, the human's.
+  WHAT IT BUYS, and this is the part that belongs to gate 70 rather
+  than 50: the rollback stops depending on a rebuild. Today a rollback
+  to SHA X rebuilds X from source at rollback time, from base layers
+  that have moved since — RUNBOOK.md §5. With promotion, rolling back
+  is pulling an image that was built once, tested by a browser, and
+  kept. That is the difference between a way back and a hope.
+  WHAT IT COSTS BEYOND MINUTES: Render deploys become pulls rather than
+  builds, so a deploy gets faster and a broken build surfaces in CI
+  instead of at deploy time. The risk moved rather than removed: the
+  registry becomes a dependency of deploying at all.
+  Not started. It touches the deploy architecture, needs the spec I
+  cannot read, and step 4 is the human's regardless. On the table with
+  numbers attached; the human decides whether it is this week's work.
