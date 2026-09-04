@@ -1527,3 +1527,28 @@ risks accepted by human: none new. The frontend healthcheck comes OFF the
   Parked table, fixed and proved.
 cost: 1 session, tokens unknown - DECLARED by the coach, not measured
 verdict: GO-READY
+
+2026-09-04 — DECISION: gate 60 closes on the human's GO, and the run belt
+  does not move
+context: GATE REPORT — 60-DOCKER was read with its six evidenced boxes
+  and no waiver — the first gate of this run to close without one. The
+  human typed GO on 2026-09-04, the day after the report was written.
+options: hold on the compose parity deviation (NODE_ENV: development in
+  the local stack) or on the artifact-identity gap the report points at;
+  GO on the report as written, both named and neither hidden.
+choice: GO. 60-DOCKER flips to PASSED, evidence pointing at the
+  2026-09-03 report. Seven gates faced — 00, 05, 10, 20, 40, 50, 60.
+  The belt stays GREEN, and that is worth saying rather than letting it
+  look like an omission: BLUE is earned by 60 AND 70 together
+  (start-guide/MANIFEST.md, the ladder). Containers without a rehearsed
+  way back is half the rung, so the ladder does not pay out for half.
+  What this gate caught, in its own words: a frontend healthcheck that
+  had never once passed and that nothing had ever waited on, whose real
+  cause — an IPv4-only server dialled through a name that resolves to
+  ::1 first — was found only after the coach published a wrong diagnosis
+  and its own new guard refused it. And a base-image layer that had no
+  update routine while the two layers around it did.
+  Not closed by this GO, carried forward unchanged: the artifact CI
+  tests is still not the artifact that ships, and the production
+  database is still only assumed closed. Both are on the Parked table
+  and both are gate 70's, which opens now.
