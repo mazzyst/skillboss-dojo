@@ -1958,3 +1958,41 @@ what the waiver does NOT cover, recorded so the accepted risk is precise
   Which makes the remaining open box heavier, not lighter, and that is
   a fact rather than a plea: with no staging, the restore rehearsal is
   the only remaining proof that a bad day is survivable.
+
+2026-09-04 — WAIVER: the human's words, verbatim
+  SKIP restore-rehearsed because pas de sauvegarde disponible pour
+  l'instant
+context: recorded as typed, in the language it was typed in. The risk
+  was stated more than once already — in GATE REPORT — 70-DEPLOYMENT
+  and twice in session — so it is not restated here. No-guilt rule: the
+  coach states a risk once, records the decision, never argues twice.
+amendment to the report of this date: the box
+  [ ] restore-rehearsed, recorded there as OPEN, is now [~] WAIVED.
+  Verdict moves from HOLD (2 boxes open) to HOLD (1 box open):
+  billing-alert-set remains.
+AN OPEN QUESTION OF FACT, not a second argument — the record cannot be
+  accurate until it is answered, and I will not resolve it by assuming:
+  the two waivers of this date are different in kind, and the reason
+  given here is not a decision the way "pas de budget" was. It is a
+  statement about the world, and it reads two ways.
+  READING A — "I cannot get at a backup right now." The rehearsal is
+  postponed. This waiver covers it exactly, and the box is the only
+  thing outstanding.
+  READING B — "There is no backup." Then this waiver does not cover
+  what is actually true. Gate 70's guardrail is "Backups exist AND one
+  restore has been rehearsed" — two claims. Waiving the REHEARSAL says
+  nothing about the EXISTENCE, and if backups do not exist then THE
+  LOST WEEKEND is not merely unopposed, it is live, and that is a
+  separate finding this gate has not recorded and I am not inventing.
+  Under reading B the honest record is not one waived box; it is a
+  waived box PLUS a Caught row PLUS a second decision from the human
+  about whether a live product holding user accounts and emails runs
+  with no recoverable copy of its database.
+  I am not asserting reading B. Render's plan is declared in
+  render.yaml (basic-256mb) and what that plan does or does not include
+  by default is exactly the platform fact I cannot check from here —
+  render.com is EGRESS_BLOCKED (see the finding of this date). So this
+  entry states the question and leaves it open rather than guessing at
+  a platform default, which is the error gate 20 already caught this
+  run once, on this same database.
+  Parked as a question to the human, revisit before the gate's GO.
