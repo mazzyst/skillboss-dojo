@@ -1366,3 +1366,164 @@ choice: GO. 50-CICD flips to PASSED, evidence pointing at this date's
   the job on, waiting on the healthcheck, scanning the whole history.
   The kit's value in this run has not been its checklists. It has been
   that a checklist forced someone to actually pull the lever.
+
+2026-09-03 — DECISION: gate 60 opens, and the healthcheck parked at gate
+  40 gets its cause and its fix
+context: gate 40 found that the frontend container's healthcheck had
+  never passed, and recorded the cause as UNKNOWN rather than guessing.
+  Gate 60 owns healthchecks, and its box wants one passing check output —
+  so the question could not be deferred again.
+options: delete the probe, which would make the box pass by removing the
+  thing it measures; raise the timeout until it stops complaining without
+  understanding why; use the two measurements the e2e job produced.
+choice: the third, and the arithmetic is the whole answer. The probe's
+  budget was start_period 30s plus five retries at 10s: Docker gave up at
+  80 seconds. The service answered at ~85-87, measured twice on CI
+  runners (runs 33869380661 and 33873508729). The probe was never wrong
+  about HOW to ask — busybox wget against the published port is right,
+  and the server does answer it. It stopped asking seven seconds too
+  early, every time, on every machine slow enough.
+  start_period is now 120s. That is not a fudge and the distinction
+  matters: a start_period is a grace window, not a stopwatch — the FIRST
+  success ends it immediately, so a generous one costs nothing on a fast
+  machine and only widens the margin before a slow boot is called dead.
+  The job of this probe is to notice a service that never came up, not to
+  race one that is still coming up.
+  And the fix is worth nothing without the thing that keeps it honest:
+  the e2e job now brings the frontend up with `docker compose up -d
+  --wait frontend`, which BLOCKS on that healthcheck. If it regresses,
+  CI goes red. The curl poll stays after it, asking the same question
+  from outside the container, because Docker's probe and the browser's
+  reach are two different assertions and collapsing them would lose one.
+  The parked ask from gate 40 is answered: the probe should exist, and
+  it now passes.
+
+2026-09-03 — DECISION: the base images had no update routine, and that is
+  the layer the app actually runs on
+context: gate 60 asks for pinned bases WITH a written routine — who bumps
+  them, how often — because a pin without a routine is a fossil. Both
+  Dockerfiles pin node:20-alpine, which satisfies "a named tag, never
+  latest". The routine did not exist.
+options: call the pin sufficient, which is the letter of the guardrail
+  and not its point; write the routine down in prose, which is a promise;
+  make it mechanical.
+choice: mechanical. .github/dependabot.yml already had entries for npm
+  and for GitHub Actions — the two layers ABOVE and AROUND the app — and
+  none for the layer the app runs on. A `docker` ecosystem now covers
+  both Dockerfile directories, weekly on the same morning as the rest, so
+  one review covers the whole supply chain. Majors stay muted under the
+  same standing operator decision that mutes npm majors: node:21 is a
+  migration, not a bump.
+  Worth naming plainly, because it is the shape of most real gaps: this
+  was not an oversight of judgement. Someone thought carefully about
+  dependency drift, wrote a considered file about it with a documented
+  trade-off, and covered two of the three layers. The third was invisible
+  precisely because it had been pinned once and therefore felt handled.
+
+2026-09-03 — DECISION: my healthcheck diagnosis was wrong, and the fix I
+  added to catch regressions is what caught it
+context: the entry above explains the frontend probe's failure as an
+  arithmetic one — a budget expiring at 80 seconds on a service answering
+  at 85-87 — and raises start_period to 120s on that basis. CI run
+  33891513664 waited on the probe with `--wait` and it failed again,
+  after four minutes.
+options: raise the window again, which is what someone does when they are
+  attached to their own explanation; read the probe's own output, which I
+  had never actually looked at.
+choice: read it. The probe reports, five times in a row, at four minutes
+  in: `wget: can't connect to remote host: Connection refused`. Not a
+  timeout. Not a slow answer. Nothing was listening at the address it
+  dialled, and no amount of extra time fixes that.
+  The real cause, mechanical and complete: inside an alpine container
+  `localhost` can resolve to ::1 first, and the Next standalone server is
+  started with HOSTNAME=0.0.0.0 (frontend/Dockerfile line 68), which
+  listens on IPv4 ONLY. The backend's identical-looking probe works
+  because Nest calls app.listen(port) with no host and Node then binds ::,
+  accepting both families. One service answers `localhost`, the other
+  never could. The probe now dials 127.0.0.1.
+  start_period goes back to 60s. 120 was picked to make a wrong diagnosis
+  add up; leaving it would leave that reasoning fossilised in the file.
+  What I got wrong, precisely, because "I was wrong" is not a finding and
+  the shape of the error is: I had two real measurements — the host
+  reached the app at ~85s, the probe's budget expired at 80s — and they
+  fit together so neatly that I stopped. Two facts that agree are not a
+  cause. I never looked at what the failing command actually PRINTED, and
+  it had been printing the answer all along.
+  The one good thing here is not the fix. It is that the previous commit
+  added `--wait` and a diagnostic step precisely so a regression would be
+  loud, and both did their job on their first run: `--wait` refused to
+  proceed on a probe I had declared healed, and the diagnostic handed over
+  the line that named the real cause. The guard caught its author.
+  Not changed, deliberately: the backend's probe still says `localhost`.
+  It works, because that service binds dual-stack, and rewriting a
+  working line in the same lot would be churn. It is a latent version of
+  the same trap and worth knowing about; it is not this gate's finding.
+
+GATE REPORT — 60-DOCKER                          date: 2026-09-03
+boxes: [x] multi-stage-minimal
+           evidence: backend/Dockerfile and frontend/Dockerfile both run
+           `FROM node:20-alpine AS builder` then `FROM node:20-alpine AS
+           runner`. Build tooling stays in the builder stage; the runtime
+           stage carries the compiled app — dist/main.js for the backend,
+           the Next standalone server for the frontend — and its runtime
+           dependencies.
+       [x] non-root-user
+           evidence: `USER node` at backend/Dockerfile:71 and
+           frontend/Dockerfile:84, and the running processes read back
+           from a live stack rather than from the Dockerfile. CI run
+           33894172271, job `e2e`, step "Container users and health":
+             postgres: user=root health=healthy
+             backend:  user=node health=healthy
+             frontend: user=node health=healthy
+           Named rather than glossed: postgres reports root because the
+           official image's entrypoint starts as root and drops to the
+           `postgres` user for the server process itself. Both
+           application containers — the ones this project builds — run
+           unprivileged.
+       [x] dockerignore-guards
+           evidence: .dockerignore at the repository root (one file; both
+           images build from the root context so the single workspace
+           lockfile resolves). It excludes `.env`, `.env.*`, `**/.env`,
+           `**/.env.*`, `.git`, `.github`, `node_modules`, `**/dist`,
+           `**/.next`, docs, brand, .claude, and the spec/test globs.
+       [x] bases-pinned
+           evidence: the four FROM lines above pin node:20-alpine — a
+           named tag, never latest. The ROUTINE is the part that did not
+           exist and now does: .github/dependabot.yml gains a `docker`
+           ecosystem over /backend and /frontend, weekly on Monday, with
+           majors muted under the same standing operator decision that
+           mutes npm majors. See the DECISION of this date: the file had
+           entries for npm and for GitHub Actions and none for the layer
+           the app actually runs on.
+       [x] healthcheck-defined
+           evidence: all three services declare one (docker-compose.yml).
+           The frontend's is the one this run repaired — see the two
+           DECISIONs of this date, the second correcting the first. One
+           passing check, from CI run 33894172271:
+             Container skillboss-frontend-1  Healthy
+             frontend answered after ~2s
+           and the inspection above reporting health=healthy for all
+           three. The e2e job now brings the frontend up with
+           `docker compose up -d --wait frontend`, so this probe is
+           blocking: if it regresses, CI goes red rather than the
+           container quietly sitting unhealthy for months, which is
+           exactly what it did before.
+       [x] compose-parity
+           evidence: docker-compose.yml builds the SAME two Dockerfiles
+           production uses, from the same repo-root context; environments
+           differ by configuration, not by Dockerfile. One deviation,
+           named because it is real: the backend service sets
+           `NODE_ENV: development` in compose while the image defaults to
+           production, so the local stack can run with the placeholder
+           JWT secret that the app's own fail-fast guard rejects under
+           production. It is documented at the point of use, in the
+           compose file. The separate and larger parity question — that
+           the platform REBUILDS these images rather than promoting the
+           one CI tested — was found at gate 50, waived there, and is on
+           the Parked table for gate 70. It is an artifact-identity
+           problem, not a compose-shape one.
+waivers: none
+risks accepted by human: none new. The frontend healthcheck comes OFF the
+  Parked table, fixed and proved.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: GO-READY
