@@ -2094,3 +2094,82 @@ options, for the human, in the coach's order of preference:
 the coach recommends A, and B on top if the human has a card alert
   within reach. Either way the five-services question from the billing
   page read is still open and still matters to this gate.
+
+2026-09-04 — WAIVER: the human's words, verbatim
+  SKIP billing-alert-set because Render n'offre aucune alerte de
+  facturation native
+context: recorded as typed. The risk was stated once and the exposure
+  bounded in the FINDING of this date; neither is restated. The
+  pipeline-minutes cap recommended alongside it is NOT recorded as set
+  — the human has not said so, and the coach does not assume a console
+  action it did not see.
+amendment: [ ] billing-alert-set → [~] WAIVED. Every box at this gate
+  is now settled: three evidenced, three waived. The report below is
+  the second for this gate and the one put forward for the GO.
+
+GATE REPORT — 70-DEPLOYMENT (second)             date: 2026-09-04
+boxes: [x] rollback-written-first
+           evidence: RUNBOOK.md §1 (the code: three options with their
+           commands, the deploy-hook call cd.yml already makes, the
+           API-before-web order and why it is not cosmetic) and §2 (the
+           database: `prisma migrate deploy` at every boot in
+           backend/tools/start-prod.sh, zero down.sql across 23
+           migrations, therefore no rollback across a destructive
+           migration — only a restore). Written after the first deploy,
+           and the file says so in its opening lines. Every procedure
+           marked REHEARSED or NOT REHEARSED; all read NOT REHEARSED.
+       [~] rehearsed-on-staging
+           waived 2026-09-04: "SKIP rehearsed-on-staging because pas de
+           budget pour un second environnement". What CI already
+           rehearses (the artifact shape: same Dockerfiles, sixteen
+           Playwright suites, blocking healthcheck) and what now meets
+           production first in production (the configuration and the
+           data) are both on the record.
+       [x] migrations-expand-contract
+           evidence: CLAUDE.md §5 and AGENTS.md carry the convention
+           with its mechanism. Latest migration
+           20260830120000_add_open_to_briefs is a single additive
+           ALTER TABLE ... ADD COLUMN with a DEFAULT; `grep -rlE "DROP
+           COLUMN|DROP TABLE"` over all 23 migrations returns nothing.
+       [x] deploys-scripted
+           evidence: .github/workflows/cd.yml is the only deploy path
+           for the three services render.yaml declares — autoDeploy
+           false on both web services, SHA pinned, health polled per
+           service before the next, concurrency without cancellation.
+           No manual-step deploy in the journal. ONE OPEN QUESTION
+           bears on this box and is named rather than hidden: the
+           billing page counts five services and a cron charge where
+           the blueprint declares three things and no cron. If those
+           are SkillBoss, they were created outside the blueprint —
+           by hand, in a console — and this box holds for the declared
+           services only. If they belong to another project, the box
+           holds as written. The human answers with the GO.
+       [~] restore-rehearsed
+           waived 2026-09-04: "SKIP restore-rehearsed because pas de
+           sauvegarde disponible pour l'instant". Clarified by the
+           human as reading A: backups exist, none reachable today.
+           scripts/restore-rehearsal.sh and RUNBOOK.md §3 stand ready —
+           one download, one command, counts printed and not graded.
+       [~] billing-alert-set
+           waived 2026-09-04: "SKIP billing-alert-set because Render
+           n'offre aucune alerte de facturation native". Exposure
+           bounded on the record: three fixed-price services, three
+           runaway vectors, one native cap (pipeline minutes) that
+           exists and is not recorded as set.
+waivers: three, all the human's, all verbatim above.
+risks accepted by human: production is the first environment to see a
+  change in its real configuration and data; the backup has never been
+  proven to restore; no alert fires before a bill grows. Each bounded
+  on the record, none hidden.
+what this gate caught, in one line each: the one command was red on a
+  fresh clone and CI could not see it because CI repaired the condition
+  it was meant to report; the written rollback plan named a tag and a
+  down-migration that do not exist; an older deploy rolls the code back
+  and the database not at all; CI already builds and browser-tests the
+  production images, then deletes them; the platform has no spend alert
+  to set; and the coach's own new guard was present, correct and mute.
+still parked, revisit named: the artifact promotion (costed, the
+  human's call on numbers); the ipAllowList line (needs the spec,
+  unreachable from here); the five-services question above.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: GO-READY, three boxes waived
