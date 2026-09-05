@@ -2173,3 +2173,53 @@ still parked, revisit named: the artifact promotion (costed, the
   unreachable from here); the five-services question above.
 cost: 1 session, tokens unknown - DECLARED by the coach, not measured
 verdict: GO-READY, three boxes waived
+
+2026-09-04 — DECISION: gate 70 closes on the human's GO, and the run
+  belt turns BLUE
+context: GATE REPORT — 70-DEPLOYMENT (second) was read with its three
+  evidenced boxes, its three waivers, and the one question it named
+  inside the deploys-scripted box rather than hiding. The human typed
+  GO on 2026-09-04 without answering that question.
+options: hold the gate for the answer, which turns a named caveat into
+  a blocker the report itself did not make it; GO on the report as
+  written, the caveat standing, the question parked with a revisit.
+choice: GO. 70-DEPLOYMENT flips to PASSED, evidence pointing at the
+  second report of this date. deploys-scripted holds as evidenced for
+  the three services render.yaml declares, exactly as the report says;
+  the five-services question moves to the Parked table, revisit at
+  gate 80, because gate 80 is where "what is actually running" gets
+  asked again through a different door — health endpoints, uptime
+  probes, and the inventory of what could be down.
+  Eight gates faced. 60 and 70 together earn BLUE on the ladder:
+  containers AND a written way back. What BLUE says here, precisely:
+  the images are built the same way everywhere and run unprivileged,
+  and there is now a file that tells a person at 02:00 which command
+  to type and which one will not help. It does not say the way back
+  works — none of it has been rehearsed, three of this gate's six
+  answers are waivers, and the record says so as loudly as it says
+  BLUE.
+  Worth naming at the halfway-plus mark: this gate closed with more
+  waivers than any before it, and that is the correct outcome rather
+  than a weak one. Every waiver here is a budget or platform fact the
+  human stated in their own words, each with its exposure bounded on
+  the record. A gate that produced three confident checkmarks on the
+  same facts would have been the dishonest one.
+
+2026-09-04 — PARKED: the five services and the cron charge on the
+  billing page, against three declared in render.yaml — other project,
+  or undeclared SkillBoss infrastructure? (revisit at gate 80)
+
+2026-09-04 — PARKED: the ipAllowList line on the production database —
+  the human's to apply, verified against the blueprint spec from
+  somewhere that can read it (revisit at gate 90)
+
+2026-09-04 — PARKED: build the artifact once and promote it — costed
+  at this gate, four steps, needs the registry and the human's console
+  (revisit at gate 90)
+
+2026-09-04 — GATE OPENED: 80-OBSERVABILITY
+context: gate 70 has its GO. The gate that opens asks whether the
+  system can answer three questions — is it up, is it erroring, is it
+  slow — in under two minutes, before the first real incident asks
+  them. It arrives with one parked question that is really its own:
+  what is actually running.
