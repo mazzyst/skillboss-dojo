@@ -2584,3 +2584,39 @@ choice: reading "other project". No Caught row: this repository's
   compose stack and the browser suite run only when a pull request
   opens. Opening one is the first time CI sees twelve commits. That is
   the human's call (CLAUDE.md §6: no PR without an explicit ask).
+
+2026-09-05 — CORRECTION: every entry of this session dated 2026-09-04
+  from "ANSWERED: the human typed A" onward was written on 2026-09-05
+context: the human's terminal showed a health timestamp of
+  2026-09-05T11:39Z, and the container clock agrees. This session
+  opened on 2026-09-04 in the evening and ran past midnight UTC around
+  06:40; the git log carries the true timestamps, and I never re-read
+  it. I derived the date once — "the day after the gate 60 report" —
+  and kept typing it.
+what is misdated, named so the record can be read correctly: the GO on
+  gate 70 and BLUE, the opening of gate 80, the ASSUMPTIONs of "ok pour
+  reco" on gates 70 (fourth) and 80, the billing-page read, the
+  spend-alert FINDING, the third waiver, GATE REPORT — 70-DEPLOYMENT
+  (second), all three gate-80 lots, GATE REPORT — 80-OBSERVABILITY, the
+  five-services answer, and the "what is live" NOTE. Each of these says
+  2026-09-04 and happened on 2026-09-05. The entries BEFORE "ANSWERED:
+  A" — the gate 60 GO, gate 70's opening and first lot, its first
+  report, the restore script, the first two waivers — are correctly
+  dated 2026-09-04.
+  The journal is append-only, so those lines stand as written and this
+  entry is the correction. The scoreboard is regenerated from the
+  journal and is corrected outright: 70-deployment PASSED since
+  2026-09-05, BLUE earned 2026-09-05, the gate-80 Caught rows on day 3,
+  the post-midnight Parked rows dated 2026-09-05. Code comments that
+  carry the same wrong date on gate-80 changes are corrected in the
+  same lot, because a comment that dates a change is a claim and the
+  commit log contradicts it; gate-70 comments dated 2026-09-04 are
+  right and untouched.
+the shape of the error, because "I got the date wrong" is not a
+  finding: a value read once and never re-read, in a session long
+  enough for the value to change. It is the same family as the CI step
+  that pre-generated the Prisma client and the test that asserted the
+  health stub — a fact frozen at the moment it was first true. The
+  YOU ARE HERE block printed "day 2" for five hours of day 3. The
+  post-commit hook computes the run's day from git, not from me; the
+  run screen was right the whole time, and I never looked at it.
