@@ -2692,3 +2692,40 @@ where the two remaining boxes actually stand:
   this branch to reach main, the webhook URL to be set, and one event
   to arrive. "On avance" here means the pull request, which is the
   human's decision and not the coach's.
+
+2026-09-05 — WAIVER: the human's words, verbatim
+  SKIP three-questions-pass because on avance pour revenir à tous les
+  skip apres
+context: recorded as typed. Risk stated once, in the reply that carries
+  this entry: the two-minute clock IS this gate's definition of done —
+  "the three questions answerable in under two minutes" — and without
+  it the definition is asserted rather than measured. Not restated.
+  What IS on the record without the clock: the three commands exist in
+  RUNBOOK.md §6, and the human ran the "erroring" and "slow" ones live
+  in this session against production, with output. Only the numbers
+  are missing.
+amendment to GATE REPORT — 80-OBSERVABILITY: [ ] three-questions-pass
+  → [~] WAIVED. Verdict: HOLD (1 box open) — errors-reach-human, which
+  waits for the branch to reach main.
+the reason carries an intent, and the intent goes on the record as a
+  promise so it does not evaporate: "pour revenir à tous les skip
+  après". Parked below. Gate 90 is the gate where the kit faces every
+  villain together, and where a return to each waiver of this run is
+  the natural first act.
+
+2026-09-05 — PARKED: return to every waiver of this run — rehearsed-on-
+  staging, restore-rehearsed, billing-alert-set, external-uptime-check,
+  three-questions-pass — and re-ask each one with the human, in the
+  human's own words (revisit at gate 90)
+
+2026-09-05 — DECISION: the pull request opens, at the human's explicit ask
+context: "ouvre la PR". CLAUDE.md §6 forbids one without an explicit
+  ask; this is one. Seventeen commits on
+  claude/gate-60-go-gate-70-546k4s, zero automatic CI runs — the
+  pre-push hook ran lint, typecheck and the unit suites on every push;
+  the integration job, the migrate-and-seed rehearsal, the compose
+  stack and the sixteen Playwright suites run only now. This is the
+  first time the pipeline sees the health probe, the JSON logs, the
+  error channel, the check.sh change and the CI change that removed
+  the masking step. If CI is red, that is the first thing this branch
+  has learned from the pipeline, and it is owned here until green.
