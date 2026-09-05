@@ -2550,3 +2550,37 @@ choice: the webhook. ErrorNotifierService in the global
   test event's arrival". The first half is now a file path; the second
   needs the URL set in the dashboard and one arrival recorded by the
   human, with the destination's kind and never its URL.
+
+2026-09-04 — ANSWERED: the five services — two belong to skillboss-universe
+context: the billing page counted five services and a cron charge
+  against three declared in render.yaml. Asked four times. The human
+  answers: the two extra services are skillboss-universe's — the brand
+  universe named in state/mission.md's Will-NOT-do list, a sibling
+  project on the same Render account.
+choice: reading "other project". No Caught row: this repository's
+  blueprint declares everything this repository runs, and gate 10's
+  evidence for it stands. deploys-scripted at gate 70 holds as written.
+  The parked question comes off the table.
+  One line kept, because it is true and cheap: same account, same
+  bill. The ceiling read at gate 70 (mid-twenties of dollars projected)
+  covers BOTH projects, and THE BILL SHOCK — already without a native
+  alert — has two projects' worth of runaway vectors under it, not one.
+
+2026-09-04 — NOTE: what is live and what is not, before the human
+  touches the dashboard
+  Every change on this branch — the health probe with its 503, the JSON
+  logs, the log leak fix, the error webhook — is on
+  claude/gate-60-go-gate-70-546k4s and NOT on main. Render deploys main.
+  So: METRICS_TOKEN takes effect the moment it is set, because the
+  metrics endpoint predates this branch and is already live.
+  ERROR_WEBHOOK_URL can be set now and is harmless, but nothing reads
+  it until this branch reaches main and cd.yml deploys it. The same is
+  true of the 503 on a database-less health check. Named so the human
+  does not set a variable, see nothing arrive, and conclude the channel
+  is broken.
+  And a fact from gate 50, now concrete: this branch has had ZERO
+  automatic CI runs — the pre-push hook ran the unit suite on every
+  push, but the integration job, the migrate-and-seed rehearsal, the
+  compose stack and the browser suite run only when a pull request
+  opens. Opening one is the first time CI sees twelve commits. That is
+  the human's call (CLAUDE.md §6: no PR without an explicit ask).
