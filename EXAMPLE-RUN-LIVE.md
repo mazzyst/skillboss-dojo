@@ -2328,3 +2328,91 @@ choice: the status code. A platform health check, the CD poll (`curl
   gate 50's and gate 70's findings, one layer over. Observed while
   proving this lot with the values CI uses (development-only, never a
   production value); parked, revisit at gate 90.
+
+2026-09-04 — DECISION: logs become one JSON object per line, with Nest's
+  own logger and no new dependency
+context: gate 80 asks for structured logs — one event per line,
+  machine-parseable, request context. The backend used Nest's default
+  logger: pretty text, colours, no shape a drain or a `jq` can read.
+  Seven logger call sites in the whole backend, zero console calls in
+  the frontend, and one bare `console.log` in app.config.ts — the
+  trust-proxy boot line — that bypassed the logger entirely and would
+  have been the one unparseable line in a production boot.
+options: pino or winston, which is a dependency and CLAUDE.md §6 says
+  not without approval; Nest 11's ConsoleLogger with `json: true`,
+  which is already installed.
+choice: ConsoleLogger, json on everywhere except NODE_ENV=development.
+  A developer's terminal keeps text because a wall of JSON is
+  unreadable at a desk; production, test and CI emit the same shape,
+  so what is debugged in one is what ships in the other. The boot line
+  goes through `new Logger('config')` like every other.
+  One real line, produced from the installed library in this container
+  (not from a running server — the app needs a database this
+  environment does not have), the user reference redacted:
+    {"level":"warn","pid":2117,"timestamp":1788598226042,
+     "message":"Suspicious run for user <redacted> on 2026-09-04",
+     "context":"QuizSubmissionService"}
+  The configuration path is backend/src/main.ts.
+  Not done, named: request context (a request id on every line) is not
+  in this lot. The seven call sites are all warn/error on named
+  events; there is no request log to correlate yet, and adding a
+  request id without a request log is a field nobody reads. Owed if a
+  request log ever exists.
+
+2026-09-04 — FINDING and fix: the error response was careful and the log
+  line beside it was not
+context: the no-sensitive-logs sweep read all seven logger call sites.
+  Six are clean — named events, error class names, a UTC date, a
+  bounded slug. The seventh is HttpExceptionFilter, which strips the
+  query string from the envelope's `path` (with a comment about a
+  future share/reset token) and then logs `req.originalUrl` WHOLE,
+  query string included, one line above. Same request, two outputs,
+  one of them careful.
+  Regression first, per CLAUDE.md §5 — a new spec,
+  http-exception.filter.spec.ts, spies Logger.prototype.error and
+  throws through the filter with `?share=tok_SECRET_123`:
+    BEFORE  Received: "Unhandled error on GET /api/v1/quiz/submit?share=tok_SECRET_123&x=1"
+    AFTER   2 tests green — the path is logged, the query is not, the
+            stack still rides as the second argument.
+  Fix: `path` computed once from the same expression, used by the log
+  and the envelope both.
+  The other note from the sweep, recorded and NOT changed: one warn
+  line names a userId. It is an internal identifier, not an address
+  or a name, and it is the only key that lets an operator find a
+  suspicious run — removing it would blind the line that exists to be
+  read. Kept, on the record as a pseudonymous identifier in a log.
+
+2026-09-04 — DECISION: the metrics token is declared so production can
+  turn its own instruments on
+context: a Prometheus scrape already exists at GET /api/v1/metrics —
+  latency histograms by route pattern, request counts by status
+  class, OAuth failures, pool exhaustion, event-loop lag — bearer-
+  gated, off unless METRICS_TOKEN is set (the route answers 404).
+  render.yaml did not declare the variable, so production has had
+  those instruments and no way to switch them on. "Is it erroring, is
+  it slow" were therefore answered by reading service logs by hand.
+choice: METRICS_TOKEN declared `sync: false` in render.yaml and
+  documented in .env.example (empty = off). The VALUE is the human's,
+  in the dashboard, never here. Until it is set, the state is exactly
+  what RUNBOOK.md §6 now says: one of three questions answerable.
+
+2026-09-04 — three-questions-pass: the commands exist; the timing is not
+  mine to record
+context: the box wants a journal entry timing the three answers under
+  two minutes. RUNBOOK.md §6 now carries two commands per question. I
+  tried to time them against production from this environment:
+    api.skillboss.dev/api/health → HTTP 000
+    skillboss.dev/healthz        → HTTP 000
+    api.skillboss.dev/api/v1/metrics → HTTP 000
+  Egress to skillboss.dev is blocked here, the same way render.com is.
+  So the honest state: "is it up" is answerable in one command from
+  any machine that can reach the site, and I could not run that
+  command. "Erroring" and "slow" are answerable in one command each
+  the moment METRICS_TOKEN is set, and not before. The box stays OPEN
+  until the human runs RUNBOOK.md §6 with a clock and reports the
+  three times, or waives it. A timing I did not perform is not one I
+  write down.
+
+2026-09-04 — RUNBOOK.md: §0 now says what 200 and 503 mean on the health
+  line (owed from lot 1), and §6 holds the three questions with their
+  commands and the honest "one of three" state. Incident log moves to §7.
