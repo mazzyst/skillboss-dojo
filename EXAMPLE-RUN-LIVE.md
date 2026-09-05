@@ -2013,3 +2013,40 @@ context: the open question of fact from the restore-rehearsed waiver.
   scripts/restore-rehearsal.sh stay ready for the day a backup is in
   hand: the rehearsal is one download and one command.
   One box remains at this gate: billing-alert-set.
+
+2026-09-04 — READ: the human sent the Render billing page, and it
+  answers Coach Play question 3 without closing the box
+context: a screenshot of dashboard.render.com, the billing view. What
+  it shows, recorded as location and order of magnitude, never as
+  account detail: usage well inside the included allowances (services,
+  bandwidth, pipeline minutes all at a small fraction of the plan);
+  charges accrued month to date under five dollars; a projected
+  September total in the mid-twenties of dollars. That is the answer to
+  "what is the monthly ceiling" that the gate asked for on opening and
+  that was taken as an ASSUMPTION earlier today — now read from the
+  platform, by the human, rather than assumed by the coach.
+what it does NOT show, and why the box stays open: no spend alert is
+  visible on this page. The one "Manage spend" control in view is on
+  pipeline minutes, which is a cap on build minutes and not a billing
+  notification. The box asks for an alert that tells a person when the
+  bill approaches a ceiling; a page that displays the bill is the thing
+  the alert exists to replace having to look at.
+  Where the alert would live is the platform fact I cannot verify from
+  here (render.com is EGRESS_BLOCKED). The human is in the console and
+  can find it; I cannot name the exact menu without guessing.
+recommended threshold, for the human to accept or change: fifty dollars
+  a month — roughly double the projected run rate. The point of a spend
+  alert is to catch a runaway before it doubles, so the threshold sits
+  at the doubling, not at the projection: an alert at the projection
+  fires on ordinary variance and gets muted; one at ten times fires
+  after the damage.
+A QUESTION, not a finding, because it may be another project on the
+  same account: the page counts five services in use and carries a
+  "Cron Jobs" line with a non-zero charge. render.yaml declares three
+  things — two web services and one database — and no `type: cron`. If
+  those five are all SkillBoss, then two pieces of production
+  infrastructure exist that the repository does not declare, and one
+  of them runs on a schedule. That would be a Caught row: the blueprint
+  is supposed to be the record of what runs, and gate 10 evidenced it
+  as such. If the account hosts something else, it is nothing. Asked
+  as one line; recorded here so the answer has somewhere to land.
