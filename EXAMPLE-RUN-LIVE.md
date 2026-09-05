@@ -2663,3 +2663,32 @@ operational lesson, into RUNBOOK.md §0: on this platform, with
   not either — a Manual Deploy did. A person who sets a variable, sees
   nothing change, and concludes the feature is broken has just lost an
   hour this run already spent for them.
+
+2026-09-05 — WAIVER: the human's words, verbatim
+  j'ai deja une mesure uptime en interne , on passe cette etape et on
+  avance
+context: not the SKIP template, but unambiguous — the box is named by
+  its subject (uptime), the reason is given (an internal measure
+  exists), and the intent is to skip. Recorded as typed. The risk was
+  stated once, in the reply that carries this entry: an internal
+  monitor shares fate with what it watches, and THE SILENT CRASH is
+  the case where both go down together and nothing says so. Not
+  restated. Rule 8: the coach states a risk once, records, never
+  argues twice.
+amendment to GATE REPORT — 80-OBSERVABILITY: [ ] external-uptime-check
+  → [~] WAIVED. Verdict moves from HOLD (3 boxes open) to HOLD (2
+  boxes open): three-questions-pass and errors-reach-human remain.
+what the waiver leaves precisely uncovered, bookkeeping not argument:
+  the health endpoint is polled today by Render's healthCheckPath and
+  by cd.yml during deploys — both inside the platform. Nothing outside
+  it asks "is it up". The one improvement banked regardless: when
+  anything does ask, the endpoint tells the truth once this branch is
+  deployed.
+where the two remaining boxes actually stand:
+  three-questions-pass — the commands are proven live (the human ran
+  them in this session); the box wants three TIMES and none was
+  reported. Three numbers, or a SKIP in the human's words.
+  errors-reach-human — built, declared, tested; structurally waits for
+  this branch to reach main, the webhook URL to be set, and one event
+  to arrive. "On avance" here means the pull request, which is the
+  human's decision and not the coach's.
