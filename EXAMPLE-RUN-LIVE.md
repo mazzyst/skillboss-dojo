@@ -2620,3 +2620,46 @@ the shape of the error, because "I got the date wrong" is not a
   YOU ARE HERE block printed "day 2" for five hours of day 3. The
   post-commit hook computes the run's day from git, not from me; the
   run screen was right the whole time, and I never looked at it.
+
+2026-09-05 — EVIDENCE: the metrics scrape is live in production, and
+  setting the variable was not enough
+context: the human set METRICS_TOKEN in the Render dashboard on
+  skillboss-api. Three probes in a row answered 404 — first with an
+  uptime of eighteen hours (no restart), then after what the dashboard
+  called a restart, still 404. A Manual Deploy of the latest commit was
+  what carried the variable into the process. In the human's words:
+  "il fallait redéployer".
+  The code side was verified from here before the human was sent back
+  to the console, and it is on the record because the alternative was
+  guessing: the route exists on origin/main (ObservabilityModule in
+  AppModule, @Controller('metrics') under api/v1); it answers 404 by
+  design on an empty token; validateEnv returns the whole config and
+  filters no key; production reads process.env directly. Nothing in
+  the code could have swallowed the variable. That narrowed the fault
+  to the platform side before a single dashboard tab was re-opened.
+evidence, aggregates only, never a value: with the bearer,
+  GET /api/v1/metrics answers Prometheus text —
+    skillboss_http_requests_total{route="/api/health",method="GET",class="2xx"} 34
+    skillboss_http_requests_total{route="/api/v1/metrics",method="GET",class="4xx"} 1
+    skillboss_http_request_duration_ms_bucket{route="unmatched",method="HEAD",le="5"} 1
+  Request counts by route pattern and status class, latency histogram
+  buckets by route. The "1" under 4xx on /api/v1/metrics is the human's
+  own earlier probe, counted. Counters reset at the restart; 34 health
+  hits since is the platform check and the CD-style polling doing
+  their rounds.
+what this settles: "is it erroring" and "is it slow" are one
+  authenticated GET each, from any machine that can reach the site.
+  Two of the three questions moved from archaeology to a command. The
+  location of the token: Render dashboard, service skillboss-api,
+  Environment. Its value: nowhere in this repository or this journal.
+what it does not settle, yet: three-questions-pass wants the three
+  answers TIMED, each under two minutes, in a journal entry. The human
+  has now run the commands; the human has not reported the times. The
+  box waits on three numbers from their clock, not on a reading of
+  mine.
+operational lesson, into RUNBOOK.md §0: on this platform, with
+  autoDeploy false, a saved environment variable does not reach the
+  running process on its own, and a "restart" from the dashboard did
+  not either — a Manual Deploy did. A person who sets a variable, sees
+  nothing change, and concludes the feature is broken has just lost an
+  hour this run already spent for them.
