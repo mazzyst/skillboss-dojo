@@ -2482,3 +2482,71 @@ parked, still: the five services against three declared — asked three
   matters most.
 cost: 1 session, tokens unknown - DECLARED by the coach, not measured
 verdict: HOLD (3 boxes open)
+
+2026-09-04 — ASSUMPTION: the human answered "ok pour reco" a fourth time,
+  on the three console items and the error channel
+  a. METRICS_TOKEN, the three-question timing, the uptime monitor: no
+     recommendation of mine moves these — they are the human's console
+     and clock. Unchanged, open.
+  b. The error channel: my stated preference was the NO-DEPENDENCY
+     path, because CLAUDE.md §6 forbids a package without explicit
+     approval and "ok pour reco" is not that. Taken as approval to
+     build the repository half of it. The destination — a webhook URL
+     the human reads — is theirs, and the box needs "one test event's
+     arrival", which cannot happen until it is set.
+  c. The five services against three declared: unanswered a fourth
+     time. Still parked.
+
+2026-09-04 — DECISION: unhandled errors get a channel to a human, with no
+  dependency and nothing a chat window should ever see
+context: errors-reach-human. HttpExceptionFilter logged unhandled
+  errors with their stack to stdout — Render's service logs — and
+  nothing read them on anyone's behalf. THE 3AM PAGE: the user reports
+  the crash before the builder knows.
+options: Sentry, the standard, and a dependency; a webhook POST from
+  the filter using Node's global fetch, which the OAuth services
+  already use, so nothing is added.
+choice: the webhook. ErrorNotifierService in the global
+  ObservabilityModule, @Optional()-injected by the filter exactly as
+  the metrics registry is, so unit apps and hand-built filters run
+  with it off.
+  Four properties, each a test in error-notifier.service.spec.ts, and
+  the order they were written matters — the tests came first:
+  FAIL-CLOSED: no ERROR_WEBHOOK_URL, no call. The stack stays in the
+  logs where it always was.
+  NOTHING A LOG LINE WOULD BE ASHAMED OF: the event carries method,
+  path without its query string, the error CLASS name, the deployed
+  commit, a timestamp and a suppressed count. Never a stack, never a
+  message (Prisma messages can quote values), never a body. The test
+  passes extra fields in and asserts they do not come out. A webhook
+  lands in a chat channel, and a chat channel is a screenshare.
+  ACTIONABLE: one message per minute; the next one carries the count
+  it swallowed. The gate's own line — "an alert nobody acts on is
+  deleted, not muted" — is a design constraint here, not a slogan: a
+  thousand-line storm is how a channel gets muted and stays muted.
+  NEVER THROWS: a dead webhook must not turn one error into two.
+  Unhandled errors ONLY. A 404, a 401, a 422 is the product working;
+  the filter test pins that a known HttpException does not notify.
+  Payload shape: the same one-liner as `text` and `content`, so a
+  Slack or a Discord incoming webhook renders it without an adapter,
+  plus the structured `event` for anything else.
+  Two DI facts worth the record: the fetch and clock seams are FIELDS,
+  not constructor parameters, because Nest resolves constructor
+  parameters by type and `typeof fetch` is not an injectable token.
+  And the error class name is the only thing forwarded from the
+  exception — bounded cardinality, the same discipline the metrics
+  labels use.
+  Regression order: two spec files RED (module not found; the filter
+  test demanding the call), then the service, the filter wiring, the
+  module registration, then 9 tests GREEN. One error of mine on the
+  way: two tuple casts on `mock.calls` that TypeScript rejected —
+  caught by the typecheck the guard would have run, fixed before any
+  push, and recorded because the coach's errors go in the register in
+  the same terms as anyone's.
+  Declared: ERROR_WEBHOOK_URL `sync: false` in render.yaml and
+  documented in .env.example (empty = off). RUNBOOK.md §6 says where
+  an error goes and how to prove the channel once.
+  The box stays OPEN. It asks for "where unhandled errors land, and one
+  test event's arrival". The first half is now a file path; the second
+  needs the URL set in the dashboard and one arrival recorded by the
+  human, with the destination's kind and never its URL.
