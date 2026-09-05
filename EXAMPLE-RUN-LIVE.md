@@ -1996,3 +1996,20 @@ AN OPEN QUESTION OF FACT, not a second argument — the record cannot be
   a platform default, which is the error gate 20 already caught this
   run once, on this same database.
   Parked as a question to the human, revisit before the gate's GO.
+
+2026-09-04 — ANSWERED: the human typed "A" — no backup reachable today,
+  backups exist
+context: the open question of fact from the restore-rehearsed waiver.
+  Reading A: the rehearsal is postponed, not impossible; the waiver
+  covers exactly what is true and nothing larger is hidden behind it.
+  Reading B is closed and no Caught row is written for it — the human
+  states the backups exist, and that statement is recorded here as the
+  human's, not verified by the coach (render.com is unreachable from
+  this environment, and the evidence rule forbids guessing a platform
+  fact). It is enough to make the record consistent; it is not evidence
+  the backup restores, which is why the rehearsal box stays WAIVED
+  rather than checked.
+  The parked question comes off the table. RUNBOOK.md §3 and
+  scripts/restore-rehearsal.sh stay ready for the day a backup is in
+  hand: the rehearsal is one download and one command.
+  One box remains at this gate: billing-alert-set.
