@@ -2416,3 +2416,69 @@ context: the box wants a journal entry timing the three answers under
 2026-09-04 — RUNBOOK.md: §0 now says what 200 and 503 mean on the health
   line (owed from lot 1), and §6 holds the three questions with their
   commands and the honest "one of three" state. Incident log moves to §7.
+
+GATE REPORT — 80-OBSERVABILITY                   date: 2026-09-04
+boxes: [x] health-contract
+           evidence: GET /api/health — backend/src/health/health.service.ts
+           runs `SELECT 1` through Prisma, raced against a 2s timeout;
+           health.controller.ts answers `status: 'ok' | 'degraded'`
+           with HTTP 503 when degraded, `commit` carrying the deployed
+           SHA. The deploy step that verifies it: .github/workflows/cd.yml
+           polls it with `curl -fsS` until `commit` equals the vetted
+           SHA — and `-f` now fails on the 503 a database-less boot
+           would produce. Before this date the endpoint said OK from two
+           string literals and two green tests kept it that way.
+       [x] structured-logs
+           evidence: backend/src/main.ts — Nest 11 ConsoleLogger,
+           `json: true` outside NODE_ENV=development, no dependency
+           added. One real line from the installed library, redacted:
+           {"level":"warn","pid":2117,"timestamp":1788598226042,
+            "message":"Suspicious run for user <redacted> on 2026-09-04",
+            "context":"QuizSubmissionService"}
+           Request context (a request id) is NOT there and the DECISION
+           of this date says why.
+       [x] no-sensitive-logs
+           evidence: all seven logger call sites read
+           (state/journal.md, this date); six clean; the seventh —
+           HttpExceptionFilter logging req.originalUrl with its query
+           string — fixed regression-first, spec at
+           backend/src/common/http-exception.filter.spec.ts: the token
+           reached the log BEFORE, the path alone AFTER. Zero console
+           calls in frontend/src. One pseudonymous userId in a warn
+           line, kept on purpose and on the record.
+       [ ] errors-reach-human
+           status: OPEN. Unhandled errors go to stdout with their stack
+           (HttpExceptionFilter) and stop there, in Render's service
+           logs. No channel. Sentry is the standard and is a dependency
+           — not added without the human's explicit approval (CLAUDE.md
+           §6). The no-dependency alternative is a webhook from the
+           filter to somewhere the human actually reads, which needs a
+           destination only they can name. THE 3AM PAGE is unopposed
+           until one of those two is chosen.
+       [ ] three-questions-pass
+           status: OPEN. RUNBOOK.md §6 holds two commands per question.
+           "Up" is one command from any machine that can reach the
+           site; this environment cannot (HTTP 000, egress blocked).
+           "Erroring" and "slow" are one command each once
+           METRICS_TOKEN is set in the dashboard — declared in
+           render.yaml this date, value unset. A timing I did not run is
+           not one I write down: the human runs §6 with a clock and
+           reports three times, or waives.
+       [ ] external-uptime-check
+           status: OPEN. Nothing outside the platform probes
+           /api/health; Render's healthCheckPath shares fate with what
+           it watches. Free external monitors exist; the human sets one
+           and names the target and interval. THE SILENT CRASH is
+           unopposed until then — with one improvement already banked:
+           when something does look, the endpoint now tells the truth.
+waivers: none yet.
+risks accepted by human: none new recorded.
+what this gate caught, one line each: a health endpoint that said OK
+  from a string literal with two tests guarding the lie; a log line
+  that printed the query string its own response envelope stripped;
+  production instruments behind a variable never declared.
+parked, still: the five services against three declared — asked three
+  times, unanswered, and this is the gate where "what is running"
+  matters most.
+cost: 1 session, tokens unknown - DECLARED by the coach, not measured
+verdict: HOLD (3 boxes open)
