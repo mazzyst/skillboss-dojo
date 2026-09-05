@@ -2223,3 +2223,108 @@ context: gate 70 has its GO. The gate that opens asks whether the
   slow — in under two minutes, before the first real incident asks
   them. It arrives with one parked question that is really its own:
   what is actually running.
+
+2026-09-04 — ASSUMPTION: the human answered "ok pour reco" on the gate 80
+  questions and plan; the recommended readings stand as assumptions
+  a. Coach Play Q1, "how would you learn the app is down": taken as BY
+     A USER, OR BY OPENING THE DASHBOARD BY CHANCE — nothing in the
+     repository or the platform config tells anyone. Not evidence; it
+     is what the external-uptime-check box exists to change.
+  b. Coach Play Q2, "the last unhandled error and where it went": taken
+     as UNKNOWN, AND TO STDOUT. HttpExceptionFilter logs unhandled
+     errors with their stack to the process output, which Render keeps
+     as service logs, and nothing reads them on anyone's behalf.
+  c. Coach Play Q3, "the log line that would embarrass you": taken as
+     the exception filter's own line — it logs req.originalUrl WITH the
+     query string, where the response envelope strips it. Owed in lot 2
+     with its regression test.
+  d. Sentry was named as the standard and NOT recommended, because it
+     is a dependency and CLAUDE.md §6 forbids one without explicit
+     approval. Not added. The error channel stays the human's choice.
+  e. The five-services question is unanswered a third time and stays
+     on the Parked table for this gate.
+
+2026-09-04 — FINDING: the health endpoint said OK without asking, and a
+  test guaranteed it would keep saying so
+context: gate 80's first guardrail is a health endpoint that checks its
+  real dependencies, and its first named refusal is one that returns
+  OK without doing so. GET /api/health returned `status: 'ok'` and
+  `database: 'not_configured'` from two string literals. The comment
+  beside them read "Stubbed until the Prisma phase wires a real DB
+  connectivity check." backend/prisma/migrations/ holds twenty-three
+  migrations. The Prisma phase was not pending; it was the oldest thing
+  in the repository.
+  The part that makes this a finding rather than a TODO: the stub was
+  under test. health.controller.spec.ts carried
+  `it('stubs database as not_configured until Prisma is wired')`, and
+  backend/test/health.integration.spec.ts asserted the same string with
+  a comment explaining that the endpoint "never touches Prisma". Two
+  green tests, protecting a lie, each citing the other's reason. This
+  is the gate-60 and gate-70 shape a third time — a guard that has
+  never been in a position to fail — but inverted: here the guard was
+  in a position to fail and had been TOLD not to.
+  What read that endpoint and believed it: .github/workflows/cd.yml,
+  which polls it after every deploy to declare the deploy live;
+  docker-compose.yml's backend healthcheck; and Render's own
+  healthCheckPath, which decides whether a new version replaces the old
+  one. A backend that booted with its database unreachable would have
+  passed all three.
+
+2026-09-04 — DECISION: the probe asks the database, and the answer moves
+  the HTTP status, not just a string
+context: two ways to "fix" this, and only one of them is visible to the
+  things that matter.
+options: probe the database and report it in the body (`database:
+  'disconnected'` under a 200); probe it and change the STATUS CODE.
+choice: the status code. A platform health check, the CD poll (`curl
+  -fsS`) and any external monitor read the code and never the body — a
+  body that says "disconnected" under a 200 is invisible to every one
+  of them. So: `status: 'ok' | 'degraded'`, and 503 when degraded. The
+  five keys of the shape are unchanged; docs/api-contract.md is not
+  touched.
+  Where the probe lives, per CLAUDE.md §5: a new HealthService, not the
+  controller — controllers handle HTTP, services own logic. The probe
+  is `$queryRaw\`SELECT 1\``, and that is a deliberate, documented
+  exception to "no raw SQL in services": a connectivity check has no
+  model-level equivalent, because every model query would also read a
+  table, and "is the database reachable" must not depend on any
+  table's contents. It is the canonical Prisma ping and the file says
+  so.
+  A probe that hangs is worse than one that fails — every caller has
+  its own timeout, and a hung probe makes all of them report "slow"
+  instead of "down". Two seconds, raced, timer cleared; the third unit
+  test proves the answer arrives inside the window.
+  Readiness semantics, chosen on purpose and written at the point of
+  use: every real endpoint of this API reads the database, so a
+  process that cannot reach it is not serving the product. Render keeps
+  the old version serving when a new one fails its health check, which
+  now correctly includes "the new version cannot reach the database".
+  Regression first, per CLAUDE.md §5:
+    BEFORE  the unit spec rewritten to demand the truth; the
+            integration spec flipped from 'not_configured' to
+            'connected' and given a 503 case →
+            Expected: "connected"  Received: "not_configured"
+            Expected: 503          Received: 200
+    AFTER   6 unit tests green including the timeout case; 3
+            integration tests green including the 503.
+  A consequence, met and fixed rather than discovered by CI: three
+  other integration suites hit /api/health with a lifecycle-only
+  Prisma stub and asserted 200. One (security-headers) already carried
+  a `$queryRaw` stub — someone anticipated this day. auth-guard and
+  throttler did not, and would have received 503s. Both stubs gain the
+  probe. Full integration run: 20 suites, 329 tests, green.
+  Diff count, named because it exceeds the guideline: seven code files
+  where CLAUDE.md §6 says five to eight per phase — service, controller,
+  module, unit spec, integration spec, and the two stub patches the fix
+  forced. The RUNBOOK.md §0 line about the health endpoint is owed in
+  lot 2 rather than making this nine.
+
+2026-09-04 — NOTE, not this gate's finding: `npm run test:integration`
+  is red in any environment without JWT_SECRET, FRONTEND_URL and
+  NODE_ENV=test — three values ci.yml sets in YAML for its test job.
+  scripts/check.sh's own header says the integration suites are CI's
+  to run because they need a database; they do not — they run on
+  mocked Prisma and need three environment variables. Same family as
+  gate 50's and gate 70's findings, one layer over. Observed while
+  proving this lot with the values CI uses (development-only, never a
+  production value); parked, revisit at gate 90.
