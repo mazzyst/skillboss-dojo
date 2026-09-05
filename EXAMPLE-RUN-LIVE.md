@@ -2050,3 +2050,47 @@ A QUESTION, not a finding, because it may be another project on the
   is supposed to be the record of what runs, and gate 10 evidenced it
   as such. If the account hosts something else, it is nothing. Asked
   as one line; recorded here so the answer has somewhere to land.
+
+2026-09-04 — FINDING: the platform has no native spend alert, so the
+  guard this gate assumes does not exist here
+context: the human, in the Render console, reports that Render offers
+  no native billing alert — no budget, no currency threshold, no
+  notification when a bill approaches a number. Recorded as the human's
+  reading from the platform; not verified by the coach (render.com is
+  EGRESS_BLOCKED from this environment) and not disputed.
+what it means, precisely: gate 70's box billing-alert-set assumes a
+  platform control. On this platform there is none to set. THE BILL
+  SHOCK — a runaway bill with no alert — has no native guard here, and
+  the box cannot be closed the way the gate file imagines.
+what bounds the exposure, so the decision is made on the real shape
+  and not on the villain's name: render.yaml puts all three declared
+  services on FIXED-PRICE plans (two `starter` web services, one
+  `basic-256mb` database, `numInstances: 1` each). A fixed-price plan
+  cannot run away on its own. The runaway vectors on this account are
+  therefore enumerable, and there are three: bandwidth beyond the
+  included allowance, pipeline minutes beyond the included allowance,
+  and services added by hand. The billing page read earlier today shows
+  the first two at a small fraction of their allowances, and shows ONE
+  native spend control in existence — a cap on pipeline minutes
+  ("Manage spend on pipeline minutes") — which covers the second vector
+  and nothing else.
+options, for the human, in the coach's order of preference:
+  A. Set the pipeline-minutes cap that does exist, and WAIVE the box
+     with the platform limitation as the reason. Honest, immediate,
+     and the record carries the bounded exposure above so nobody later
+     reads the waiver as "no one thought about cost".
+  B. Set a card-side alert — the card issuer's transaction alert on the
+     card Render charges, at the recommended threshold. That IS an
+     alert with a location and a threshold, outside the platform but
+     real, and it would let the box be CHECKED rather than waived:
+     evidence "card issuer transaction alert, threshold N", location
+     never account values. Combine with A's cap.
+  C. Build a poller — a scheduled GitHub Actions job asking Render's
+     API for accrued charges and failing above a threshold. NOT
+     recommended now: it needs a new credential (a Render API key as a
+     repository secret), and I cannot read the API's surface from here
+     to know whether billing data is even exposed. Writing that blind
+     is the error this run has refused three times today.
+the coach recommends A, and B on top if the human has a card alert
+  within reach. Either way the five-services question from the billing
+  page read is still open and still matters to this gate.
