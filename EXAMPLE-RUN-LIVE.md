@@ -2729,3 +2729,11 @@ context: "ouvre la PR". CLAUDE.md §6 forbids one without an explicit
   error channel, the check.sh change and the CI change that removed
   the masking step. If CI is red, that is the first thing this branch
   has learned from the pipeline, and it is owned here until green.
+
+2026-09-05 — EVIDENCE: the pull request is open
+  https://github.com/mazzyst/skillboss/pull/170 — twenty commits, 24
+  files, +2185/−61, claude/gate-60-go-gate-70-546k4s → main. No PR
+  template exists in the repository; the body carries what changes in
+  production terms, what changes in the pipeline, the tests written
+  first, and what is deliberately not in it. The pipeline's first look
+  at this branch starts now. Whatever it says is this run's to answer.
