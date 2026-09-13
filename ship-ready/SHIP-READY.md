@@ -202,6 +202,21 @@ never decides whether your app is good.
   path, a path with a line number, or a short commit reference — and never
   the thing you found. A value that looks like a credential is refused at
   the door, before anything is sent.
+- **Cite the line when there is one.** `path:line` for something you found
+  inside a file; the bare path when the finding is the file itself. When
+  what you found is an ABSENCE — no example env file, no ignore rule, no
+  health route — cite where it would live: the path the check expects, or
+  the directory that should hold it. A location is never a sentence.
+- **Names, never values.** When a check needs the NAMES of environment
+  variables, read them from the tracked example file when one exists. Only
+  when there is none may you open an untracked env file, and then read
+  what stands left of the `=` alone: never copy, quote or reason from what
+  stands right of it. Cite the file as the location.
+- **What the files cannot settle is `UNKNOWN`.** Where a check says that
+  runtime evidence stays `UNKNOWN`, it means the files are all you read:
+  report what they establish, and treat what only a running app could
+  show — whether a handler fires, whether an event arrives — as out of
+  reach. That absence is neither a pass nor a finding.
 - **One entry per check you actually ran**, with its exact `ruleId` below.
 - **Nothing else belongs in the file**: no date, no counts, no verdict, no
   sentence about whether the project is good. The house stamps the date it
