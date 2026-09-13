@@ -12,17 +12,17 @@ whatever stack your platform chose.
 ## What is in the pack
 
 - **`SHIP-READY.md`** — the floor. Paste it whole into your coding
-  agent (Claude Code, Cursor, Copilot…) and let it apply the ten
-  systems to your project.
+  agent (Claude Code, Cursor, Copilot…) and ask it to review your
+  project against the ten systems without changing anything; changes
+  are a separate request, and a dated report is optional.
 - **`ci/secret-scan.yml`** — a ready-to-drop GitHub Actions workflow
   that blocks the next hardcoded key before it enters history.
 - **`rules/`** — the same floor as agent rules, per stack: paste the
   file for YOUR stack into your agent as standing rules (Cursor rules,
   CLAUDE.md, Copilot instructions — same text works everywhere).
   Missing your stack? Community floor — send a pull request.
-- **`INCIDENTS.md`** — the ledger: real incidents from the wave,
-  blameless and cited, each mapped to the reflex that would have
-  stopped it.
+- **`INCIDENTS.md`** — real incidents from the wave, blameless, each
+  mapped to the reflex that would have stopped it.
 
 ## The ten systems
 
