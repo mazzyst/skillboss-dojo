@@ -1,11 +1,11 @@
 ---
 name: skillboss-devops-check
-description: Use when the user wants a pre-ship review of their repository's operational hygiene — secrets, env files, auth coverage, database exposure, backups, health checks, error monitoring, rate limiting, dependencies, and cost guardrails. Runs the Ship Check 10 against the current repo and produces an honest, four-state report. A heuristic review, not an audit.
+description: Use when the user wants a pre-ship review of their repository's operational hygiene — secrets, env files, auth coverage, database exposure, backups, health checks, error monitoring, rate limiting, dependencies, and cost guardrails. Runs the Ship Check 10 against the current repo and produces an honest, four-state review in the conversation; on request, also writes an optional dated Pre-flight report (five statuses, 24 named checks) the builder may keep on skillboss.dev. A heuristic review, not an audit.
 ---
 
 # skillboss-devops-check — the Ship Check 10
 
-Version 0.2 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · CC BY-SA 4.0
+Version 0.3 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · CC BY-SA 4.0
 
 You are running a pre-ship hygiene review. The agent does the looking; this
 skill supplies the judgment. Ten checks, each mapping to a documented
@@ -40,8 +40,11 @@ capabilities, and your ecosystem's built-in commands.
 3. **Read the user's stack first.** Identify the language, framework,
    hosting hints (Dockerfiles, IaC, platform config files) before running
    the checks, and adapt the file patterns accordingly.
-4. **Never send code, secrets, or findings anywhere.** The review stays in
-   the conversation.
+4. **Never transmit project material to SkillBoss from the agent.** Never
+   print a secret or copy source into findings. Report locations only.
+   Write the optional report file (below) only when the builder asks; the
+   builder decides whether to paste it into SkillBoss. Your agent sends
+   nothing to SkillBoss. The review itself stays in the conversation.
 
 ## The Ship Check 10
 
@@ -241,6 +244,9 @@ Ship Check run on <date> — it reviews the builder's habits, never
 certifies the app.
 ```
 
+Keeping the review in this conversation is a complete outcome. The step
+below is optional.
+
 Rules for the report, non-negotiable:
 
 - The disclaimer block appears on **every** report, verbatim, above the
@@ -257,3 +263,212 @@ Rules for the report, non-negotiable:
   reviewed ten habits visible in your repo. Security is a property you
   maintain, not a state you reach — and a heuristic review can't certify
   either."
+
+## Optional: a dated record the builder can compare later
+
+> Optional dated record: ask your agent to write `PREFLIGHT-REPORT.json`
+> using the contract below. Read it yourself. To record it, sign in to your
+> ship at https://skillboss.dev/hangar and paste its contents. SkillBoss
+> stores what your agent reported and dates its receipt. Your agent sends
+> nothing to SkillBoss. You can keep the review in this conversation.
+
+This is a SEPARATE run, not a translation of the ten verdicts above. The
+four verdicts are habits judged in prose; the report is 24 named checks,
+each with its own status, and the house stores exactly what the file
+says. Do not convert a `PASS` on a habit into `PASSED` on its checks: run
+each check named below, on its own terms, and report only what you ran.
+Where a check's method differs from the habit's — the dependency check
+reads an existing audit report rather than running one, the backup check
+reads retention configuration and never the builder's answer about a
+restore — the check's own text wins for the report. A human's answer
+("I restored once") stays a declaration in the conversation; it is not a
+finding.
+
+Write the report as a NEW file named `PREFLIGHT-REPORT.json` at the project
+root. If a file with that name already exists, do not overwrite it: return
+the JSON in the conversation and say so. Write to no other file. If you
+cannot create a file, return the JSON as a fenced block instead. A check you
+did not run is left out of the file; a check you ran and could not decide
+is `UNKNOWN`. Neither is ever `PASSED`.
+
+### Rules for the run
+
+- **Read only.** Do not change a file, do not run a deploy or an apply,
+  do not touch a provider console, do not move a git ref.
+- **Never print, copy, or test a value.** A finding cites a LOCATION — a
+  path, a path with a line number, or a short commit reference — and never
+  the thing you found. A value that looks like a credential is refused at
+  the door, before anything is sent.
+- **One entry per check you actually ran**, with its exact `ruleId` below.
+- **Nothing else belongs in the file**: no date, no counts, no verdict, no
+  sentence about whether the project is good. The house stamps the date it
+  receives the file, and reports what you reported.
+
+### The statuses
+
+- `BLOCKED` — fix this before your first real week.
+- `WARNING` — fix before real users.
+- `PASSED` — you ran the check and found nothing at the floor it names.
+- `UNKNOWN` — you ran the check and could not establish an answer.
+- `NOT_SCANNED` — you did not run it. Leave the check out of the file and
+  it is recorded that way; never invent a status to fill a gap.
+
+### The checks
+
+Use these ids exactly. An id that is not on this list is refused.
+
+#### SECRETS
+
+- `secrets.hardcoded-credential` — A credential-shaped value is committed in a tracked file.
+  Why: A committed credential may remain available to everyone with repository access.
+  Check (any stack): Read tracked files for credential-shaped values. Report file and line only; never print or test a value.
+- `secrets.history-credential` — A credential-shaped value exists in git history.
+  Why: Deleting a value from the current file does not remove it from earlier commits.
+  Check (any stack): Inspect available git history without changing refs. Cite a short commit reference only; if history is incomplete, report UNKNOWN.
+- `secrets.public-env-prefix` — A public env variable name looks like a secret.
+  Why: Public-prefixed variables can be included in the browser bundle.
+  Check (nextjs): Read public-prefixed variable names and their references in Next.js source. Report names as locations only, never variable values.
+- `secrets.workflow-echoes-secret` — A workflow step prints a secret.
+  Why: Workflow output can expose credentials to people who can read job logs.
+  Check (github-actions): Read workflow steps for commands that print credentials. Cite the workflow path and line; never execute a step or retrieve a value.
+
+#### ENV FILES
+
+- `env.file-tracked` — An env file is tracked by git.
+  Why: An env file in git can disclose project credentials.
+  Check (any stack): Inspect the tracked-file list for env files, distinguishing example files from values. Cite paths only; do not display their contents.
+- `env.no-ignore-rule` — .gitignore does not exclude env files.
+  Why: Without an exclusion, a later commit can accidentally include an env file.
+  Check (any stack): Read ignore patterns and their applicability to env filenames without creating files or changing the index. Report missing coverage as a location.
+- `env.no-example` — No .env.example documents the variables.
+  Why: An example file helps a builder identify configuration names without sharing values.
+  Check (any stack): Look for a tracked .env.example documenting variable names. Report its absence without creating one or copying values.
+- `env.image-copies-env` — The image build can copy env files.
+  Why: Files included in an image can travel beyond the original repository.
+  Check (docker): Read Dockerfile COPY instructions and .dockerignore patterns for env inclusion. Do not build or run an image; report relevant file locations.
+
+#### AUTH
+
+- `auth.mutating-route-unguarded` — A mutating API route has no identity check.
+  Why: A route that changes data needs to establish who may perform that action.
+  Check (nextjs): Read mutating Next.js routes and their identity-check wrappers. Trace source only; never call a route. Report UNKNOWN where coverage cannot be established.
+
+#### DATABASE
+
+- `db.public-network-access` — The database accepts public network access.
+  Why: Public network settings can expose a database beyond its intended clients.
+  Check (terraform, azure): Read Terraform or Azure configuration for database network exposure. Do not query a provider or connect to the database; report UNKNOWN if deployment settings are unavailable.
+- `db.service-key-in-client` — A service or admin key is referenced in client code.
+  Why: A privileged key referenced by browser code may escape the server boundary.
+  Check (nextjs): Read client entry points and their imports for service or admin key references. Cite locations only; do not build the app or evaluate a key.
+
+#### BACKUPS
+
+- `backups.retention-below-floor` — Backup retention is below seven days.
+  Why: A short retention window limits the recovery points available after a loss.
+  Check (terraform, azure): Read declared Terraform or Azure backup retention and compare with seven days. Do not query the provider or run a restore; report UNKNOWN if the setting is unavailable.
+
+#### HEALTH
+
+- `health.no-endpoint` — No health endpoint or container health check.
+  Why: A health signal gives an operator a place to begin checking an application.
+  Check (nextjs, docker): Read route definitions and container health configuration. Do not call an endpoint or run the container; report only what the files establish.
+
+#### ERRORS
+
+- `errors.no-boundary-or-tracker` — No error boundary and no error tracker wired.
+  Why: An error path without a boundary or tracker may leave a failure unnoticed.
+  Check (nextjs): Read Next.js error boundaries and tracker initialization. Do not trigger an error or send an event; absent runtime evidence stays UNKNOWN.
+
+#### RATE LIMITS
+
+- `ratelimit.public-post-unlimited` — A public POST route has no rate limit.
+  Why: An unrestricted write route can consume resources through repeated requests.
+  Check (nextjs): Read public POST handlers and their rate-limit middleware. Do not send requests or test limits against a running service.
+- `ratelimit.retry-without-backoff` — A retry loop has no backoff or attempt cap.
+  Why: Repeated failures without a cap or delay can amplify load.
+  Check (any stack): Read retry loops for attempt bounds and increasing delays. Cite the source; never exercise a remote failure to test the loop.
+
+#### DEPENDENCIES
+
+- `deps.no-lockfile` — No lockfile is committed.
+  Why: A missing lockfile makes the installed dependency set less repeatable.
+  Check (any stack): Inspect tracked dependency manifests and lockfile paths. Do not install packages or generate a lockfile.
+- `deps.audit-advisories` — The package audit reports critical or high advisories.
+  Why: Known high-severity dependency advisories deserve an explicit decision.
+  Check (any stack): Read an existing package advisory report for critical or high entries. Do not run a network check or install packages; report UNKNOWN when no report is available.
+- `deps.unpinned-actions` — A third-party action is not pinned to a commit.
+  Why: A movable action reference can change what a workflow executes.
+  Check (github-actions): Read third-party action references in workflows and check whether each names a full commit hash. Do not fetch or execute the action.
+- `deps.floating-base-image` — The base image tag floats.
+  Why: A floating image tag can select different bytes on a later build.
+  Check (docker): Read base-image references for mutable tags and digest pins. Do not pull, build or run an image; cite Dockerfile locations.
+
+#### COSTS
+
+- `cost.no-owner-env-tags` — Resources carry no owner or environment tag.
+  Why: Without owner and environment tags, a resource can be difficult to account for.
+  Check (terraform, azure): Read declared Terraform or Azure resource tags for owner and environment. Do not query or change provider resources.
+- `cost.nonprod-always-on` — Non-production compute runs without a schedule.
+  Why: Idle non-production compute can keep incurring charges.
+  Check (terraform, azure): Read non-production compute declarations and schedules. Do not query billing or start and stop resources; report UNKNOWN when scheduling is outside the available configuration.
+- `cost.no-budget-alert` — No budget alert exists.
+  Why: A budget notification gives a person an opportunity to respond to rising spend.
+  Check (terraform, azure): Read Terraform or Azure budget-alert declarations and recipient references. Never query billing or send an alert; report UNKNOWN when settings live outside the available files.
+- `cost.ai-calls-unbounded` — Model or API calls have no token, time, or quota cap.
+  Why: Unbounded model calls can keep consuming time or a project budget.
+  Check (nextjs): Read model or API call sites for token, timeout and quota bounds. Do not send a request, use credentials or infer runtime enforcement from a setting alone.
+
+### The file
+
+```json
+{
+  "schema": "skillboss.preflight-report/1",
+  "tool": {
+    "name": "your-agent",
+    "version": "1"
+  },
+  "stack": [
+    "nextjs",
+    "github-actions"
+  ],
+  "findings": [
+    {
+      "ruleId": "secrets.hardcoded-credential",
+      "status": "BLOCKED",
+      "evidence": [
+        {
+          "location": "server/mailer.ts:31",
+          "note": "assigned from a literal"
+        }
+      ]
+    },
+    {
+      "ruleId": "env.file-tracked",
+      "status": "PASSED"
+    },
+    {
+      "ruleId": "deps.unpinned-actions",
+      "status": "WARNING",
+      "evidence": [
+        {
+          "location": ".github/workflows/deploy.yml:24"
+        }
+      ]
+    },
+    {
+      "ruleId": "backups.retention-below-floor",
+      "status": "UNKNOWN"
+    }
+  ]
+}
+```
+
+Optional alongside `tool` and `stack`: `commit`, the full commit
+reference of what you read. Everything else is refused — the file has no
+date field, no counts and no place to put a conclusion.
+
+Everything above comes from the SkillBoss source at the revision named in
+the commit that published it; the rule ids, the five statuses and the
+checks are the same the berth accepts. An id that is not on the list is
+refused there.

@@ -14,6 +14,7 @@ so the review can spend its attention on the parts that matter.
 """
 
 import glob
+import json
 import math
 import os
 import re
@@ -196,6 +197,111 @@ def check_review_page(r):
     return len(pages)
 
 
+PREFLIGHT_SCHEMA = "skillboss.preflight-report/1"
+PREFLIGHT_STATUSES = ("BLOCKED", "WARNING", "PASSED", "NOT_SCANNED", "UNKNOWN")
+RULE_ID_RE = re.compile(r"^- `([a-z]+\.[a-z0-9-]+)` — ", re.M)
+JSON_FENCE_RE = re.compile(r"```json\n(.*?)\n```", re.S)
+# The sentence the skill used to carry: "never send … findings anywhere" is
+# false the moment a builder may paste a report on purpose. A contradictory
+# no-report statement is exactly what this check exists to refuse.
+CONTRADICTORY_RE = re.compile(r"never send[^.]*findings anywhere", re.I)
+NO_AUTO_SEND = "Your agent sends nothing to SkillBoss."
+
+
+def _catalogue_ids(text):
+    """The rule ids a published file lists under its checks section."""
+    if "### The checks" not in text:
+        return []
+    body = text[text.index("### The checks"):]
+    if "### The file" in body:
+        body = body[:body.index("### The file")]
+    return RULE_ID_RE.findall(body)
+
+
+def _check_example(path, text, ids, r):
+    """Every fenced JSON example must be a report the berth would accept."""
+    fences = JSON_FENCE_RE.findall(text)
+    if not fences:
+        r.fail(path, "no fenced ```json example of the report")
+        return 0
+    for fence in fences:
+        try:
+            report = json.loads(fence)
+        except ValueError as e:
+            r.fail(path, "the JSON example does not parse: %s" % e)
+            continue
+        if report.get("schema") != PREFLIGHT_SCHEMA:
+            r.fail(path, "example schema is %r, not %r" % (report.get("schema"), PREFLIGHT_SCHEMA))
+        allowed = {"schema", "tool", "commit", "stack", "findings"}
+        extra = sorted(set(report) - allowed)
+        if extra:
+            r.fail(path, "example carries keys the contract refuses: %s" % ", ".join(extra))
+        seen = set()
+        for i, f in enumerate(report.get("findings") or []):
+            rid, status = f.get("ruleId"), f.get("status")
+            if rid not in ids:
+                r.fail(path, "example findings[%d].ruleId %r is not in the published catalogue" % (i, rid))
+            if rid in seen:
+                r.fail(path, "example repeats ruleId %r" % rid)
+            seen.add(rid)
+            if status not in PREFLIGHT_STATUSES:
+                r.fail(path, "example findings[%d].status %r is not one of the five" % (i, status))
+            for piece in f.get("evidence") or []:
+                if "=" in piece.get("location", "") or " " in piece.get("location", ""):
+                    r.fail(path, "example evidence location %r is not a location" % piece.get("location"))
+    return len(fences)
+
+
+def check_preflight_contract(r):
+    """The public projection of the Pre-flight report contract.
+
+    Two files publish it: ship-ready/SHIP-READY.md (generated from the
+    SkillBoss source, byte for byte) and the skill, which carries an editorial
+    copy of the same rules, statuses and checks so it stays usable on its own.
+    The checks here are what the plan named: an incompatible example, a
+    missing status, and a contradictory no-report statement are refused; and
+    the skill's catalogue must match the floor's, id for id. They cannot prove
+    an arbitrary agent follows the text — only that the text agrees with
+    itself and with the source it was published from."""
+    floor_path = os.path.join("ship-ready", "SHIP-READY.md")
+    skill_path = os.path.join("skills", "skillboss-devops-check", "SKILL.md")
+    floor = open(floor_path, encoding="utf-8").read()
+    skill = open(skill_path, encoding="utf-8").read()
+    n = 0
+
+    if "## Report back" not in floor:
+        r.fail(floor_path, "no `## Report back` section")
+    floor_ids = _catalogue_ids(floor)
+    if len(floor_ids) != 24:
+        r.fail(floor_path, "the floor lists %d rule ids; the catalogue has 24" % len(floor_ids))
+    skill_ids = _catalogue_ids(skill)
+    if skill_ids != floor_ids:
+        missing = sorted(set(floor_ids) - set(skill_ids))
+        extra = sorted(set(skill_ids) - set(floor_ids))
+        r.fail(skill_path, "catalogue drifts from the floor — missing %s, extra %s"
+               % (", ".join(missing) or "none", ", ".join(extra) or "none"))
+    n += len(floor_ids)
+
+    for path, text in ((floor_path, floor), (skill_path, skill)):
+        for status in PREFLIGHT_STATUSES:
+            if "`%s`" % status not in text:
+                r.fail(path, "status `%s` is not explained" % status)
+        n += _check_example(path, text, floor_ids, r)
+        # Markdown wraps prose; the sentence is verbatim once whitespace folds.
+        if NO_AUTO_SEND not in re.sub(r"\s+", " ", text):
+            r.fail(path, "must say, verbatim: %s" % NO_AUTO_SEND)
+        m = CONTRADICTORY_RE.search(text)
+        if m:
+            r.fail(path, "contradictory no-report statement: %r" % m.group(0))
+
+    # The conversation-only finish survives: the four-verdict review is
+    # still the skill's own output, and the report is announced as optional.
+    for needed in ("`CAN'T VERIFY`", "## The report", "optional"):
+        if needed not in skill:
+            r.fail(skill_path, "the conversation-only review must keep %r" % needed)
+    return n
+
+
 def main():
     r = Report()
     print("SkillBoss Dojo — content checks")
@@ -212,6 +318,9 @@ def main():
     n = check_review_page(r)
     print("  %s review pages (%s)" % ("ok  " if len(r.failures) == before else "FAIL",
                                       "%d checked" % n if n else "none, skipped"))
+    before = len(r.failures)
+    n = check_preflight_contract(r)
+    print("  %s pre-flight contract (%d ids + examples)" % ("ok  " if len(r.failures) == before else "FAIL", n))
 
     if r.failures:
         print("\n%d problem%s:" % (len(r.failures), "" if len(r.failures) == 1 else "s"))

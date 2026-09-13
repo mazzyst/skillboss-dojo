@@ -173,6 +173,13 @@ including "can't verify" when the evidence isn't in your repo.
 an audit, not a pentest, not a guarantee, and it certifies nothing about
 your app.
 
+**Optional, and yours to decide:** the skill can also write a dated
+`PREFLIGHT-REPORT.json` — 24 named checks, five statuses — that you may
+paste on your own ship at [skillboss.dev/hangar](https://skillboss.dev/hangar)
+to keep it with your project and compare a later one. Your agent sends
+nothing to SkillBoss; the review in your conversation is a complete outcome
+on its own.
+
 **Prefer an outside pair of eyes?** The same ten checks, run by a human on
 an app they didn't write, are a paid service — scope, method, and a sample
 deliverable are described here:
@@ -188,8 +195,9 @@ holding back a named villain, each linking a free drill:
 ![The Ship-Ready map — ten systems, ten villains](ship-ready/ship-ready-map.png)
 
 - **[`SHIP-READY.md`](ship-ready/SHIP-READY.md)** — the floor. Paste it
-  whole into your coding agent and let it apply the ten systems to your
-  project.
+  whole into your coding agent and ask it to review your project against
+  the ten systems without changing anything; changes are a separate
+  request, and a dated report is optional.
 - **[`rules/`](ship-ready/rules/)** — the floor as standing agent rules,
   per stack (generic, Next.js + Supabase, Lovable). Same text works as
   Cursor rules, CLAUDE.md material, or Copilot instructions. Missing your
