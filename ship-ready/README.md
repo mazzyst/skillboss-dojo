@@ -1,5 +1,7 @@
 # Ship-Ready Starter Pack
 
+Apache-2.0 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · see [LICENSE](LICENSE)
+
 An ops floor for AI-era builders: the judgment your coding agent needs
 the week you start, and the week you ship. Not a boilerplate, not a
 scanner — a set of rules and templates your OWN agent applies to
