@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "cost.provider-hard-limit",
+  "version": "0.1.0",
+  "system": "cost-guardrails",
+  "rule": "cost.no-budget-alert",
+  "gateBox": "70:billing-alert-set",
+  "class": "self-contained",
+  "evidenceStrength": "pattern-present",
+  "resolves": [],
+  "matrix": {
+    "framework": { "name": "any", "version": "any" },
+    "authPattern": { "name": "any", "version": "any" },
+    "sdk": { "name": "any model SDK the finder knows", "version": "any" },
+    "deployment": { "name": "any", "version": "any" },
+    "store": { "name": "none", "version": "any" }
+  },
+  "permissions": {
+    "read": ["package.json", "requirements.txt", "pyproject.toml", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs", "**/*.py"],
+    "write": []
+  },
+  "preconditions": [
+    {
+      "id": "a-person-with-console-access",
+      "statement": "A person who can open the provider's billing console is available; the agent never holds those credentials.",
+      "evidencePrompt": "Which role? A role, never a name or a login."
+    }
+  ],
+  "fixtures": [
+    { "id": "two-providers-named", "plants": "A project naming one provider in its manifest and another only in an import.", "expect": "red-then-green" },
+    { "id": "never-a-value", "plants": "An environment file holding a placeholder beside the SDKs; the output must not contain it.", "expect": "red-then-green" },
+    { "id": "locations-not-amounts", "plants": "The same project; the output must locate the import and mark every limit NOT RECORDED, printing no amount.", "expect": "red-then-green" },
+    { "id": "no-provider-no-claim", "plants": "A project calling no model SDK; the recipe must say so and hand back no evidence line.", "expect": "red-then-green" }
+  ],
+  "refusalTest": {
+    "command": "node fixtures/run.mjs",
+    "refusedLooksLike": "the finder names what it found and marks every limit NOT RECORDED; it prints no amount and no environment value, and hands back no evidence line when it found nothing"
+  },
+  "exposure": {
+    "covered": "the model providers this repository's manifests and imports name",
+    "notCovered": "providers called through a gateway, a proxy or a bare URL; other API keys; other applications on the same provider account; whatever the provider's limit excludes",
+    "behind": "nothing — this recipe is the thing that stands behind every other cost recipe"
+  },
+  "evidenceLine": {
+    "template": "billing-alert-set — evidence: provider hard limit configured at <location>, read <date>"
+  },
+  "reversal": {
+    "steps": ["Nothing in the repository to revert: the recipe wrote no file. The limit is removed in the provider console by the person who set it."]
+  },
+  "licence": { "kind": "free", "spdx": "Apache-2.0" },
+  "postconditions": {
+    "buildNotWorse": "run the project's own check before and after; restore every written file and refuse if it was clean and is not",
+    "refusalLeavesNoTrace": "a recipe that cannot finish writes nothing at all"
+  }
+}

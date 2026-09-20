@@ -1,0 +1,51 @@
+SkillBoss Recipes
+Copyright 2026 Hamdi Hadrich
+
+Licensed under the Apache License, Version 2.0. See ../LICENSE-APACHE.
+
+Apache-2.0 section 4(d) requires this NOTICE to travel with every copy and
+every derivative work. That is deliberate here: what follows is what a
+recipe IS and IS NOT, and it should reach whoever ends up holding one.
+
+WHAT A RECIPE CLAIMS, AND WHAT IT DOES NOT
+
+A recipe is a change your own agent makes to your own repository, on a
+branch, reviewed by you. It ends by handing back one line saying WHERE
+something now lives, with a date. It never hands back a value, a score,
+or a verdict.
+
+- A recipe makes a check green. It does not make an application correct.
+  A route can gain a ceiling and still do the wrong thing for the wrong
+  person; nothing in this directory can close that gap. Your review does.
+- Free, forever. Every recipe in this directory is free, and nothing here
+  is held back or degraded to make something else worth paying for.
+  Recipes sold by the same author live elsewhere and are never mixed in.
+- Heuristic, and says so. A recipe reads what it can read and refuses what
+  it cannot. It answers UNKNOWN rather than guess, and when it cannot
+  finish it writes nothing at all.
+- The builder, never the app. What a recipe records is that a person's
+  agent applied it on a date. No claim like "protected by SkillBoss" or
+  "SkillBoss verified" about an application may be derived from it.
+- No telemetry. As published, no recipe here makes a network request or
+  sends anything anywhere, with one stated exception: a recipe that must
+  resolve a value at an outside source it names in its own contract, such
+  as a commit reference for a tag. When that source cannot be reached, the
+  recipe refuses and hands back the command, and changes nothing.
+- Never less buildable. A recipe runs your project's own check before and
+  after, and if the project was clean and is not, it puts every file back
+  and refuses.
+
+TRADEMARKS
+
+"SkillBoss" and the SkillBoss brand, name, and logo are NOT licensed by
+this directory, and Apache-2.0 section 6 grants no rights in them. You may
+state that a project "applied a SkillBoss recipe". You may not use the
+SkillBoss name or brand to certify, endorse, or badge an application. The
+recipe refuses that claim about itself; this notice refuses it about you.
+
+MODIFIED COPIES
+
+You may adapt any recipe and redistribute your adaptation under
+Apache-2.0, including commercially, including inside a private codebase.
+Two conditions, both from the license itself: state in your own NOTICE
+that you changed it, and do not present the result as a SkillBoss recipe.
