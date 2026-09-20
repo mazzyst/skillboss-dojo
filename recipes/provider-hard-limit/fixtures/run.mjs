@@ -31,6 +31,21 @@ record('never-a-value', outA.length > 0 && !/planted-not-a-credential/.test(outA
 record('locations-not-amounts', /src\/chat\.ts:1/.test(outA) && /NOT RECORDED/.test(outA) && !/\$|€|\d+\s*(usd|eur)/i.test(outA),
   `import located=${/src\/chat\.ts:1/.test(outA)}, limit marked NOT RECORDED=${/NOT RECORDED/.test(outA)}, no amount printed=${!/\$|€/.test(outA)}`);
 
+// C — a file that only MENTIONS an import inside a string literal. Found by
+//     running the finder on the dojo itself the day it was published: it
+//     reported a provider at this very fixture's own test data. A check that
+//     fires when nothing is wrong teaches its reader to ignore it.
+const C = mkdtempSync(join(tmpdir(), 'phl-c-'));
+mkdirSync(join(C, 'src'));
+writeFileSync(join(C, 'package.json'), JSON.stringify({ dependencies: { next: '16' } }));
+writeFileSync(join(C, 'src', 'fixture.js'),
+  'const sample = "import OpenAI from \'openai\';";\n'
+  + 'const doc = `use require(\'@anthropic-ai/sdk\') to call it`;\n'
+  + 'export { sample, doc };\n');
+const outC = run(C);
+record('mention-is-not-a-call', /no model SDK found/.test(outC) && !/OpenAI|Anthropic/.test(outC),
+  `says none=${/no model SDK found/.test(outC)}, names no provider=${!/OpenAI|Anthropic/.test(outC)}`);
+
 // B — no provider at all: the recipe must say so and claim nothing.
 const B = mkdtempSync(join(tmpdir(), 'phl-b-'));
 writeFileSync(join(B, 'package.json'), JSON.stringify({ dependencies: { next: '16' } }));
@@ -38,6 +53,6 @@ const outB = run(B);
 record('no-provider-no-claim', /no model SDK found/.test(outB) && !/billing-alert-set/.test(outB),
   `says none=${/no model SDK found/.test(outB)}, hands back no evidence line=${!/billing-alert-set/.test(outB)}`);
 
-rmSync(A, { recursive: true, force: true }); rmSync(B, { recursive: true, force: true });
+for (const d of [A, B, C]) rmSync(d, { recursive: true, force: true });
 for (const r of results) console.log(`${r.pass ? 'GREEN' : 'RED  '} ${r.id}: ${r.detail}`);
 process.exit(results.every((r) => r.pass) ? 0 : 1);

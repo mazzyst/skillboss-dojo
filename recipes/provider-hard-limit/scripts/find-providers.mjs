@@ -35,6 +35,28 @@ const PY = [
   ['google-genai', 'Google Gemini API'], ['mistralai', 'Mistral'], ['cohere', 'Cohere'], ['groq', 'Groq'],
 ];
 
+// A package name is only a CALL when it appears in STATEMENT position. The
+// first published version matched the pattern anywhere on a line, so it
+// reported a provider for a file that merely MENTIONED an import inside a
+// string — found by running this finder on its own repository the day it
+// shipped. A check that fires when nothing is wrong teaches its reader to
+// ignore it, so these patterns are anchored instead.
+//
+// Known residual, said rather than hidden: an import written at the start of
+// a line INSIDE a multi-line template literal still reads as a statement, and
+// a dynamic `await import(...)` is not seen at all. The exposure sheet says
+// what this finder does not see.
+function importPatterns(q) {
+  return [
+    // import x from 'pkg' / export { x } from 'pkg' — may span lines, never a statement end
+    new RegExp(`(?:^|\\n)\\s*(?:import|export)[^;]{0,200}?from\\s*['"]${q}(?:/|['"])`, 'g'),
+    // import 'pkg' — a side-effect import
+    new RegExp(`(?:^|\\n)\\s*import\\s*['"]${q}(?:/|['"])`, 'g'),
+    // = require('pkg') or a bare require('pkg'); anything else before it is text
+    new RegExp(`(?:=\\s*|(?:^|\\n)\\s*)require\\(\\s*['"]${q}(?:/|['"])`, 'g'),
+  ];
+}
+
 const found = new Map(); // provider -> Set(locations)
 const add = (name, where) => { if (!found.has(name)) found.set(name, new Set()); found.get(name).add(where); };
 
@@ -72,17 +94,24 @@ function walk(dir) {
     if (!SRC.test(e)) continue;
     let text; try { text = readFileSync(p, 'utf8'); } catch { continue; }
     const rel = relative(root, p);
-    text.split('\n').forEach((line, i) => {
-      for (const [dep, name] of KNOWN) {
-        if (new RegExp(`from\\s+['"]${dep.replace(/[/.@-]/g, '\\$&')}(/|['"])|require\\(['"]${dep.replace(/[/.@-]/g, '\\$&')}(/|['"])`).test(line)) add(name, `${rel}:${i + 1}`);
-      }
-      if (p.endsWith('.py')) {
+    const lineOf = (index) => text.slice(0, index).split('\n').length;
+    if (p.endsWith('.py')) {
+      text.split('\n').forEach((line, i) => {
         for (const [dep, name] of PY) {
           const mod = dep.replace(/-/g, '_').replace('google_generativeai', 'google.generativeai').replace('google_genai', 'google.genai');
           if (new RegExp(`^\\s*(import|from)\\s+${mod.replace(/\./g, '\\.')}\\b`).test(line)) add(name, `${rel}:${i + 1}`);
         }
+      });
+      continue;
+    }
+    for (const [dep, name] of KNOWN) {
+      const q = dep.replace(/[/.@-]/g, '\\$&');
+      for (const re of importPatterns(q)) {
+        re.lastIndex = 0;
+        let m;
+        while ((m = re.exec(text)) !== null) add(name, `${rel}:${lineOf(m.index + (m[0].startsWith('\n') ? 1 : 0))}`);
       }
-    });
+    }
   }
 }
 walk(root);

@@ -5,7 +5,7 @@ description: Use when the user asks how to stop an AI bill from running away, me
 
 # provider-hard-limit — the setting that stops spending
 
-Version 0.1 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.1.1 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 A ceiling in your application bounds requests and tokens. It does not bound
 money. The provider's own hard limit is the thing that does, and it belongs
@@ -35,6 +35,20 @@ only a person can open.
 5. Record WHERE it is configured. Never the amount.
 6. If the provider offers no enforced limit, write that down in your
    exposure sheet. An absence recorded is honest; an absence unsaid is not.
+
+## What this finder does not see, and says so
+
+- A provider called through a gateway, a proxy or a bare URL: it reads
+  manifests and imports, not network calls.
+- A dynamic `await import(...)`.
+- An import written at the start of a line inside a multi-line template
+  literal: it still reads as a statement, and would be over-reported.
+
+The first published version matched the pattern anywhere on a line, so it
+reported a provider for a file that merely MENTIONED an import inside a
+string. It was found by running the finder on its own repository the day it
+shipped, and the patterns are now anchored to statement position. A check
+that fires when nothing is wrong teaches its reader to ignore it.
 
 ## What never happens here
 
