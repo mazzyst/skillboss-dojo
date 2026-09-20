@@ -84,7 +84,8 @@ answer wrong burns trust, so we check every blank against every pool token:
   `<details>`, below the exercise, no exceptions.
 - **Real secrets or proprietary material** — no live credentials (even
   revoked ones), no internal configs from your employer, nothing you don't
-  have the right to license CC BY-SA.
+  have the right to license under this repository's licences (see
+  README § License).
 - **Copyrighted or franchise content** — inspirations stay genre-level.
 - **Incident material that names individuals or uses non-public
   postmortems** — public, well-documented postmortems only, always
@@ -120,4 +121,6 @@ answer wrong burns trust, so we check every blank against every pool token:
    the SkillBoss training bank, credited.
 
 By submitting a pull request you agree to license your contribution under
-[CC BY-SA 4.0](LICENSE).
+the licence of the directory it lands in: [CC BY-SA 4.0](LICENSE) for
+`katas/` and `docs/`, [Apache-2.0](LICENSE-APACHE) for `start-guide/`,
+`ship-ready/`, `skills/` and `recipes/` (see README § License).

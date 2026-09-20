@@ -15,8 +15,9 @@ the *why* behind every token.
   same content that runs inside the product, exported as-is: scenario,
   artifact, token pool, solution folded behind a spoiler, why-notes.
 - **It is not** the SkillBoss application. The app's code is a separate,
-  private codebase and is not open source. This repo's content is licensed
-  [CC BY-SA 4.0](LICENSE) — share it, adapt it, keep it open (see
+  private codebase and is not open source. This repo carries two licences:
+  the katas and docs are [CC BY-SA 4.0](LICENSE), and everything your agent
+  copies into your own repository is [Apache-2.0](LICENSE-APACHE) (see
   [License](#license)).
 - **No inflated claims.** You won't find "join 10,000 developers" here
   until it's true. The product publishes real numbers or none.
@@ -266,16 +267,19 @@ sample content, nothing recorded.
 
 ## License
 
-The **content** of this repository (katas, path, docs) is licensed under
-[Creative Commons Attribution-ShareAlike 4.0 International](LICENSE)
-(CC BY-SA 4.0): use it, adapt it, teach with it — credit SkillBoss and
-keep derivatives under the same license.
+Two licences, split by directory, because two different things live here.
+
+**Apache-2.0** — `start-guide/`, `ship-ready/`, `skills/`, `recipes/`.
+Everything meant to be copied into your own repository and run by your own
+agent. Adapt it, redistribute it, use it commercially, including in a
+private codebase. Full text in [LICENSE-APACHE](LICENSE-APACHE); the Start
+Guide's [NOTICE](start-guide/NOTICE) travels with every copy of it.
+
+**CC BY-SA 4.0** — `katas/`, `docs/`, and this README.
+The teaching content: use it, adapt it, teach with it — credit SkillBoss and
+keep derivatives under the same licence. Full text in [LICENSE](LICENSE).
 
 The **SkillBoss application** (backend, frontend, infrastructure) is a
-separate work, not covered by this license and not open source.
-
-The **Start Guide** (`start-guide/`) is the exception: it is licensed
-[Apache-2.0](start-guide/LICENSE) with a [NOTICE](start-guide/NOTICE) that
-travels with every copy, so it can be adapted and redistributed,
-including commercially. The SkillBoss name and brand are not licensed by
-either license and never badge an application.
+separate work, not covered by either licence and not open source. The
+SkillBoss name and brand are not licensed by either, and never badge an
+application.

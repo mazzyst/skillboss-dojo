@@ -5,7 +5,7 @@ description: Use when the user wants a pre-ship review of their repository's ope
 
 # skillboss-devops-check — the Ship Check 10
 
-Version 0.3 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · CC BY-SA 4.0
+Version 0.3 · from the [SkillBoss Dojo](https://github.com/mazzyst/skillboss-dojo) · Apache-2.0
 
 You are running a pre-ship hygiene review. The agent does the looking; this
 skill supplies the judgment. Ten checks, each mapping to a documented
