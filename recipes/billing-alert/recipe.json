@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "id": "cost.billing-alert",
+  "version": "0.1.0",
+  "system": "cost-guardrails",
+  "rule": "cost.no-budget-alert",
+  "gateBox": "70:billing-alert-set",
+  "class": "self-contained",
+  "evidenceStrength": "pattern-present",
+  "resolves": [],
+  "matrix": {
+    "framework": {
+      "name": "any",
+      "version": "any"
+    },
+    "authPattern": {
+      "name": "any",
+      "version": "any"
+    },
+    "sdk": {
+      "name": "none",
+      "version": "any"
+    },
+    "deployment": {
+      "name": "any platform whose budget is declared in code; a console-only budget is invisible here",
+      "version": "any"
+    },
+    "store": {
+      "name": "none",
+      "version": "any"
+    }
+  },
+  "permissions": {
+    "read": [
+      "**/*.tf",
+      "**/*.yaml",
+      "**/*.yml",
+      "**/*.json",
+      "**/*.ts",
+      "**/*.js",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.py"
+    ],
+    "write": []
+  },
+  "preconditions": [
+    {
+      "id": "a-person-with-billing-console-access",
+      "statement": "A person who can open the platform's billing console is available; the agent never holds those credentials and never sets a budget itself.",
+      "evidencePrompt": "Which role? A role, never a name and never an address."
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "budget-declared-located",
+      "plants": "A Terraform budget with a notification channel; the finder must locate it by file and line and count it.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "no-amount-printed",
+      "plants": "The same budget, declaring an amount and a currency beside it; neither may appear in the output.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "budget-without-a-listener",
+      "plants": "A budget declared with no recipient; the evidence line must be refused, because its sentence names a role and there is none.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "mention-is-not-a-declaration",
+      "plants": "A budget resource named in prose and inside a string literal; the finder must declare nothing. The lesson provider-hard-limit learned after publishing, applied here before.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "no-budget-no-claim",
+      "plants": "A project with no infrastructure at all; the recipe must say so, hand back no evidence line, and name the console as the only place left.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "every-format-is-read",
+      "plants": "A CloudFormation YAML budget and a Pulumi constructor call; both branches were proved by hand first, which is why they are pinned here.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "never-claims-the-bill-is-capped",
+      "plants": "Every case's output together; none of them may say capped, protected, safe, guaranteed or cannot exceed. The first draft of this assertion passed on empty output and was corrected.",
+      "expect": "red-then-green"
+    }
+  ],
+  "refusalTest": {
+    "command": "node fixtures/run.mjs",
+    "refusedLooksLike": "a budget with no declared recipient is named and its evidence line withheld; a repository with no declared budget gets no evidence line at all and is told the console is the only place left"
+  },
+  "exposure": {
+    "covered": "budgets declared in this repository's Terraform HCL, CloudFormation YAML or JSON, and Pulumi constructor calls",
+    "notCovered": "a budget set in a platform console, which leaves nothing here to read; a budget in a format the finder does not read; a recipient defined elsewhere and attached by a variable; whether any alert has ever reached a person, which no file can show",
+    "behind": "the provider's own hard limit \u2014 an alert tells a person while the spending continues, and the hard limit is the thing that stops it"
+  },
+  "evidenceLine": {
+    "template": "billing-alert-set \u2014 evidence: budget configured at <location>, notifies <role>, read <date>"
+  },
+  "reversal": {
+    "steps": [
+      "Nothing in the repository to revert: the recipe wrote no file. The budget is removed in the platform console by the person who set it."
+    ]
+  },
+  "licence": {
+    "kind": "free",
+    "spdx": "Apache-2.0"
+  },
+  "postconditions": {
+    "buildNotWorse": "run the project's own check before and after; restore every written file and refuse if it was clean and is not",
+    "refusalLeavesNoTrace": "a recipe that cannot finish writes nothing at all"
+  }
+}
