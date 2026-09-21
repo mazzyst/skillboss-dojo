@@ -8,11 +8,12 @@ machine. No telemetry, in any recipe, ever.
 
 ## What is here today
 
-One recipe. More arrive one at a time, each behind its own trial.
+Two recipes. More arrive one at a time, each behind its own trial.
 
 | Recipe | What it does | Changes code? |
 |---|---|---|
 | [provider-hard-limit](provider-hard-limit/SKILL.md) | finds the model providers this repository calls, and walks you to the one setting that stops spending rather than slowing it: the provider's own hard limit | no |
+| [billing-alert](billing-alert/SKILL.md) | finds every budget declared in your infrastructure files, says whether anybody is declared to hear it, and refuses to hand back evidence when nobody is | no |
 
 ## How to use one
 
