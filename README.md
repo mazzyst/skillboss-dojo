@@ -226,8 +226,19 @@ tests, CI/CD, Docker, deployment, observability, and the final boss:
 SHIP. Nothing gets built until the first gate opens; nothing advances
 without evidence and your explicit GO.
 
+**You code alone. You do not ship alone.** At every gate the coach calls in
+a crew of nine specialist agents — architecture, security, data and
+privacy, tests, DevOps, FinOps, design, go-to-market, first user — each
+with one job and one checklist. They read and report; they never touch
+your code. When a free recipe in [`recipes/`](recipes/) would help, a
+report names it as the next step, and your own agent runs it after your
+GO. You decide.
+
 - **[`HELLO-WORLD.md`](start-guide/HELLO-WORLD.md)** — the wake-up. Your
   agent reads it once; the coach is on.
+- **[`crew/CREW.md`](start-guide/crew/CREW.md)** — the crew: who owns
+  each gate, who is consulted, and the seven rules they work by. One card
+  per agent, plain markdown, portable to any coding agent.
 - **[`THE-RUN.md`](start-guide/THE-RUN.md)** — the method in one page:
   Evidence-Gated Delivery, four laws, two paths.
 - **[`gates/`](start-guide/gates/)** — the ten gates, each with its
