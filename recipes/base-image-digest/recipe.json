@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "id": "deps.base-image-digest",
+  "version": "0.1.0",
+  "system": "dependencies",
+  "rule": "deps.floating-base-image",
+  "gateBox": "60:bases-pinned",
+  "class": "self-contained",
+  "evidenceStrength": "pattern-present",
+  "resolves": [],
+  "matrix": {
+    "framework": {
+      "name": "any",
+      "version": "any"
+    },
+    "authPattern": {
+      "name": "any",
+      "version": "any"
+    },
+    "sdk": {
+      "name": "none",
+      "version": "any"
+    },
+    "deployment": {
+      "name": "any build that uses a Dockerfile; an image built by a platform with no Dockerfile in the repository is invisible here",
+      "version": "any"
+    },
+    "store": {
+      "name": "none",
+      "version": "any"
+    }
+  },
+  "permissions": {
+    "read": [
+      "**/Dockerfile",
+      "**/Dockerfile.*",
+      "**/*.Dockerfile",
+      "**/Containerfile*"
+    ],
+    "write": []
+  },
+  "preconditions": [
+    {
+      "id": "a-person-who-can-reach-the-registry",
+      "statement": "A person who can query the project's own container registry is available; the agent never reaches a registry and never resolves a tag itself.",
+      "evidencePrompt": "Which role owns the image update routine? A role, never a name."
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "floating-tag-located",
+      "plants": "A Dockerfile whose base carries a moving tag; the finder must locate it by file and line and mark it FLOATING.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "stage-name-is-not-a-base",
+      "plants": "A multi-stage file whose second FROM names the stage above it; that line must not be read as a base image. The phantom-image trap, and the failure mode the previous recipe in this directory shipped and corrected.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "evidence-withheld-while-anything-floats",
+      "plants": "The same file; the gate line says \"each pinned by digest\", so it must be withheld while any base is not.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "digest-pin-is-not-a-finding",
+      "plants": "A base pinned by digest; it must not be reported as a finding, and with nothing else floating the evidence line is offered.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "never-invents-a-digest",
+      "plants": "A tagged base and no registry; the output must contain no sha256 value at all, because resolving one needs a network this recipe does not touch.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "arg-base-is-unresolvable-not-pinned",
+      "plants": "A base supplied by a build argument; it must be marked UNRESOLVED and must not count as pinned. An unknown is not a pass.",
+      "expect": "red-then-green"
+    },
+    {
+      "id": "no-dockerfile-no-claim",
+      "plants": "A project with no Dockerfile; the recipe must say so, hand back no evidence line, and name the case it cannot see.",
+      "expect": "red-then-green"
+    }
+  ],
+  "refusalTest": {
+    "command": "node fixtures/run.mjs",
+    "refusedLooksLike": "any base that is not pinned by a digest withholds the gate line for the whole repository, and a base supplied by a build argument is marked UNRESOLVED rather than assumed pinned; no sha256 value appears in the output that was not already in the file"
+  },
+  "exposure": {
+    "covered": "the base images declared by FROM in this repository's Dockerfiles, and whether each is a digest or a movable tag",
+    "notCovered": "an image built with no Dockerfile in the repository; a base supplied by a build argument the builder chooses; what a digest actually contains; whether anyone refreshes it; and every registry-specific command, which this recipe has not run and therefore does not print",
+    "behind": "the journal entry recording the update routine, which gate 60 asks for in the same breath \u2014 a pin nobody refreshes is an unpatched image with a date on it, and no file can show a habit"
+  },
+  "evidenceLine": {
+    "template": "bases-pinned \u2014 evidence: the FROM lines at <locations>, each pinned by digest, read <date>"
+  },
+  "reversal": {
+    "steps": [
+      "Nothing in the repository to revert: the recipe wrote no file. A digest a person wrote in is replaced by the tag it came from, in the same Dockerfile."
+    ]
+  },
+  "licence": {
+    "kind": "free",
+    "spdx": "Apache-2.0"
+  },
+  "postconditions": {
+    "buildNotWorse": "run the project's own check before and after; restore every written file and refuse if it was clean and is not",
+    "refusalLeavesNoTrace": "a recipe that cannot finish writes nothing at all"
+  }
+}
