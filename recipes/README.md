@@ -8,12 +8,13 @@ machine. No telemetry, in any recipe, ever.
 
 ## What is here today
 
-Two recipes. More arrive one at a time, each behind its own trial.
+Three recipes. More arrive one at a time, each behind its own trial.
 
 | Recipe | What it does | Changes code? |
 |---|---|---|
 | [provider-hard-limit](provider-hard-limit/SKILL.md) | finds the model providers this repository calls, and walks you to the one setting that stops spending rather than slowing it: the provider's own hard limit | no |
 | [billing-alert](billing-alert/SKILL.md) | finds every budget declared in your infrastructure files, says whether anybody is declared to hear it, and refuses to hand back evidence when nobody is | no |
+| [base-image-digest](base-image-digest/SKILL.md) | reads every Dockerfile and says whether each base image is pinned by a digest or named by a tag that can move under you | no |
 
 ## How to use one
 
