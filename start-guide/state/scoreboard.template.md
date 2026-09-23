@@ -55,6 +55,16 @@ States: `PASSED` (journal Gate Report + human GO, Since = GO date,
 Evidence = the report's journal date) · `WAIVED` (human or profile,
 Evidence = the waiver's journal line) · `OPEN`. No other state exists.
 
+## Crew
+
+Who has reviewed each gate, from the CREW REPORTs in the journal
+(crew/CREW.md says who owns and who is consulted). Regenerated, never
+patched. Only gates the crew has started on get a row.
+
+| Gate | Reviewed | Pending |
+|---|---|---|
+| <gate> | <agents who filed a CREW REPORT> | <agents still to report> |
+
 ## Caught
 
 WHAT THIS CAUGHT, one row per closed gate, quoted from the evidence. The

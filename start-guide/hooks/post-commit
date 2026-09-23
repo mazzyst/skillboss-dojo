@@ -1,5 +1,5 @@
 #!/bin/sh
-# SkillBoss Start Guide — THE RUN SCREEN (Gate 05), v2.
+# SkillBoss Start Guide — THE RUN SCREEN (Gate 05), v4.
 #
 # Renders state/scoreboard.md into TWO views after every commit:
 #   state/run-screen.md    for your IDE — open it as a tab beside your code,
@@ -15,8 +15,8 @@
 # lines (the same three the YOU ARE HERE block carries, read from the
 # scoreboard's Now section); the map with its legend; gates faced, passed
 # and waived; milestones; the run belt and the next rung; the ten
-# villains, marked when the gate that faces them is faced; what the gates
-# caught; the waivers with their reasons; the parked asks; the one alarm;
+# villains, marked when the gate that faces them is faced; the crew's
+# reviews per gate (who reported, who is pending); what the gates caught; the waivers with their reasons; the parked asks; the one alarm;
 # FinOps. Every block is omitted when its data is absent — the screen
 # never fabricates a state. Every fixed string it prints is defined in
 # SCREENS.md, and the build refuses a hook that drifts from it.
@@ -110,7 +110,7 @@ render() {
 BEGIN { section=""; belt="WHITE"; project="this project"; started="-"; profile="FULL RUN";
         mdone=0; mtotal=0; mnext=""; gpassed=0; gtotal=0; gwaived=0; gfaced=0; gopen=""; sec="OPEN";
         map=""; csessions=0; ctokens=""; ctokmore=0; crows=0; complete=0; momentum="";
-        nnext=""; nnow=""; nafter=""; ncaught=0; nparked=0; nwaived=0;
+        nnext=""; nnow=""; nafter=""; ncaught=0; nparked=0; nwaived=0; ncrew=0;
         DOT="\302\267"; DASH="\342\200\224" }
 
 function trim(s) { gsub(/^[ ]+|[ ]+$/, "", s); return s }
@@ -161,6 +161,18 @@ section ~ /^## Gates/ && /^\| [0-9][0-9]-/ {
   else if (gopen == "") gopen=gate
   if (gate ~ /^20-/) sec=state
   if (gate ~ /^90-/ && state == "PASSED") complete=1
+  next
+}
+
+# Crew reviews per gate (crew/CREW.md): who has filed a CREW REPORT and
+# who is still pending. An empty or dash cell is silent.
+section ~ /^## Crew/ && /^\| / {
+  n=split($0, f, "|")
+  g=trim(f[2]); rev=trim(f[3]); pend=trim(f[4])
+  if (ph(g) || g == "Gate" || g ~ /^-+$/) next
+  v=toupper(g) "  reviewed: " (rev == "" || rev ~ /^(-|\342\200\224)$/ ? "none yet" : rev)
+  if (pend != "" && pend !~ /^(-|\342\200\224)$/) v = v " " DOT " pending: " pend
+  ncrew++; crew_line[ncrew]=v
   next
 }
 
@@ -308,6 +320,10 @@ END {
     print ""
     nv = split(villains(), vl, "\n")
     for (i = 1; i <= nv; i++) { if (i == 1) row_md("VILLAINS", vl[i]); else cont_md(vl[i]) }
+    if (ncrew > 0) {
+      print ""
+      for (i = 1; i <= ncrew; i++) { if (i == 1) row_md("CREW", crew_line[i]); else cont_md(crew_line[i]) }
+    }
     if (ncaught > 0) {
       print ""
       for (i = 1; i <= ncaught; i++) {
@@ -429,6 +445,7 @@ END {
   print "<div class=\"block\"></div>"
   nv = split(villains(), vl, "\n")
   for (i = 1; i <= nv; i++) row_html((i == 1 ? "Villains" : ""), esc(vl[i]))
+  if (ncrew > 0) { print "<div class=\"block\"></div>"; for (i = 1; i <= ncrew; i++) row_html((i == 1 ? "Crew" : ""), esc(crew_line[i])) }
   if (ncaught > 0) { print "<div class=\"block\"></div>"; for (i = 1; i <= ncaught; i++) row_html((i == 1 ? "Caught" : ""), esc("day " caught_d[i] "  " caught_what[i] " " DASH " " caught_where[i])) }
   if (nwaived > 0) { print "<div class=\"block\"></div>"; for (i = 1; i <= nwaived; i++) row_html((i == 1 ? "Waived" : ""), esc(waived_g[i] (waived_why[i] != "" && waived_why[i] != "-" ? " " DASH " " waived_why[i] : ""))) }
   if (nparked > 0) { print "<div class=\"block\"></div>"; for (i = 1; i <= nparked; i++) row_html((i == 1 ? "Parked" : ""), esc(parked_ask[i] " (revisit at " parked_rev[i] ")")) }

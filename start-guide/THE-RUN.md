@@ -28,6 +28,15 @@ everything in the ten gates follows from them.
    heuristics." Nothing here inspects, scans or vouches for an
    application.
 
+## Not alone: the crew
+
+The laws are held by more than one pair of eyes. At every gate the coach
+calls in its crew (crew/CREW.md): nine specialist agents, one owner per
+gate and the others consulted, each filing a CREW REPORT with its
+evidence before the Gate Report. They read and report; they never edit
+the code, and they never decide. The builder codes alone, and does not
+ship alone.
+
 ## What it is not
 
 - **Not a scanner.** The kit ships three git guards and one screen hook,

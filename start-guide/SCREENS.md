@@ -11,10 +11,11 @@ Placeholders are in angle brackets. Everything outside them is locked.
 ## COACH READY — the kit is installed, the words have not been said
 
 ```
-COACH READY — SkillBoss Start Guide v2
+COACH READY — SkillBoss Start Guide v4
 KIT .............. installed (start-guide/, checksum verified)
 CONTRACT ......... loaded (CONTRACT-CARD.md, 12 rules)
 GATE MAP ......... 10 gates, 00-KICKOFF -> 90-SHIP
+CREW ............. 9 specialists on call, read-only (crew/CREW.md)
 STATE ............ nothing created yet — nothing has been built
 AWAITING ......... the magic word
 
@@ -24,9 +25,10 @@ INSERT COIN — say the two words every program says first.
 ## COACH ONLINE — the human said "Hello World", no state/ exists
 
 ```
-COACH ONLINE — SkillBoss Start Guide v2
+COACH ONLINE — SkillBoss Start Guide v4
 CONTRACT ......... loaded (CONTRACT-CARD.md, 12 rules)
 GATE MAP ......... 10 gates, 00-KICKOFF -> 90-SHIP
+CREW ............. 9 specialists on call, read-only (crew/CREW.md)
 STATE ............ creating state/ from templates
 RUN BELT ......... WHITE
 NEXT ............. Gate 00 intake — I ask, you answer, nothing gets built yet.
@@ -35,7 +37,7 @@ NEXT ............. Gate 00 intake — I ask, you answer, nothing gets built yet.
 ## COACH RESUMED — state/ already holds filled files
 
 ```
-COACH RESUMED — SkillBoss Start Guide v2
+COACH RESUMED — SkillBoss Start Guide v4
 QUIET ............ <n> days since the last commit — the record kept your place
 LAST ENTRY ....... <date> — <title of the last journal entry>
 ```
@@ -69,8 +71,24 @@ boxes: [x] <box-id>   evidence: <path, command output, or URL — location, neve
        [ ] <box-id>   status: OPEN — <what is missing>
 waivers: <none, or SKIP lines quoted verbatim>
 risks accepted by human: <none, or the list>
+reviewed by: <owner and consulted agents, each with its CREW REPORT date or pending; or: coach alone>
 cost: <n sessions, ~n tokens — DECLARED by the coach, not measured; or unknown>
 verdict: <GO-READY | HOLD (<n> box open)>
+```
+
+## CREW REPORT — appended to state/journal.md by each crew agent at a gate
+
+One per agent, before the Gate Report that gathers them. The owner of the
+gate files first, then each consulted agent (crew/CREW.md). A blocker
+holds the gate. Evidence names where, never a value.
+
+```
+CREW REPORT — <agent> on <gate id>          date: YYYY-MM-DD
+blockers: <box or finding> — evidence: <path, command or URL>
+warnings: <finding> — evidence: <path, command or URL>
+passed:   <box> — evidence: <path, command or URL>
+next:     <the one action this agent would take first>
+cost:     <declared, never invented>
 ```
 
 ## RUN BELT EARNED — a GO changes the run belt
@@ -203,6 +221,11 @@ PASSED or WAIVED; Gate 90 faces all ten together:
 80 | rate-limiting | THE FLOOD | https://skillboss.dev/demo/rate-limiting
 ```
 
+The crew rows — the scoreboard's `## Crew` table, one row per gate the
+crew has started on, regenerated from the CREW REPORTs in the journal;
+the run screen prints them as its CREW block (`reviewed:`, `pending:`).
+Who owns and who is consulted comes from crew/CREW.md, never from memory.
+
 The fixed strings the run screen prints — the build refuses a hook that
 does not carry every one of them:
 
@@ -211,6 +234,9 @@ RUN CLEARED
 run belt
 NEXT
 VILLAINS
+CREW
+reviewed:
+pending:
 CAUGHT
 WAIVED
 PARKED

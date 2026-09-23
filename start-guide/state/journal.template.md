@@ -2,7 +2,7 @@
 
 > Dated entries, newest at the bottom. Nothing here is ever edited or
 > deleted; a correction is a new entry that says what it corrects. Gate
-> Reports, decision records, waivers, parked asks, and RE-SCOPE deltas all
+> Reports, crew reports, decision records, waivers, parked asks, and RE-SCOPE deltas all
 > land here, in the shapes below (defined once in SCREENS.md).
 
 Entry shapes:
@@ -20,8 +20,18 @@ boxes: [x] <box-id>   evidence: <path, command output, or URL — location, neve
        [ ] <box-id>   status: OPEN — <what is missing>
 waivers: <none, or SKIP lines quoted verbatim>
 risks accepted by human: <none, or the list>
+reviewed by: <owner and consulted agents, each with its CREW REPORT date or pending; or: coach alone>
 cost: <n sessions, ~n tokens - DECLARED by the coach, not measured; or unknown>
 verdict: <GO-READY | HOLD (<n> box open)>
+```
+
+```
+CREW REPORT — <agent> on <gate id>          date: YYYY-MM-DD
+blockers: <box or finding> — evidence: <path, command or URL>
+warnings: <finding> — evidence: <path, command or URL>
+passed:   <box> — evidence: <path, command or URL>
+next:     <the one action this agent would take first>
+cost:     <declared, never invented>
 ```
 
 ```

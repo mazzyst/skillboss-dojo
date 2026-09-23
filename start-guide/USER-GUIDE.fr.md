@@ -16,11 +16,35 @@ d'apprentissage.
 
 ## Ce que vous obtenez
 
-Un coach de livraison qui vit dans votre dépôt. Votre agent adopte un
-contrat qui lui interdit de sauter des étapes : dix gates du kickoff au
+Un coach de livraison et sa crew, qui vivent dans votre dépôt. Vous
+codez en solo ; vous ne livrez pas en solo. Votre agent suit un contrat
+qui lui interdit de sauter des étapes : dix gates du kickoff au
 ship, chacune verrouillée tant que le travail n'est pas prouvé et que
 vous n'avez pas dit GO. Vous restez l'arbitre — le coach peut être
 contredit, mais uniquement sur procès-verbal.
+
+## Votre crew — vous n'êtes pas en solo
+
+À chaque gate, le coach fait appel à des spécialistes. Neuf agents, un
+métier chacun :
+
+- **Architecture** — votre app tient debout et se modifie sans tout casser.
+- **Sécurité** — pas de secret qui fuit, pas de porte laissée ouverte.
+- **Données & vie privée** — vos utilisateurs vous confient quelque chose.
+- **Tests** — ce qui compte est prouvé, pas espéré.
+- **DevOps** — un push, une mise en ligne, un retour arrière possible.
+- **FinOps** — vous savez ce que coûte votre agent, et ce que coûtera votre app.
+- **Design** — votre utilisateur sait quoi faire dès le premier écran.
+- **Go-to-market** — vous savez pour qui vous livrez, et comment il vous trouvera.
+- **Premier utilisateur** — quelqu'un a essayé avant vos utilisateurs.
+
+Chacun lit votre travail et dépose un CREW REPORT dans le journal : ce qui
+bloque, ce qui l'inquiète, ce qui passe, et où se trouve la preuve. Aucun
+ne modifie votre code, aucun n'est une personne, et aucun ne certifie
+quoi que ce soit ; Données & vie privée est une checklist, pas un conseil
+juridique. Si deux d'entre eux ne sont pas d'accord, le coach vous montre
+les deux positions et vous tranchez. `crew/CREW.md` dit qui est appelé à
+quelle gate.
 
 ## Avant de commencer
 

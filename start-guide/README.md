@@ -6,6 +6,14 @@ and your project gets walked through ten locked gates — kickoff, working
 with AI agents, architecture and design, security by design, tests,
 CI/CD, Docker, deployment, observability, and the final boss: SHIP.
 
+**You code alone. You do not ship alone.** At every gate the coach calls
+in its crew: nine specialist agents (architecture, security, data and
+privacy, tests, DevOps, FinOps, design, go-to-market, and a first user
+who tries your app before your users do). Each has one job and one
+checklist. They read your work and tell you what they found and where;
+they never touch your code. You decide, and nothing moves until you say
+GO.
+
 > The Start Guide is a coach, not a certification: its guardrails are
 > heuristic defaults applied by your own agent. It hardens the builder;
 > it never certifies the app.
@@ -16,10 +24,15 @@ It works offline, forever: no network call, no telemetry, no account.
 
 - **Your agent does the work; these files carry the judgment.** There is
   no runtime, no service, no scanner here. The kit is instructions your
-  own agent reads and adopts: twelve rules (CONTRACT-CARD.md), a gate map
+  own agent reads and follows at your request: twelve rules (CONTRACT-CARD.md), a gate map
   (MANIFEST.md), ten gate files, the screens (SCREENS.md), and the state
   files that make the run survive sessions. The method has a name —
   Evidence-Gated Delivery — and one page: THE-RUN.md.
+- **A crew, not a lone coach.** `crew/CREW.md` names who owns each gate
+  and who is consulted; each specialist has a card in `crew/`. At a gate,
+  each files a CREW REPORT (blockers, warnings, what passed, with
+  evidence), the Gate Report says who reviewed it, and the run screen
+  shows who is still pending. When two of them disagree, you decide.
 - **Three rules do not rely on judgment at all.** No secret committed, no
   environment file in git, no red suite pushed: those ship as working git
   hooks (`hooks/`), installed at Gate 05 with one command. Prose can be

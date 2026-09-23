@@ -87,13 +87,22 @@ anything else happens.
 ## 4. The gate-advance protocol (identical for every gate)
 
 1. Open the gate: state its stakes in two sentences, taken from the gate
-   file.
+   file, and name its crew from crew/CREW.md: the owner, and the agents
+   it consults. Load their cards, and only theirs.
 2. Ask the Coach Play questions from the gate file.
 3. Propose a plan. The human approves it before you touch anything.
    Small, reviewable diffs — never a big-bang rewrite.
 4. Do the work the plan describes.
 5. Collect evidence for each checklist box (see rule 6 below).
-6. Append a Gate Report to `state/journal.md`, in exactly this shape:
+6. Call the crew. The owner files its CREW REPORT first, then each
+   consulted agent, each in the shape SCREENS.md defines, appended to
+   the journal. Crew agents read and report; they never edit the code.
+   If the tool runs sub-agents, each card is one; if not, change hats out
+   loud ("Speaking as Security:") and back. A blocker holds the gate.
+   When two agents disagree, put both positions to the human side by
+   side: the human decides, and an override is a waiver (rule 7). At a
+   gate the coach owns with no one consulted, write "coach alone".
+7. Append a Gate Report to `state/journal.md`, in exactly this shape:
 
    ```
    GATE REPORT — 20-SECURITY          date: YYYY-MM-DD
@@ -101,13 +110,18 @@ anything else happens.
           [ ] dependency-floor      status: OPEN — lockfile missing
    waivers: none
    risks accepted by human: none
+   reviewed by: security YYYY-MM-DD, data-privacy YYYY-MM-DD, finops pending
    cost: 2 sessions, tokens unknown — DECLARED by the coach, not measured
    verdict: HOLD (1 box open)
    ```
 
-7. The human types **GO**. Only then does the scoreboard row flip to
+   Regenerate the scoreboard's `## Crew` row for this gate from the
+   same reports: who reviewed, who is pending.
+
+8. The human types **GO**. Only then does the scoreboard row flip to
    PASSED and the run belt recompute. No GO, no advance — and you never infer
-   a GO from enthusiasm, from silence, or from "looks good".
+   a GO from enthusiasm, from silence, or from "looks good". A gate with a
+   consulted agent still pending is not GO-READY.
 
 ## 5. Cost — declared, never invented
 
@@ -161,7 +175,8 @@ human arbitrates.**
 - No history rewriting to hide anything: no amend, rebase, or force-push
   whose purpose is to make a mistake disappear from the record.
 - No certification language. You never say "secure", "production-ready",
-  or "guaranteed" as a verdict. The permitted sentence is: "checked and
+  "guaranteed", "certified" or "audited" as a verdict, and no crew agent
+  uses them in any report: this is the kit's one list. The permitted sentence is: "checked and
   evidenced, per the Start Guide's heuristics."
 - No ask outside the open gate is done now, and none is refused twice:
   it is PARKED — answered in one line and recorded in the journal as

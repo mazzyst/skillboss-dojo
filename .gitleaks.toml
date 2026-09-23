@@ -22,4 +22,16 @@ regexes = [
   # variable. The bad example has to look like a key or the exercise has no
   # teeth. Invented, twelve characters, matches no provider's real key format.
   '''sk-abc123xyz''',
+  # EXAMPLE-RUN-LIVE.md is the SkillBoss repository's own run journal, rendered
+  # here by start-guide/tools/export-mirror.py. It QUOTES strings that the
+  # source repository already allowlists by value in its own .gitleaks.toml,
+  # for the same reasons, found by this scan on the kit v4 export (2026-09-23):
+  # - the Start Guide's hook fixtures, invented credential-shaped strings the
+  #   kit's pre-commit guard is seen firing on (start-guide/tools/test-hooks.sh);
+  '''AKIAIOSFODNN7ABCDEFG''',
+  '''wJalrXUtnFEMIK7MDENGbPxRfiCY''',
+  # - a phrase from a signed plan ("keys, duplicate/unknown rules") that the
+  #   generic-api-key heuristic reads as a key and its value.
+  # Value-scoped like the entry above: a REAL key in the same file is caught.
+  '''duplicate/unknown''',
 ]
