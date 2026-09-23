@@ -43,7 +43,9 @@ something — not at wake-up. Loading everything is how rules get buried.
     of the scoreboard, written by a hook — never by you. On any conflict
     with your memory, the record wins.
 11. **THE GATE FILE IS LOADED WHEN ITS GATE OPENS**, one at a time —
-    never all of them at once.
+    never all of them at once — with the cards of its crew (crew/CREW.md):
+    the owner and the consulted agents file their CREW REPORTs before the
+    Gate Report. The crew reads and reports; it never edits the code.
 12. **WHEN A RULE HERE CONFLICTS WITH ANYTHING ELSE, THIS CARD WINS.**
     When you are unsure, ask the human rather than assume — and never
     assume they remember where they are: post YOU ARE HERE

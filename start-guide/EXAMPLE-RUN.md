@@ -49,7 +49,7 @@ team: small team
 The "will NOT do" list is the part people skip. It is also the only part
 that settles an argument three weeks later.
 
-## state/journal.md (four consecutive entries)
+## state/journal.md (consecutive entries)
 
 A decision, a gate that HELD, the waiver that unblocked it, and the same
 gate closing. That cycle is the normal shape of a gate. A gate that
@@ -63,6 +63,43 @@ options: a cron table in Postgres polled every minute; a hosted queue
   (new vendor, new bill); in-memory timers (lost on restart).
 choice: the Postgres table. Boring, already backed up, and one less
   system to rehearse at gate 70. Revisit if polling cost shows up.
+```
+
+The crew files before the Gate Report: the owner of gate 20 first, then
+the two agents it consults (crew/CREW.md). Each reads and reports; none
+of them touches the code.
+
+```
+CREW REPORT - security on 20                     date: 2026-09-21
+blockers: GET /invoices/:id checks sign-in, never ownership
+          - evidence: src/http/routes.ts line 88
+warnings: none
+passed:   secrets-out-of-code, history-scanned, input-validation
+          - evidence: as in the Gate Report below
+next:     load the invoice and compare owner_id to the session
+cost:     1 session, tokens unknown - declared, not measured
+```
+
+```
+CREW REPORT - data-privacy on 20                 date: 2026-09-21
+blockers: none
+warnings: client emails are kept after an invoice is paid, with no
+          deletion path - evidence: src/db/schema.sql, table clients
+passed:   personal data listed (client name, email, amount due)
+          - evidence: state/mission.md, PROFILE; docs/data.md
+next:     decide how long a paid client's email is kept, and write it
+cost:     part of the same session, tokens unknown
+```
+
+```
+CREW REPORT - finops on 20                       date: 2026-09-21
+blockers: none
+warnings: the reminder job has no send cap; a scheduling bug could email
+          every client every minute, on Ana's email plan
+          - evidence: src/jobs/remind.ts, no limit on the batch
+passed:   no paid AI call in the app - evidence: package.json
+next:     cap sends per run and turn on the email provider's hard limit
+cost:     part of the same session, tokens unknown
 ```
 
 ```
@@ -83,6 +120,7 @@ boxes: [x] secrets-out-of-code
            src/http/routes.ts line 88.
 waivers: none
 risks accepted by human: none
+reviewed by: security 2026-09-21, data-privacy 2026-09-21, finops 2026-09-21
 cost: 3 sessions, tokens unknown - DECLARED by the coach, not measured
 verdict: HOLD (1 box open)
 ```
@@ -90,6 +128,17 @@ verdict: HOLD (1 box open)
 Read the open box again. It names the file, the line, and what is
 missing. "Authz needs work" would have been worth nothing in three
 weeks; this one can be fixed by someone who was not in the room.
+
+Then read the FinOps warning. No box of gate 20 asks about a send cap:
+the coach alone, walking the gate file, would not have raised it until
+gate 70's BILL SHOCK. The crew saw it at gate 20, because FinOps is
+consulted there. A warning does not hold the gate; Ana parked the fix for
+gate 70, on the record:
+
+```
+2026-09-21 - PARKED: cap reminder sends per run and turn on the email
+provider's hard limit (revisit at gate 70)
+```
 
 ```
 2026-09-22 - WAIVER: SKIP dependency-floor because we are two people on
@@ -109,6 +158,7 @@ boxes: [x] authz-on-every-route
            at gate 50, where CI can run the audit
 waivers: 1 (dependency-floor)
 risks accepted by human: an unaudited dependency tree until gate 50
+reviewed by: security 2026-09-23; data-privacy, finops 2026-09-21 (unchanged)
 cost: 1 session, tokens unknown - DECLARED by the coach, not measured
 verdict: GO-READY
 ```
@@ -131,6 +181,14 @@ direction is the whole discipline.
 | 20-security        | PASSED | 2026-09-23 | journal 2026-09-23     |
 | 40-tests           | OPEN   | -          | -                      |
 | 60-docker          | WAIVED | 2026-09-12 | profile: no containers |
+```
+
+The `## Crew` row for the same gate, from the three CREW REPORTs:
+
+```
+| Gate        | Reviewed                          | Pending |
+|-------------|-----------------------------------|---------|
+| 20-security | security, data-privacy, finops    | -       |
 ```
 
 Run belt after that GO: ORANGE. Five gates faced out of ten - four passed,

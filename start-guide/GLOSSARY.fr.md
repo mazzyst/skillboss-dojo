@@ -12,9 +12,17 @@ mot du guide ou d'un message du coach n'est pas clair, il est défini ici
 - **Hello World** — les mots que vous dites à votre agent pour démarrer
   (ou reprendre) la run. La plus vieille phrase de la programmation,
   recyclée en pièce dans la borne d'arcade.
-- **Le coach** — le rôle que votre agent adopte : il planifie, questionne,
+- **Le coach** — le rôle que votre agent endosse : il planifie, questionne,
   refuse de sauter des étapes, et n'avance jamais sans votre GO. Vous
   restez le patron de chaque décision.
+- **La crew** — les neuf agents spécialistes que le coach appelle à chaque
+  gate (crew/CREW.md) : architecture, sécurité, données et vie privée,
+  tests, DevOps, FinOps, design, go-to-market, premier utilisateur. Ils
+  lisent et rendent compte ; ils ne modifient jamais votre code. Vous
+  codez en solo ; vous ne livrez pas en solo.
+- **CREW REPORT** — ce qu'un agent de la crew dépose dans le journal à une
+  gate : bloquants, alertes, ce qui passe, chacun avec sa preuve. La ligne
+  `reviewed by` du Gate Report les liste.
 - **Gate** — une étape verrouillée de la run (architecture, sécurité,
   tests, etc.). Une gate est OPEN (en cours), PASSED (prouvée, et vous
   avez dit GO), ou WAIVED (vous avez choisi de la passer, sur

@@ -10,12 +10,34 @@ to. Ten minutes here is the whole learning curve.
 
 ## What you get
 
-A delivery coach living in your repository. Your agent adopts a contract
-that forbids it to skip steps: ten gates from kickoff to ship, each
+A delivery coach and its crew, living in your repository. You code
+alone; you do not ship alone. Your agent follows a contract that forbids
+it to skip steps: ten gates from kickoff to ship, each
 locked until the work is evidenced and you say GO. You stay the
 arbitrator — the coach can be overruled, but only on the record. The
 method has a name, Evidence-Gated Delivery, and one page if you want the
 why: THE-RUN.md.
+
+## Your crew — you are not alone
+
+At every gate the coach calls in specialists. Nine agents, one job each:
+
+- **Architecture** — your app stands up and changes without breaking.
+- **Security** — no secret leaks, no door left open.
+- **Data & Privacy** — your users trust you with something.
+- **Tests** — what matters is proven, not hoped.
+- **DevOps** — one push, one release, one way back.
+- **FinOps** — you know what your agent costs, and what your app will.
+- **Design** — your user knows what to do on the first screen.
+- **Go-to-market** — you know who you ship for, and how they will find you.
+- **First User** — someone tried it before your users did.
+
+Each one reads your work and files a CREW REPORT in the journal: what
+blocks, what worries it, what passed, and where the evidence is. None of
+them edits your code, none of them is a person, and none of them
+certifies anything; Data & Privacy is a checklist, not legal advice. If
+two of them disagree, the coach shows you both sides and you decide.
+`crew/CREW.md` says who is called at which gate.
 
 ## Before you start
 

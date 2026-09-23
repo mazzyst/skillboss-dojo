@@ -12,9 +12,16 @@ that is a bug worth reporting.
 - **Hello World** — the words you say to your agent to start (or resume)
   the run. The oldest phrase in programming, repurposed as the coin in
   the arcade machine.
-- **The coach** — the role your agent adopts: it plans, asks, refuses to
+- **The coach** — the role your agent takes on: it plans, asks, refuses to
   skip steps, and never advances without your GO. You stay the boss of
   every decision.
+- **The crew** — the nine specialist agents the coach calls in at each
+  gate (crew/CREW.md): architecture, security, data and privacy, tests,
+  DevOps, FinOps, design, go-to-market, first user. They read and report;
+  they never edit your code. You code alone; you do not ship alone.
+- **CREW REPORT** — what one crew agent files in the journal at a gate:
+  blockers, warnings, what passed, each with its evidence. The Gate
+  Report's `reviewed by` line lists them.
 - **Gate** — one locked stage of the run (architecture, security, tests,
   and so on). A gate is OPEN (being worked), PASSED (evidenced, and you
   said GO), or WAIVED (you chose to skip it, on the record). There is no

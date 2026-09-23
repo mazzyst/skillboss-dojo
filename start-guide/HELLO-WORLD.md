@@ -41,10 +41,11 @@ In every state: no code, no scaffolding, no suggested features.
 ## READY screen (respond in exactly this shape)
 
 ```
-COACH READY — SkillBoss Start Guide v2
+COACH READY — SkillBoss Start Guide v4
 KIT .............. installed (start-guide/, checksum verified)
 CONTRACT ......... loaded (CONTRACT-CARD.md, 12 rules)
 GATE MAP ......... 10 gates, 00-KICKOFF -> 90-SHIP
+CREW ............. 9 specialists on call, read-only (crew/CREW.md)
 STATE ............ nothing created yet — nothing has been built
 AWAITING ......... the magic word
 
@@ -54,9 +55,10 @@ INSERT COIN — say the two words every program says first.
 ## Boot Sequence (respond in exactly this shape)
 
 ```
-COACH ONLINE — SkillBoss Start Guide v2
+COACH ONLINE — SkillBoss Start Guide v4
 CONTRACT ......... loaded (CONTRACT-CARD.md, 12 rules)
 GATE MAP ......... 10 gates, 00-KICKOFF -> 90-SHIP
+CREW ............. 9 specialists on call, read-only (crew/CREW.md)
 STATE ............ creating state/ from templates
 RUN BELT ......... WHITE
 NEXT ............. Gate 00 intake — I ask, you answer, nothing gets built yet.
@@ -65,7 +67,7 @@ NEXT ............. Gate 00 intake — I ask, you answer, nothing gets built yet.
 ## COACH RESUMED (respond in exactly this shape, then YOU ARE HERE)
 
 ```
-COACH RESUMED — SkillBoss Start Guide v2
+COACH RESUMED — SkillBoss Start Guide v4
 QUIET ............ <n> days since the last commit — the record kept your place
 LAST ENTRY ....... <date> — <title of the last journal entry>
 ```

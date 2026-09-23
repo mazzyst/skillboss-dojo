@@ -1,4 +1,4 @@
-# MANIFEST.md — SkillBoss Start Guide v2
+# MANIFEST.md — SkillBoss Start Guide v4
 
 > The gate map and the file map. The coach consults this file when it
 > needs the full map — it is NOT part of the wake-up load (that is
@@ -12,9 +12,15 @@
 The SkillBoss Start Guide turns your coding agent into a delivery coach.
 One folder of markdown plus three guard hooks, one screen hook and a CI
 workflow: your agent reads it,
-adopts the coach posture defined in CONTRACT-CARD.md, and walks your
+takes on the coach posture defined in CONTRACT-CARD.md, and walks your
 project through ten locked gates — from kickoff to ship — refusing to
 advance without evidence and without your explicit GO.
+
+The coach does not work alone: crew/ holds nine specialist agents
+(architecture, security, data and privacy, tests, DevOps, FinOps, design,
+go-to-market, first user), each with one job and one card, and CREW.md
+says which of them owns and which is consulted at every gate. They read
+and report; they never edit your code.
 
 Internally, a delivery is called **the run**: ten gates, one final boss
 (SHIP), and a run belt earned at every stage. The run starts when the
@@ -63,6 +69,8 @@ MANIFEST.md for the full map, each gate file when its gate opens,
 COACH-CONTRACT.md when a situation is not covered by the card,
 SCREENS.md whenever you are about to post a fixed block, THE-RUN.md when
 the human asks what the method is, hooks/README.md at gate 05,
+crew/CREW.md and the cards of the owner and consulted agents when a gate
+opens,
 EXAMPLE-RUN.md before you write your first Gate Report or whenever the
 human asks what a filled record looks like.
 
@@ -102,6 +110,16 @@ gates/60-docker.md
 gates/70-deployment.md
 gates/80-observability.md
 gates/90-ship.md
+crew/CREW.md
+crew/architecture.md
+crew/security.md
+crew/data-privacy.md
+crew/tests.md
+crew/devops.md
+crew/finops.md
+crew/design.md
+crew/go-to-market.md
+crew/first-user.md
 state/README.md
 state/mission.template.md
 state/journal.template.md

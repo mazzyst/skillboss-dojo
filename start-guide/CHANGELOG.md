@@ -3,6 +3,49 @@
 One entry per kit version. The ZIP served at https://skillboss.dev/start
 is rebuilt for every entry, and its checksum is printed on that page.
 
+## v4
+
+- **The crew names a recipe; it never runs one.** Crew rule 1 now says
+  where a helpful recipe or tool may appear in a CREW REPORT: in its
+  `next:` line only, never among blockers or passed. Your main agent runs
+  it, after your GO. The kit names no recipe.
+- **One list of claim words.** The coach contract's refusal (§8) is the
+  kit's one list: "secure", "production-ready", "guaranteed", "certified",
+  "audited". Crew rule 4 points to it instead of keeping its own.
+- **Gate 70, one check in one place.** The DevOps card says the billing
+  alert (`billing-alert-set`) is FinOps's check: DevOps owns the gate and
+  gathers that report without repeating it.
+
+## v3
+
+- **The crew.** The coach no longer works alone: crew/ adds nine
+  specialist agents (architecture, security, data and privacy, tests,
+  DevOps, FinOps, design, go-to-market, first user), one card each, with
+  what it checks, what it refuses and what it hands off.
+- **The crew is a graph.** CREW.md says which agent owns each gate and
+  which are consulted, as a fenced block the build checks: one owner per
+  gate, no unknown node, no card without an agent, no hand-off loop.
+- **Seven crew rules.** Read-only, one CREW REPORT shape, the human
+  arbitrates, no inflated claims, roles not characters, called at the
+  gate, portable to any agent.
+- **The coach runs the crew.** The gate-advance protocol (COACH-CONTRACT
+  rule 4) calls the owner, then the consulted agents; each files a CREW
+  REPORT (shape in SCREENS.md) before the Gate Report, which gains a
+  `reviewed by` line. A pending agent means the gate is not GO-READY. The
+  build refuses a report shape that drifts between files.
+- **The run screen shows the crew.** A CREW block lists, per gate, who
+  reviewed and who is pending, from the scoreboard's new `## Crew` table.
+- **You code alone. You do not ship alone.** The README, both user
+  guides (a new "Your crew" section), both glossaries, THE-RUN.md and the
+  READY and boot screens now say it first: the crew is on call at every
+  gate, read-only.
+- **"Adopt" is gone.** No reader-facing file asks the agent to adopt the
+  kit any more; it follows it at the human's request. ADAPTERS.md's
+  install paragraph now includes the hook audit.
+- EXAMPLE-RUN.md shows gate 20 with three crew reports, and the FinOps
+  warning the gate file alone would not have raised. ADAPTERS.md explains
+  sub-agents or hats.
+
 ## v2
 
 - **The guards say where, never what.** The pre-commit secret guard
