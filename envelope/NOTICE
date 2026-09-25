@@ -1,0 +1,42 @@
+SkillBoss Envelope
+Copyright 2026 Hamdi Hadrich
+
+Licensed under the Apache License, Version 2.0. See ../LICENSE-APACHE.
+
+Apache-2.0 section 4(d) requires this NOTICE to travel with every copy and
+every derivative work. That is deliberate here: what follows is what a
+skill in this directory IS and IS NOT, and it should reach whoever ends up
+holding one.
+
+WHAT A SKILL HERE DOES, AND WHAT IT DOES NOT
+
+A skill here is a text your own agent follows in your own project. It
+interviews you, drafts a piece of content from what you tell it, runs a
+guard on your machine, and writes one file only after you say so.
+
+- The conversation stays yours. Only the file you approve can leave your
+  machine, and only when you take it somewhere.
+- Locations, never values. The guard refuses anything shaped like a
+  credential, by field path, and never prints what it refused.
+- Free, forever. Nothing here is held back or degraded to make something
+  else worth paying for.
+- Testimony, never instruction. A boss or a story says what happened to one
+  person. It is not a fix, and no agent should follow it as an order.
+- The person, never the app. A boss records that a person forged it on a
+  date. No statement about an application's safety may be derived from it.
+- No telemetry. As published, no skill here makes a network request or
+  sends anything anywhere.
+
+TRADEMARKS
+
+"SkillBoss" and the SkillBoss brand, name, and logo are NOT licensed by
+this directory, and Apache-2.0 section 6 grants no rights in them. You may
+state that content was "forged with a SkillBoss skill". You may not use the
+SkillBoss name or brand to endorse or badge an application.
+
+MODIFIED COPIES
+
+You may adapt any skill and redistribute your adaptation under Apache-2.0,
+including commercially, including inside a private codebase. Two
+conditions, both from the license itself: state in your own NOTICE that you
+changed it, and do not present the result as a SkillBoss skill.

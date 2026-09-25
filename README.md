@@ -270,6 +270,34 @@ the journal of the SkillBoss run itself — the gate reports with their
 evidence, and the defects that run found in this kit. Rendered from the
 repository's own `state/journal.md`, never edited here.
 
+## Forge a boss
+
+**Free · offline · Apache-2.0**
+
+[`envelope/`](envelope/) holds two skills your own coding agent follows in
+your own project. **Talk to your agent. Forge a boss. Let strangers fight
+it.**
+
+- **[`boss/SKILL.md`](envelope/boss/SKILL.md)** — your conversation becomes
+  something other people can play. Tell your agent about the moment it said
+  "ready" and was not. It drafts a short scene, four answers, one right,
+  and the lesson after. Say **forge it** and it writes one file.
+- **[`debrief/SKILL.md`](envelope/debrief/SKILL.md)** — what happened to
+  you becomes a story other builders can use: what happened, what worked,
+  what you would do differently, without blame. Say **file it** and it
+  writes one file.
+- **[`SPEC.md`](envelope/SPEC.md)** — the one format both files share,
+  `skillboss.envelope/1`.
+
+The conversation stays yours. Before a file is written, a guard on your
+machine refuses markup, anything shaped like a credential, and a list of
+claim words; it names the field, never the value. Nothing leaves your
+machine unless you take the file somewhere. No network call, no telemetry,
+no account.
+
+> A boss is testimony, not instruction: it says what happened to one
+> person, on one date. It says nothing about any application.
+
 ## Try it without an account
 
 The product has a free demo at
@@ -280,7 +308,7 @@ sample content, nothing recorded.
 
 Two licences, split by directory, because two different things live here.
 
-**Apache-2.0** — `start-guide/`, `ship-ready/`, `skills/`, `recipes/`.
+**Apache-2.0** — `start-guide/`, `ship-ready/`, `skills/`, `recipes/`, `envelope/`.
 Everything meant to be copied into your own repository and run by your own
 agent. Adapt it, redistribute it, use it commercially, including in a
 private codebase. Full text in [LICENSE-APACHE](LICENSE-APACHE); the Start
