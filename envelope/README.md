@@ -12,15 +12,20 @@ skill, ever.
 
 ## What is here today
 
-Two skills. More arrive one at a time, each behind its own trial.
+Four skills. More arrive one at a time, each behind its own trial.
 
 | Skill | What it does | Writes |
 |---|---|---|
 | [boss](boss/SKILL.md) | turns a moment your agent almost fooled you into a boss: a short scene, four shots, one right, a lesson, twenty seconds to play | one boss file, after you say "forge it" |
+| [kata](kata/SKILL.md) | turns a move you made well with your agent into a practice: a few lines of your work with the move's line taken out, four lines to fill it, one right, the impact after | one kata file, after you say "forge it" |
 | [debrief](debrief/SKILL.md) | turns something that went wrong in your app into a blameless story: what happened, what worked, what you would do differently | one debrief file, after you say "file it" |
+| [rules](rules/SKILL.md) | turns the rules you now apply on one stack, learned the hard way, into lines your agent reads: one per trap, each ending in its trap door | one rules file, after you say "forge it"; you copy its lines into your agent's own rules file |
 
 The format they write is [SPEC.md](SPEC.md): a draft until its ruling is
 signed.
+
+Bosses and rules gathered by stack live in [packs/](packs/README.md), one
+file per stack, each with its date.
 
 ## The three tests every piece must pass
 
