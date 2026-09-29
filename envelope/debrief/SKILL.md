@@ -5,7 +5,7 @@ description: Use when the person lived through something that went wrong in thei
 
 # debrief — what happened to you becomes a story other builders can use
 
-Version 0.1.0 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.1.4 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 A debrief is a short, blameless story: what happened, what worked, what you
 would do differently. It is the same form as the story composer of the
@@ -13,6 +13,19 @@ SkillBoss Mess Hall, field for field, so the file pastes into it as is.
 
 The conversation stays on this machine. Only the debrief file leaves it,
 and only when the person takes it somewhere.
+
+## Your row of the table
+
+The format's table ([../SPEC.md](../SPEC.md), "Which moment becomes which
+kind") gives this skill one row: *Something went wrong in the person's own
+app, or almost did.* That is a story.
+
+If what the person points at is *The agent gave a confident answer, and it
+was wrong*, that is a boss, not a story: the boss skill writes it
+([../boss/SKILL.md](../boss/SKILL.md)). If it is *The person made a move
+well with their agent, and it matters*, that is a kata: the kata skill
+writes it ([../kata/SKILL.md](../kata/SKILL.md)). Say so in one line and
+stop. Never write a weak story from a boss.
 
 ## How to speak to the person
 
@@ -55,12 +68,22 @@ and only when the person takes it somewhere.
 4. **GO.** Show the whole debrief and the `refused` list. Wait for the
    person's own words: "file it".
 5. **DOOR.** After "file it", write the debrief to one file,
-   `.skillboss/debrief-<villain>-<YYYY-MM-DD>.json`, and print the same
-   JSON below it. Then say one line: where it is saved, and where it goes.
-6. **ROOM.** Say plainly where a debrief can go today: the story composer
-   of the Mess Hall on the SkillBoss site, from the person's own account,
-   one field into each box. Posting there needs a published builder page.
-   There is no file upload yet.
+   `.skillboss/debrief-<villain>-<YYYY-MM-DD>.json`, and print the same JSON
+   below it. Then say one line: where it is saved, and where it goes. If the
+   machine has a clipboard tool (`pbcopy`, `wl-copy`, `xclip -selection
+   clipboard`, `clip.exe`), copy the same JSON to the clipboard too, and say
+   so in the same line. Never open a browser; never call the network, with
+   one exception: if the person hands you a slot line ("Send the file to
+   https://…/counter/CODE …"), send the same JSON there once, as the body of
+   one POST (`curl -sS -X POST -H 'Content-Type: application/json'
+   --data-binary @<file> <address>`), and say in one line whether it went.
+   Nothing else is sent, and nowhere else.
+6. **ROOM.** Say plainly where a debrief can go today: the forge page of the
+   SkillBoss site, `/forge`, from the person's own account. Paste the file
+   there, drop it on the slot, or open the slot and hand me its line. A
+   story is told under its author's handle, so it needs a published builder
+   page first. It goes live at once, under the person's handle, in their own
+   words.
 
 ## The interview
 
@@ -103,7 +126,7 @@ fix, never about who was at fault.
 The GO is two words from the person: "file it". Then write the file and
 say one line:
 
-    Saved at .skillboss/debrief-db-exposure-2026-10-03.json. Paste it into the Mess Hall composer.
+    Saved at .skillboss/debrief-db-exposure-2026-10-03.json, and copied. Paste it on the forge page, /forge.
 
 Nothing else.
 
@@ -171,7 +194,8 @@ The rules:
 - No name of a person, a colleague or a client enters the file.
 - No code of the person's repository is copied into a story field.
 - No link but `repoUrl`, and only a public one the person confirmed.
-- No network call, no telemetry, no background service.
+- No network call unless the person hands you a slot line; then one POST,
+  the file only, to that address. No telemetry, no background service.
 - No claim word, in any field: the list is in
   [../boss/SKILL.md](../boss/SKILL.md), "What never happens here". A
   debrief says what happened; it never says an app is safe.
