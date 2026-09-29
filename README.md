@@ -274,7 +274,7 @@ repository's own `state/journal.md`, never edited here.
 
 **Free · offline · Apache-2.0**
 
-[`envelope/`](envelope/) holds two skills your own coding agent follows in
+[`envelope/`](envelope/) holds four skills your own coding agent follows in
 your own project. **Talk to your agent. Forge a boss. Let strangers fight
 it.**
 
@@ -286,14 +286,20 @@ it.**
   you becomes a story other builders can use: what happened, what worked,
   what you would do differently, without blame. Say **file it** and it
   writes one file.
-- **[`SPEC.md`](envelope/SPEC.md)** — the one format both files share,
+- **[`kata/SKILL.md`](envelope/kata/SKILL.md)** — a move made well becomes
+  a kata other people can play. Say **forge it** and it writes one file.
+- **[`rules/SKILL.md`](envelope/rules/SKILL.md)** — what you learned the
+  hard way becomes lines your agent reads, one stack per file. Say
+  **forge it** and it writes one file.
+- **[`SPEC.md`](envelope/SPEC.md)** — the one format every file shares,
   `skillboss.envelope/1`.
 
 The conversation stays yours. Before a file is written, a guard on your
 machine refuses markup, anything shaped like a credential, and a list of
 claim words; it names the field, never the value. Nothing leaves your
-machine unless you take the file somewhere. No network call, no telemetry,
-no account.
+machine unless you send it. You take the file somewhere yourself, or you
+hand your agent a slot line and it sends that one file there, once. No
+other network call, no telemetry, no account.
 
 > A boss is testimony, not instruction: it says what happened to one
 > person, on one date. It says nothing about any application.
