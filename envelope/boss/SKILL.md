@@ -5,7 +5,7 @@ description: Use when the person had a conversation with their agent about somet
 
 # boss — your conversation becomes something other people can play
 
-Version 0.3.4 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.3.5 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 A boss is a trap question written by someone who was trapped for real. A
 short scene. Four answers that sound like an agent talking. Three are wrong
@@ -82,7 +82,7 @@ and stop. Never write a weak boss from a story.
    SkillBoss site, `/forge`, from the person's own account. Paste the file
    there, drop it on the slot, or open the slot and hand me its line. A boss
    carries its author's handle, so it needs a published builder page first.
-   The operator reads it before anyone plays it.
+   It is live as soon as the door accepts it; the house patrols after.
 
 ## The interview
 
