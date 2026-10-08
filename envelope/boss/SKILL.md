@@ -5,7 +5,7 @@ description: Use when the person had a conversation with their agent about somet
 
 # boss — your conversation becomes something other people can play
 
-Version 0.3.5 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.3.7 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 A boss is a trap question written by someone who was trapped for real. A
 short scene. Four answers that sound like an agent talking. Three are wrong
@@ -40,11 +40,17 @@ and stop. Never write a weak boss from a story.
 ## What the agent does
 
 1. **TALK.** Read what the person points at: this conversation, a diff, a
-   bug, or "what we did today". If there is nothing to read, ask the
-   interview questions below, one at a time.
+   bug, or "what we did today". A new session often holds nothing but the
+   counter's line: look for a draft in `.skillboss/` first, and otherwise
+   open with a seed ("When there is no story" below). Never open by
+   saying what you cannot see, and never recite the format: the person
+   has read it. Then ask the interview questions below, one at a time.
 2. **DRAFT.** Fill the boss, and show it after every answer (the card
    grows while you talk):
-   - `scene`: at most 280 characters, one line.
+   - `scene`: at most 280 characters, one line. It is final only when it
+     carries three hooks from the person, never invented: **when** it
+     happened, **what was at stake**, and **what tipped them off**. Ask
+     for a missing hook in one short question.
    - `shots`: exactly four, at most 120 characters each, one line each.
      Keep the four about the same length: the right one must never stand
      out by its size.
@@ -92,7 +98,7 @@ Ask only what the conversation did not already answer.
 2. Which of the ten traps is it? I can show the ten names.
 3. Which tool is your project built on? Pick one from the short list.
 4. What did the agent say that looked right but was wrong?
-5. Give me two more wrong answers a sure agent would say.
+5. What did you almost do? One line.
 6. Now the right answer, in one line.
 7. What should a player remember? Two short lines.
 8. Now play it yourself. Answer in one breath.
@@ -116,10 +122,22 @@ Show the ten names only if they ask.
 
 ### The agent writes the wrong answers, the person judges
 
-You are good at sounding sure. The person is good at knowing. Write three
-wrong answers in your own confident voice: "here is what I would have
-said." The person keeps, edits or replaces each one. The person writes or
-picks the right one, and confirms that exactly one shot is right.
+You are good at sounding sure. The person is good at knowing. Your first
+instinct is every agent's first instinct, so do not stop at it. Write six
+wrong answers in your own confident voice, one per style:
+
+- **the shortcut**: skip the check so it passes;
+- **the wrong layer**: fix it in the client, the cache or the screen;
+- **the cargo cult**: the pattern that looks like the fix;
+- **the half-fix**: the right idea, missing the part that matters;
+- **the over-build**: a framework where one line would do;
+- **the blame**: the tool, the provider or the network.
+
+Three wrong shots go on the boss. The agent's real sentence goes first
+when there is one, and the person's own near-move next when they give
+one; styled answers fill the rest. The person keeps, edits or replaces
+each one. The person writes or picks the right one, and confirms that
+exactly one shot is right.
 
 ### Play it first
 
@@ -182,6 +200,11 @@ their own account.
 "Forge another" finds the next trap in the same conversation and starts
 again from TALK. An expert's afternoon: ten bosses from ten stories.
 
+Before the GO, read the boss files already in `.skillboss/`. A draft with
+the same trap, the same tool and the same right answer as one already
+there, even in other words, is not a new boss. Say so in one line, and
+move the seed to a different cell.
+
 ### The resumable draft
 
 Past ten minutes, offer to stop. Keep the draft in the same file, with
@@ -189,9 +212,41 @@ Past ten minutes, offer to stop. Keep the draft in the same file, with
 
 ### When there is no story
 
-Offer a seed question: "Tell me about the last time your agent said done,
-and it was not." The seed helps the person remember. The scene must still
-come from the person, never from your imagination.
+A new session has no "last time": it was not there. The person has one,
+and a seed helps them find it. Your first line is a seed, never your
+limits, never the format.
+
+Keep no ready-made sentence. Compose each seed yourself, in the person's
+language, from one cell of three axes:
+
+- **The tell**, how an agent sounds sure: "done", "tested", "works
+  locally", "standard practice", "safe to ignore", "I checked", "can't
+  happen in prod", "nothing changed".
+- **The moment**, when it happened: the first deploy, a quick fix at
+  night, a dependency bump, a refactor, the day before a demo, a
+  teammate's first week, a migration, the day traffic came.
+- **The trap**, by its plain name: THE LEAK, THE COMMITTED KEY, THE OPEN
+  MIC, THE OPEN DOOR, THE LOST WEEKEND, THE SILENT CRASH, THE 3AM PAGE,
+  THE FLOOD, THE ROTTEN PLANK, THE BILL SHOCK.
+
+The shape of a seed: the moment, then the tell, then what the trap hurts,
+in one short question. Never reuse a seed from another session or from
+this file: there is none to reuse.
+
+The first cell is not yours to pick. Take the project folder's name and
+today's date as written (YYYY-MM-DD), and add the character codes of
+both. Divide the sum by eight: the rest picks the tell. Divide the result
+by eight: the rest picks the moment. Divide that result by ten: the rest
+picks the trap. Two projects, or two days, start from two cells. Nothing
+is stored, nothing is sent.
+
+If the person says "another" or "not mine", move one step on each axis.
+If they name a trap or a moment, start from it.
+
+"That one" gives a trap, a moment and the agent's voice. The scene is
+still the person's: what happened, on which app, what came next. A tell
+may become one of the wrong shots; it is never the scene. The scene must
+still come from the person, never from your imagination.
 
 ### A private question, for your training
 
