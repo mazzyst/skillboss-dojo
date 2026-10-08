@@ -5,7 +5,7 @@ description: Use when the person had a conversation with their agent about somet
 
 # boss — your conversation becomes something other people can play
 
-Version 0.3.6 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.3.5 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 A boss is a trap question written by someone who was trapped for real. A
 short scene. Four answers that sound like an agent talking. Three are wrong
@@ -40,11 +40,8 @@ and stop. Never write a weak boss from a story.
 ## What the agent does
 
 1. **TALK.** Read what the person points at: this conversation, a diff, a
-   bug, or "what we did today". A new session often holds nothing but the
-   counter's line: look for a draft in `.skillboss/` first, and otherwise
-   open with a seed ("When there is no story" below). Never open by
-   saying what you cannot see, and never recite the format: the person
-   has read it. Then ask the interview questions below, one at a time.
+   bug, or "what we did today". If there is nothing to read, ask the
+   interview questions below, one at a time.
 2. **DRAFT.** Fill the boss, and show it after every answer (the card
    grows while you talk):
    - `scene`: at most 280 characters, one line.
@@ -192,34 +189,9 @@ Past ten minutes, offer to stop. Keep the draft in the same file, with
 
 ### When there is no story
 
-A new session has no "last time": it was not there. The person has one,
-and a seed helps them find it. Your first line is a seed, never your
-limits, never the format.
-
-The first seed is a question: "Tell me about the last time your agent
-said done, and it was not."
-
-If nothing comes, the second seed is a door. Name three traps in plain
-words, each with the sure sentence an agent says, and ask which one the
-person has heard. Three at a time, from this table; the rest if asked.
-
-| Trap | The sure sentence |
-|---|---|
-| THE LEAK | "The token only shows in the logs, and nobody reads those." |
-| THE COMMITTED KEY | "The key is in .env, so it never reached the repo." |
-| THE OPEN MIC | "The button is hidden, so the route is protected." |
-| THE OPEN DOOR | "The service key fixes the error. Ship it." |
-| THE LOST WEEKEND | "The provider keeps backups, so we are covered." |
-| THE SILENT CRASH | "The home page answers, so the app is up." |
-| THE 3AM PAGE | "Nobody reported anything, so nothing broke." |
-| THE FLOOD | "It is a small app; nobody will hammer that endpoint." |
-| THE ROTTEN PLANK | "I bumped it to latest and it still builds." |
-| THE BILL SHOCK | "It is serverless, so it costs nothing while idle." |
-
-"That one" gives the trap and the agent's voice. The scene is still the
-person's: when, on which app, what happened next. A sure sentence may
-become one of the wrong shots; it is never the scene. The scene must
-still come from the person, never from your imagination.
+Offer a seed question: "Tell me about the last time your agent said done,
+and it was not." The seed helps the person remember. The scene must still
+come from the person, never from your imagination.
 
 ### A private question, for your training
 
