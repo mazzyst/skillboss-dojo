@@ -5,7 +5,7 @@ description: Use when the person had a conversation with their agent about somet
 
 # boss — your conversation becomes something other people can play
 
-Version 0.3.7 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.3.8 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 A boss is a trap question written by someone who was trapped for real. A
 short scene. Four answers that sound like an agent talking. Three are wrong
@@ -59,6 +59,11 @@ and stop. Never write a weak boss from a story.
    - `rulesLine`: optional, at most 160 characters, one line. One rule the
      person's own agent should follow from now on, ending in the boss's
      trap door: `/guild?trap=<villain>`. Leave it out if the person skips.
+   - `trace`: optional, at most four lines, each one line of at most 160
+     characters. Offer it when the moment has a timeline. Each line starts
+     with its instant, `T+00ms`, then the file or function you see here: a
+     path or a name, never a value. It gives away the answer, so a player
+     sees it after the shot, like the lesson ("The trace" below).
    - `difficulty`: `NORMAL` or `HARD`.
    - `villain`: one of the ten trap slugs in
      [references/villains.md](references/villains.md). If none fits, say
@@ -133,6 +138,10 @@ wrong answers in your own confident voice, one per style:
 - **the over-build**: a framework where one line would do;
 - **the blame**: the tool, the provider or the network.
 
+The scene ends on the agent's sure claim, in its own words: "It says:
+ready." The four shots are four answers to that claim. The right one breaks
+the claim: the counter-example, or the check that finds it.
+
 Three wrong shots go on the boss. The agent's real sentence goes first
 when there is one, and the person's own near-move next when they give
 one; styled answers fill the rest. The person keeps, edits or replaces
@@ -172,6 +181,21 @@ that plays a run. It never points at another trap.
 That rule is sound, but this boss's trap is `db-exposure`: the door must
 be `/guild?trap=db-exposure`. Say so in one line, and rewrite it with the
 person.
+
+### The trace: what you assumed, then what broke it
+
+When the moment has a timeline, write the trace yourself, at most four
+lines. The first line is the assumption you made without saying it. The
+last line is the smallest case that broke it: one request with no
+session, not a flood. The lines between, if any, are what
+ran. Use the real paths and function names you see on this machine.
+
+    T+00ms POST() in app/api/orders/route.ts assumes a signed-in caller
+    T+09ms a request with no session reaches the insert, and it runs
+
+Then show it and ask: is that the assumption? The person judges if it is
+true; you only state it. Leave the trace out if they skip. A trace says
+what broke; it never says the app is safe now.
 
 ### Forge it
 
@@ -375,7 +399,11 @@ Filled from brainstorm §15, with a trap and a tool from the closed lists:
     "correct": 2,
     "lesson": "A route that writes without checking who writes is the open door. The service_role key on the client opens it wide.",
     "rulesLine": "Check who writes before any route writes, and keep the service_role key on the server. /guild?trap=db-exposure",
-    "difficulty": "HARD"
+    "difficulty": "HARD",
+    "trace": [
+      "T+00ms POST() in app/api/orders/route.ts assumes a signed-in caller",
+      "T+09ms a request with no session reaches the insert, and it runs"
+    ]
   },
   "refused": []
 }

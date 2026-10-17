@@ -2,7 +2,10 @@
 
 **Status: Ruling 1 signed 2026-09-25 (option B)** — the format as first
 published, plus the optional story reference below
-(`rulings-platform-env1-2026-09.md`, card 1, in the SkillBoss repository).
+(`rulings-platform-env1-2026-09.md`, card 1, in the SkillBoss repository),
+plus the boss's optional `trace` (lots AUDIT-S4a and AUDIT-S4b, under the
+RULING 2026-10-17 "GO plan combiné" in `state/journal.md`): additive, a
+file without one reads as before.
 A change to this file is a new ruling. The source of each rule is named
 beside it.
 
@@ -30,7 +33,7 @@ account.
 
 | Kind | Body | State today |
 |---|---|---|
-| `boss` | `scene` (≤ 280 characters) · `shots` (exactly four, ≤ 120 each) · `correct` (0 to 3, exactly one) · `lesson` (≤ 280) · `difficulty` (`NORMAL` or `HARD`) · `rulesLine` (optional, ≤ 160, one line, ending in the boss's own trap door `/guild?trap=<villain>`) | skill written: [boss/SKILL.md](boss/SKILL.md) |
+| `boss` | `scene` (≤ 280 characters) · `shots` (exactly four, ≤ 120 each) · `correct` (0 to 3, exactly one) · `lesson` (≤ 280) · `difficulty` (`NORMAL` or `HARD`) · `rulesLine` (optional, ≤ 160, one line, ending in the boss's own trap door `/guild?trap=<villain>`) · `trace` (optional, at most four lines, each ≤ 160, one line, written `T+00ms …` by the person's agent in the file and function names it sees: the assumption it made without saying, then the smallest case that broke it; paths and names, never a value; it describes the failure, so it is served after the shot only, like the lesson) | skill written: [boss/SKILL.md](boss/SKILL.md) |
 | `kata` | `title` (≤ 80) · `scenario` (≤ 280) · `artifact` (≤ 12 lines, each ≤ 120, one line; exactly one line is the marker `_____`, where the move's own line was removed) · `fills` (exactly four whole lines, ≤ 120 each, all different; one right, the removed line) · `correct` (0 to 3) · `impact` (≤ 200, one line, in words: no figure, never "secure" or "verified") · `guards` (one trap slug, the header's `villain` repeated; never `env-hygiene`, `backups` or `dependencies`, which have no Dojo hall) · `exerciseType` (`CLOZE` only) | skill written: [kata/SKILL.md](kata/SKILL.md) (card LP-5 A, 2026-09-27); the site's door to come |
 | `debrief` | the Mess Hall composer's fields and caps: `villainSlug` (the header's `villain`, repeated) · `ship` (≤ 80, one line) · `whatHappened` (≤ 1500) · `whatWorked` (≤ 800) · `doDifferently` (optional, ≤ 800) · `repoUrl` (optional, public https, ≤ 512); the composer's reply-to link stays on the site | skill written: [debrief/SKILL.md](debrief/SKILL.md) |
 | `rules` | `lines` (one to ten, each ≤ 160, one line, one trap per line, each ending in its trap door `/guild?trap=<villain>` with one of the ten slugs; no figure, no claim word, no command that plays a run); the stack is the header's | skill written: [rules/SKILL.md](rules/SKILL.md) (card DK-8 A, 2026-09-29); no site door — the person copies the lines into their agent's own rules file; the boss's `rulesLine` (card LP-1 A) stays |
@@ -68,6 +71,10 @@ skill writes (card DK-8 A, 2026-09-29).
   `<` or `>` (`^[^<>]*$`). The debrief's story fields are `whatHappened`,
   `whatWorked` and `doDifferently`, as in the composer. Every field is
   rendered as text, never as markup.
+- A boss's `trace`: at most four lines;
+  each line of a `trace` is a text field, one line, never a story field.
+  The debrief has no `trace`: its timeline goes in `whatHappened`, as
+  paragraphs.
 - Every location: a path, optionally with a line, or a commit reference.
 
 ## What never crosses — the guard list
