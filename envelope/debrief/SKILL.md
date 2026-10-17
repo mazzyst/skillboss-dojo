@@ -5,7 +5,7 @@ description: Use when the person lived through something that went wrong in thei
 
 # debrief — what happened to you becomes a story other builders can use
 
-Version 0.1.4 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.1.5 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 A debrief is a short, blameless story: what happened, what worked, what you
 would do differently. It is the same form as the story composer of the
@@ -52,6 +52,8 @@ stop. Never write a weak story from a boss.
    - `ship`: one line, at most 80 characters: what the app is built with,
      in the person's words ("Next.js + Supabase", "Lovable").
    - `whatHappened`: the story, paragraphs allowed, at most 1500 characters.
+     When it has a timeline, write that part as lines, one instant per
+     line, `T+00ms` first: paths and names, never a value.
    - `whatWorked`: what got it back, paragraphs allowed, at most 800 characters.
    - `doDifferently`: optional, at most 800 characters; what the person
      would do next time, paragraphs allowed.
@@ -96,8 +98,18 @@ Ask only what the conversation did not already answer.
 5. What got it back to working?
 6. What would you do differently next time?
 7. Is there a public link to the code? It is fine to say no.
+8. What did you check yourself before you accepted what the agent proposed? Nothing is a fine answer.
+9. Imagine this change wakes someone on call at night. Which assumption of the agent breaks first?
 
 If an answer is "I don't know", keep it as unknown. Unknown beats a guess.
+
+### The two questions only the person answers
+
+Ask questions 8 and 9 every time, last, even when the conversation seems to
+answer them. You never answer them yourself, and you never suggest an
+answer: what counts is what the person checked, not what you did. Put both
+answers in `doDifferently`, in the person's words, within its cap. If the
+person skips one, leave it out.
 
 ### When there is no story
 
@@ -218,7 +230,7 @@ The rules:
     "ship": "Next.js + Supabase",
     "whatHappened": "My agent added a route that creates orders and said it was ready. The route wrote to the table without checking who was signed in.\n\nI noticed when an order appeared under an account that never placed it.",
     "whatWorked": "I asked the agent to show every table the route could write to. Then I checked the session in the route and turned on row-level access for the orders table.",
-    "doDifferently": "Ask the agent who can write before I ask if it works.",
+    "doDifferently": "I ran no check of my own: I took \"ready\" as the answer.\n\nThe assumption that broke: only a signed-in user reaches the route. Next time I ask who can write before I ask if it works.",
     "repoUrl": "https://example.com/orders-app"
   },
   "refused": []
