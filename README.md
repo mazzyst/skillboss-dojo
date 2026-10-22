@@ -269,7 +269,7 @@ kit got wrong. It says what you did; it certifies nothing about your app.
 
 **Free · offline · Apache-2.0**
 
-[`envelope/`](envelope/) holds four skills your own coding agent follows in
+[`envelope/`](envelope/) holds five skills your own coding agent follows in
 your own project. **Talk to your agent. Forge a boss. Let strangers fight
 it.**
 
@@ -286,6 +286,10 @@ it.**
 - **[`rules/SKILL.md`](envelope/rules/SKILL.md)** — what you learned the
   hard way becomes lines your agent reads, one stack per file. Say
   **forge it** and it writes one file.
+- **[`mr/SKILL.md`](envelope/mr/SKILL.md)** — a change from your own
+  project becomes a merge request you review: the line, the verdict, the
+  reason, the answer after you lock. Say **play it** and your agent builds
+  the play link on your machine; the case is never sent.
 - **[`SPEC.md`](envelope/SPEC.md)** — the one format every file shares,
   `skillboss.envelope/1`.
 

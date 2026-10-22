@@ -12,7 +12,7 @@ skill, ever.
 
 ## What is here today
 
-Four skills. More arrive one at a time, each behind its own trial.
+Five skills. More arrive one at a time, each behind its own trial.
 
 | Skill | What it does | Writes |
 |---|---|---|
@@ -20,6 +20,7 @@ Four skills. More arrive one at a time, each behind its own trial.
 | [kata](kata/SKILL.md) | turns a move you made well with your agent into a practice: a few lines of your work with the move's line taken out, four lines to fill it, one right, the impact after | one kata file, after you say "forge it" |
 | [debrief](debrief/SKILL.md) | turns something that went wrong in your app into a blameless story: what happened, what worked, what you would do differently | one debrief file, after you say "file it" |
 | [rules](rules/SKILL.md) | turns the rules you now apply on one stack, learned the hard way, into lines your agent reads: one per trap, each ending in its trap door | one rules file, after you say "forge it"; you copy its lines into your agent's own rules file |
+| [mr](mr/SKILL.md) | turns a change from your own project into a review you play: a few lines of diff, three verdicts, three reasons each, the answer after you lock | a play link built on your machine after you say "play it", and one MR file after you say "forge it" |
 
 The format they write is [SPEC.md](SPEC.md): a draft until its ruling is
 signed.

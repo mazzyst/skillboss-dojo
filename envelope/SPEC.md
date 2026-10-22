@@ -5,7 +5,8 @@ published, plus the optional story reference below
 (`rulings-platform-env1-2026-09.md`, card 1, in the SkillBoss repository),
 plus the boss's optional `trace` (lots AUDIT-S4a and AUDIT-S4b, under the
 RULING 2026-10-17 "GO plan combiné" in `state/journal.md`): additive, a
-file without one reads as before.
+file without one reads as before. Plus the `mr` kind (lot DM-3, under the
+RULING 2026-10-22 on the demo MCP, decision M3): additive too.
 A change to this file is a new ruling. The source of each rule is named
 beside it.
 
@@ -17,7 +18,7 @@ one header shared by every kind, and one small closed body per kind.
 | Field | Rule |
 |---|---|
 | `schema` | always `skillboss.envelope/1` |
-| `kind` | one of `debrief`, `boss`, `kata`, `rules`, `questions`, `readback` |
+| `kind` | one of `debrief`, `boss`, `kata`, `rules`, `questions`, `readback`, `mr` |
 | `villain` | one of the ten trap slugs in [boss/references/villains.md](boss/references/villains.md); for `rules`, the trap of the first line, the one the file was born from; each line names its own trap in its door |
 | `stack` | one of `nextjs`, `docker`, `github-actions`, `terraform`, `azure` (the Pre-flight closed list; any extension needs the ruling) |
 | `by` | `human` or `agent+human`; always shown to the reader |
@@ -29,7 +30,13 @@ one header shared by every kind, and one small closed body per kind.
 The author is never in the file. The site takes it from the signed-in
 account.
 
-## The six kinds
+An `mr` file has a header of its own: `schema`, `kind` and `theme` only,
+then `body`. `theme` is one of the track's MR themes (`agile`, `git`,
+`k8s`, `cloud`, `ci-cd`, `sre`, `security`). It has no `villain`,
+`stack`, `by`, `locations` or `refused`: the skill shows its refusals,
+and the MR forge's closed shape takes no other field.
+
+## The seven kinds
 
 | Kind | Body | State today |
 |---|---|---|
@@ -39,6 +46,7 @@ account.
 | `rules` | `lines` (one to ten, each ≤ 160, one line, one trap per line, each ending in its trap door `/guild?trap=<villain>` with one of the ten slugs; no figure, no claim word, no command that plays a run); the stack is the header's | skill written: [rules/SKILL.md](rules/SKILL.md) (card DK-8 A, 2026-09-29); no site door — the person copies the lines into their agent's own rules file; the boss's `rulesLine` (card LP-1 A) stays |
 | `questions` | exactly three lines, each a question, no order, no link | parked until its ruling |
 | `readback` | one finding that changed · one doubt that remains · which questions it answers | parked until its ruling |
+| `mr` | `author` (`AI_AGENT` or `DEVELOPER`) · `title` (≤ 120) · `filePath` (≤ 200) · `fileFormat` (≤ 32) · `requirement` (≤ 240) · `context` (≤ 600) · `diff` (4 to 30 lines, each ≤ 200, each starting with a space, `+`, `-` or `@@`) · `claim` (≤ 240) · `evidence` (≤ 400) · `scope` (≤ 240) · `reasons` (exactly three for each of `MERGE`, `CHANGES`, `PROVE`, ≤ 200 each, all nine different) · `key` (`verdict`, `reasonIndex` 0 to 2, `decisiveLines` on changed lines only, `decisiveCondition` ≤ 200, `smallestCheck` ≤ 240, `whyOthersWeaker` ≤ 400, `source` ≤ 240; its reason is never the longest of the nine) | skill written: [mr/SKILL.md](mr/SKILL.md) (lot DM-3, 2026-10-22); the play link carries the `body` after `#v1.`, built on the person's machine, and the static page `/play/mr.html` plays it with no connection |
 
 ## Which moment becomes which kind
 
@@ -55,6 +63,7 @@ names the right skill instead of writing a weak file.
 | A rule the person now applies on one stack, learned the hard way | `rules` | one line per trap, ending in the trap door it guards | a figure, a claim word, a command that plays a run |
 | Three questions an expert would ask a builder on one trap | `questions` | exactly three questions, no order, no link | a command verb, a link, an answer |
 | The builder's answer to those three questions, months later | `readback` | one finding that changed, one doubt that remains, which questions it answers | the code, a value, a statement about the app |
+| A change the person or their agent made, where the review decides | `mr` | a few diff lines rewritten from the change, the claim and its evidence, three reasons per verdict, the key | a name, a hostname, a value, the rest of the repository |
 
 A moment that fits no row is not an envelope. The `kata` row is from
 card LP-5 A (2026-09-27), which amends card 10. The `questions` and
@@ -104,4 +113,5 @@ The boss skill writes `.skillboss/boss-<villain>-<YYYY-MM-DD>.json` in the
 person's project; the debrief skill writes
 `.skillboss/debrief-<villain>-<YYYY-MM-DD>.json`; the kata skill writes
 `.skillboss/kata-<villain>-<YYYY-MM-DD>.json`; the rules skill writes
-`.skillboss/rules-<stack>-<YYYY-MM-DD>.json` (named by its stack, card DK-8 A). The folder and the name are part of ruling 1.
+`.skillboss/rules-<stack>-<YYYY-MM-DD>.json` (named by its stack, card DK-8 A); the MR skill writes
+`.skillboss/mr-<theme>-<YYYY-MM-DD>.json` (named by its theme, lot DM-3). The folder and the name are part of ruling 1.
