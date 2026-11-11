@@ -5,7 +5,7 @@ description: Use when the person wants to practise reviewing a merge request on 
 
 # mr — a change from your own project becomes a review you play
 
-Version 0.2.0 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
+Version 0.3.0 · from the SkillBoss Dojo · Apache-2.0 · see [../NOTICE](../NOTICE)
 
 An MR here is one change, a few lines of diff, rewritten from the person's
 own project. The person reviews it in three shots: the line that decides,
@@ -65,17 +65,27 @@ in one line and stop. Never write a weak MR from another moment.
    promise, the trap, a note on each decisive line, the fix, what the
    proof showed, what the ticket asked, the lesson's name. The key's
    reason is never the longest of the nine.
-4. **GUARD.** Run the guard below on every field, before showing anything.
+4. **TWIN.** When the case allows it, write its twin: the same case with one
+   to four diff lines turned, so that another verdict is right. Most often it
+   is the change done properly, where `MERGE` is the answer. The twin shares
+   the ticket, the claim and the nine reasons; it brings only its own diff and
+   a short key. If no honest twin exists, write none: a forced twin teaches
+   nothing.
+5. **GUARD.** Run the guard below on every field, before showing anything.
    Each refusal is a field path, never a value.
-5. **SHOW.** Show the case without the key: the ticket, the diff, the
+6. **SHOW.** Show the case without the key: the ticket, the diff, the
    claim and its promises, the pipeline, the nine reasons. Ask one thing: is anything in it still private?
-6. **PLAY.** After "play it", build the play link on this machine with the
+7. **PLAY.** After "play it", build the play link on this machine with the
    recipe below, and give it as the last line. Never open a browser; never
    call the network. Never pick a line, a verdict or a reason for the
-   person, and never say the key before they lock their review.
-7. **DOOR.** After "forge it", write the MR file to
+   person, and never say the key before they lock their review. The play
+   link never carries the twin.
+8. **DOOR.** After "forge it", write the MR file to
    `.skillboss/mr-<theme>-<YYYY-MM-DD>.json` and print the same JSON below
-   it. Say where it is saved. It stays in the person's project.
+   it. Say where it is saved. It stays in the person's project. The person
+   signs the MR themselves on SkillBoss: their line, their verdict, their
+   reason. Never sign for them, and never tell them the key before they
+   have signed.
 
 ## The ladder
 
@@ -251,6 +261,12 @@ check a fact. So the key follows this method.
   - `lessonName` at most 80.
   - `fix`, `proofNote` and `ticketNote` at most 300 each: the
     correction, what the evidence showed, what the ticket asked.
+- `twin`, optional: `diff` under the same rules as the MR's, with one to
+  four lines turned from it; `key` with `verdict` (another than the MR's),
+  `reasonIndex` (0 to 2, among the same nine reasons, never the longest),
+  `decisiveLines` (changed lines of the twin's diff) and
+  `decisiveCondition` at most 200. The forge keeps the twin with the key:
+  nobody reads it before the editor does.
 - `theme`, in the file only: one of `agile`, `git`, `k8s`, `cloud`,
   `ci-cd`, `sre`, `security`.
 
@@ -287,12 +303,21 @@ one letter and one digit, and has an entropy of 3 or more. Entropy says how
 random a piece looks: for each distinct character, take its share `p` of
 the piece, and add up `-p × log2(p)`.
 
-Every text field and every diff line must be one line with no markup. It
-must match:
+Every text field must be one line with no markup. It must match:
 
 ```text
 ^[^\n\r<>]*$
 ```
+
+A diff line is one line too, but it may hold `<` and `>`: code needs them.
+
+Before you write the file, measure the nine reasons. The key's reason must
+not be longer than every other one, and neither must the twin's. If one is,
+shorten it or lengthen a wrong one, and keep each of them true.
+
+Run every diff check on the twin's diff, and refuse a twin whose verdict
+is the MR's own, whose diff is the MR's own, or which turns more than four
+lines.
 
 The rules:
 
@@ -304,6 +329,9 @@ The rules:
   `body.key.criteriaChecks[count]` when the checks and the criteria differ
   in number, `body.key.promiseChecks[verdict]` when the checks disagree
   with the verdict, `body.key.lineNotes[0][not-a-line]` on a hunk header.
+- A twin is refused the same way: `body.twin.key.verdict[same]`,
+  `body.twin.diff[unchanged]`, `body.twin.diff[too-far]`,
+  `body.twin.key.reasonIndex[longest]`.
 - A refusal removes the field's text and asks the person to rewrite it
   with you. It never guesses a safe version.
 
@@ -314,7 +342,7 @@ compact JSON in base64url (no padding). Build it with one local command,
 from the drafted file:
 
 ```sh
-node -e "const b=JSON.parse(require('fs').readFileSync(0,'utf8')).body;process.stdout.write('https://skillboss.dev/play/mr.html#v1.'+Buffer.from(JSON.stringify(b)).toString('base64url'))" < case.json
+node -e "const b=JSON.parse(require('fs').readFileSync(0,'utf8')).body;delete b.twin;process.stdout.write('https://skillboss.dev/play/mr.html#v1.'+Buffer.from(JSON.stringify(b)).toString('base64url'))" < case.json
 ```
 
 Opening the link loads one page and sends nothing else: the browser keeps
